@@ -3,96 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tài khoản - Mega Casino</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Thành Viên - Mega Casino World</title>
     <style>
-        .profile-header {
-            background: linear-gradient(135deg, #2b2f45, #171a29);
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom: 1px solid #24293f;
+        * {
+            box-sizing: border-box;
         }
-        .avatar {
-            font-size: 50px;
-            margin-bottom: 10px;
+        body {
+            margin: 0;
+            background-color: #131521;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
         }
-        .username {
-            font-size: 16px;
-            font-weight: bold;
-            color: #cca352;
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #131521;
+            position: relative;
+            padding-bottom: 70px;
         }
-        .user-id {
-            font-size: 12px;
-            color: #7a83a0;
-            margin-top: 4px;
-        }
-        .menu-list {
-            padding: 15px;
-        }
-        .menu-item {
+
+        /* Header chính */
+        .header {
+            padding: 12px 15px;
             background-color: #171a29;
-            border: 1px solid #24293f;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
+            border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
             color: #fff;
+        }
+        .cskh-btn {
+            background: #212537;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #cca352;
+            border: 1px solid #303650;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Member Dashboard Styles */
+        .member-top-banner {
+            background: linear-gradient(180deg, #e63900, #991400);
+            padding: 15px;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+        .member-user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #ffcccc;
+        }
+        .logout-link {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+        .member-balance-box {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .member-balance-num {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .member-action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .member-act-btn {
+            background: #fff;
+            color: #cc0000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .member-grid-menu {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 15px;
+        }
+        .member-menu-card {
+            background: #ff5722;
+            border-radius: 10px;
+            padding: 16px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+        }
+        .member-menu-card:active {
+            transform: scale(0.96);
+        }
+        .mmc-icon {
+            font-size: 28px;
+        }
+        .mmc-label {
+            font-size: 11px;
+            color: #fff;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* Auth Modals */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .auth-overlay.open {
+            display: flex;
+        }
+        .auth-modal-box {
+            width: 90%;
+            max-width: 380px;
+            background: #131521;
+            border: 1px solid #cca352;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .auth-header {
+            background: #cca352;
+            color: #131521;
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .auth-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #131521;
+            font-weight: bold;
+        }
+        .auth-body {
+            padding: 20px;
+        }
+        .auth-logo-area {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #cca352;
+            font-weight: bold;
             font-size: 14px;
         }
-        .menu-item:hover {
-            border-color: #cca352;
+        .auth-input-group {
+            background: #1e2235;
+            border: 1px solid #303650;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 15px;
+        }
+        .auth-input-label {
+            font-size: 11px;
+            color: #9fa5b9;
+            margin-bottom: 4px;
+        }
+        .auth-input-field {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+        .auth-submit-btn {
+            width: 100%;
+            background: #2b2f45;
+            color: #cca352;
+            border: 1px solid #cca352;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .auth-switch-text {
+            text-align: center;
+            font-size: 12px;
+            color: #9fa5b9;
+            margin-top: 15px;
+        }
+        .auth-switch-text a {
+            color: #cca352;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #7a83a0;
+            font-size: 10px;
+            gap: 3px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: #cca352;
+        }
+        .nav-icon {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="profile-header">
-            <div class="avatar">👤</div>
-            <div class="username">Thành viên VIP</div>
-            <div class="user-id">ID: 88886688</div>
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">Trang Cá Nhân</div>
+            </div>
+            <a href="#" class="cskh-btn" onclick="alert('Đang kết nối CSKH...'); return false;">🎧 CSKH</a>
         </div>
 
-        <div class="menu-list">
-            <div class="menu-item" onclick="location.href='/deposit'">
-                <span>💳 Quản lý Ví (Nạp / Rút)</span>
-                <span>➔</span>
+        <!-- Nội dung Thành viên -->
+        <div id="memberDashboard">
+            <div class="member-top-banner">
+                <div class="member-user-row">
+                    <span id="greetingText">Xin chào, Phucc</span>
+                    <a href="#" class="logout-link" onclick="handleLogout(); return false;">đăng xuất 🚪</a>
+                </div>
+                <div class="member-balance-box">
+                    <div class="member-balance-num">
+                        <span id="walletBalanceBig">0</span> VND 
+                        <span style="font-size:18px; cursor:pointer;" onclick="refreshWallet()">🔄</span>
+                    </div>
+                </div>
+                <div class="member-action-buttons">
+                    <button class="member-act-btn" onclick="handleDeposit()">💳 Nạp Tiền</button>
+                    <button class="member-act-btn" onclick="handleWithdraw()">👛 Rút Tiền</button>
+                </div>
             </div>
-            <div class="menu-item" onclick="alert('Lịch sử giao dịch trống')">
-                <span>📋 Lịch sử giao dịch</span>
-                <span>➔</span>
-            </div>
-            <div class="menu-item" onclick="alert('Liên hệ CSKH trực tuyến 24/7')">
-                <span>🎧 Hỗ trợ chăm sóc khách hàng</span>
-                <span>➔</span>
-            </div>
-            <div class="menu-item" onclick="alert('Đã đăng xuất tài khoản')">
-                <span>🚪 Đăng xuất</span>
-                <span>➔</span>
+
+            <div class="member-grid-menu">
+                <div class="member-menu-card" onclick="alert('Giới thiệu bạn bè')"><div class="mmc-icon">👥</div><div class="mmc-label">Giới thiệu bạn bè</div></div>
+                <div class="member-menu-card" onclick="alert('Hộp thư')"><div class="mmc-icon">✉️</div><div class="mmc-label">Hộp Thư</div></div>
+                <div class="member-menu-card" onclick="alert('Chi tiết đặt cược')"><div class="mmc-icon">📋</div><div class="mmc-label">Chi tiết đặt cược</div></div>
+                <div class="member-menu-card" onclick="alert('Trung tâm giao dịch')"><div class="mmc-icon">📑</div><div class="mmc-label">Trung tâm giao dịch</div></div>
+                <div class="member-menu-card" onclick="alert('Khu sự kiện')"><div class="mmc-icon">🎁</div><div class="mmc-label">Khu sự kiện</div></div>
+                <div class="member-menu-card" onclick="alert('Yêu thích')"><div class="mmc-icon">❤️</div><div class="mmc-label">Yêu Thích</div></div>
+                <div class="member-menu-card" onclick="alert('Bảo mật')"><div class="mmc-icon">🔒</div><div class="mmc-label">Bảo Mật</div></div>
+                <div class="member-menu-card" onclick="alert('Thông báo')"><div class="mmc-icon">🔔</div><div class="mmc-label">Thông Báo</div></div>
+                <div class="member-menu-card" onclick="alert('Hoàn trả')"><div class="mmc-icon">🔄</div><div class="mmc-label">Hoàn Trả</div></div>
+                <div class="member-menu-card" onclick="alert('VIP')"><div class="mmc-icon">💎</div><div class="mmc-label">VIP</div></div>
             </div>
         </div>
 
         <!-- Bottom Nav -->
         <nav class="bottom-nav">
-            <a href="/" class="nav-item">
+            <a href="index.html" class="nav-item">
                 <div class="nav-icon">🏠</div>
-                <span>Trang chủ</span>
+                <span>Trang Chủ</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật')">
+            <a href="#" class="nav-item" onclick="alert('Khuyến mãi'); return false;">
                 <div class="nav-icon">🎁</div>
-                <span>Khuyến mãi</span>
+                <span>Khuyến Mãi</span>
             </a>
-            <a href="/deposit" class="nav-item">
+            <a href="#" class="nav-item" onclick="handleDeposit()">
                 <div class="nav-icon">💳</div>
-                <span>Nạp tiền</span>
+                <span>Nạp - Rút</span>
             </a>
-            <a href="/profile" class="nav-item active">
+            <a href="#" class="nav-item" onclick="alert('CSKH'); return false;">
+                <div class="nav-icon">💬</div>
+                <span>CSKH 24/7</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
                 <div class="nav-icon">👤</div>
-                <span>Tài khoản</span>
+                <span>Thành Viên</span>
             </a>
         </nav>
     </div>
+
+    <!-- MODAL ĐĂNG NHẬP -->
+    <div class="auth-overlay" id="loginModal">
+        <div class="auth-modal-box">
+            <div class="auth-header">
+                <span>Đăng nhập</span>
+                <button class="auth-close" onclick="window.location.href='index.html'">✕</button>
+            </div>
+            <div class="auth-body">
+                <div class="auth-logo-area">MEGA CASINO WORLD</div>
+                <div class="auth-input-group">
+                    <div class="auth-input-label">Tên đăng nhập</div>
+                    <input type="text" class="auth-input-field" id="loginUser" placeholder="gồm 4 ~ 16 ký tự">
+                </div>
+                <div class="auth-input-group">
+                    <div class="auth-input-label">Mật khẩu</div>
+                    <input type="password" class="auth-input-field" id="loginPass" placeholder="6–20 ký tự và số">
+                </div>
+                <button class="auth-submit-btn" onclick="submitLogin()">Đăng nhập</button>
+                <div class="auth-switch-text">
+                    Bạn chưa có tài khoản? <a href="#" onclick="openRegisterModal(); return false;">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐĂNG KÝ -->
+    <div class="auth-overlay" id="registerModal">
+        <div class="auth-modal-box">
+            <div class="auth-header">
+                <span>Đăng ký</span>
+                <button class="auth-close" onclick="window.location.href='index.html'">✕</button>
+            </div>
+            <div class="auth-body">
+                <div class="auth-input-group">
+                    <div class="auth-input-label">Chọn đơn vị tiền tệ</div>
+                    <select class="auth-input-field"><option>🇻🇳 VND</option></select>
+                </div>
+                <div class="auth-input-group">
+                    <div class="auth-input-label">Tên đăng nhập</div>
+                    <input type="text" class="auth-input-field" placeholder="gồm 4 ~ 16 ký tự">
+                </div>
+                <div class="auth-input-group">
+                    <div class="auth-input-label">Mật khẩu</div>
+                    <input type="password" class="auth-input-field" placeholder="6–20 ký tự và số">
+                </div>
+                <div class="auth-input-group">
+                    <div class="auth-input-label">Số điện thoại (+84)</div>
+                    <input type="text" class="auth-input-field" placeholder="Điền số điện thoại">
+                </div>
+                <button class="auth-submit-btn" onclick="submitRegister()">Đăng ký tài khoản</button>
+                <div class="auth-switch-text">
+                    Đã có tài khoản? <a href="#" onclick="openLoginModal(); return false;">Đăng nhập</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkAuthOnLoad() {
+            const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+            if (!isLoggedIn) {
+                document.getElementById('loginModal').classList.add('open');
+            } else {
+                const user = localStorage.getItem('username') || 'Phucc';
+                document.getElementById('greetingText').innerText = 'Xin chào, ' + user;
+                updateBalanceDisplay();
+            }
+        }
+
+        function getBalance() {
+            let bal = localStorage.getItem('wallet_balance');
+            return bal !== null ? parseInt(bal) : 0;
+        }
+
+        function setBalance(amount) {
+            localStorage.setItem('wallet_balance', amount);
+            updateBalanceDisplay();
+        }
+
+        function updateBalanceDisplay() {
+            document.getElementById('walletBalanceBig').innerText = getBalance().toLocaleString('vi-VN');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthOnLoad();
+        });
+
+        function openLoginModal() {
+            document.getElementById('registerModal').classList.remove('open');
+            document.getElementById('loginModal').classList.add('open');
+        }
+
+        function openRegisterModal() {
+            document.getElementById('loginModal').classList.remove('open');
+            document.getElementById('registerModal').classList.add('open');
+        }
+
+        function submitLogin() {
+            let user = document.getElementById('loginUser').value.trim() || "Phucc";
+            localStorage.setItem('is_logged_in', 'true');
+            localStorage.setItem('username', user);
+            document.getElementById('loginModal').classList.remove('open');
+            checkAuthOnLoad();
+        }
+
+        function submitRegister() {
+            localStorage.setItem('is_logged_in', 'true');
+            localStorage.setItem('username', 'Phucc');
+            document.getElementById('registerModal').classList.remove('open');
+            checkAuthOnLoad();
+        }
+
+        function handleLogout() {
+            localStorage.setItem('is_logged_in', 'false');
+            window.location.href = 'index.html';
+        }
+
+        function handleDeposit() {
+            let input = prompt("Nhập số tiền muốn nạp (VND):", "100000");
+            if (input !== null) {
+                let amount = parseInt(input);
+                if (!isNaN(amount) && amount > 0) {
+                    setBalance(getBalance() + amount);
+                    alert("Nạp tiền thành công!");
+                }
+            }
+        }
+
+        function handleWithdraw() {
+            let input = prompt("Nhập số tiền muốn rút (VND):", "50000");
+            if (input !== null) {
+                let amount = parseInt(input);
+                if (!isNaN(amount) && amount > 0) {
+                    let current = getBalance();
+                    if (amount <= current) {
+                        setBalance(current - amount);
+                        alert("Rút tiền thành công!");
+                    } else {
+                        alert("Số dư không đủ!");
+                    }
+                }
+            }
+        }
+
+        function refreshWallet() {
+            updateBalanceDisplay();
+            alert('Đã làm mới số dư!');
+        }
+    </script>
 </body>
-</html>
+    </html>
+    

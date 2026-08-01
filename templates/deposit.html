@@ -8,9 +8,7 @@
     <style>
         .wallet-container {
             padding: 15px;
-            padding-bottom: 90px;
         }
-        /* Top bar ví */
         .wallet-header {
             background-color: #cca352;
             color: #131521;
@@ -26,7 +24,6 @@
             text-decoration: none;
             color: #131521;
         }
-        /* Tab chuyển đổi Nạp / Rút */
         .wallet-tabs {
             display: flex;
             background-color: #1b1e2e;
@@ -37,18 +34,17 @@
             flex: 1;
             padding: 12px;
             text-align: center;
-            background-color: #9c7c32;
-            color: #fff;
+            background-color: #2b2f45;
+            color: #9fa5b9;
             border-radius: 6px;
             font-weight: bold;
             font-size: 14px;
             cursor: pointer;
         }
-        .w-tab.inactive {
-            background-color: #2b2f45;
-            color: #9fa5b9;
+        .w-tab.active {
+            background-color: #9c7c32;
+            color: #fff;
         }
-        /* Card box */
         .section-box {
             background-color: #171a29;
             border: 1px solid #24293f;
@@ -65,7 +61,6 @@
             align-items: center;
             gap: 6px;
         }
-        /* Select dropdown */
         .custom-select {
             width: 100%;
             background-color: #212537;
@@ -74,8 +69,8 @@
             padding: 12px;
             border-radius: 6px;
             font-size: 13px;
+            outline: none;
         }
-        /* Payment methods grid */
         .pay-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -95,15 +90,13 @@
             align-items: center;
             gap: 6px;
             cursor: pointer;
+            transition: 0.2s;
         }
         .pay-item.active {
             border-color: #cca352;
             background-color: #2b2b20;
         }
-        .pay-item img, .pay-item .p-icon {
-            font-size: 20px;
-        }
-        /* Amount grid */
+        .p-icon { font-size: 20px; }
         .amount-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -120,12 +113,12 @@
             font-weight: bold;
             text-align: center;
             cursor: pointer;
+            transition: 0.2s;
         }
         .amount-btn.active {
             border-color: #cca352;
             background-color: #2b2b20;
         }
-        /* Custom input money */
         .money-input-wrap {
             position: relative;
             background-color: #212537;
@@ -148,13 +141,11 @@
             color: #7a83a0;
             font-size: 12px;
         }
-        /* Notice box */
         .notice-box {
             font-size: 11px;
             color: #9fa5b9;
             line-height: 1.5;
         }
-        /* Submit Button */
         .btn-submit-wallet {
             width: 100%;
             background: linear-gradient(180deg, #ebd08d 0%, #cca352 100%);
@@ -165,7 +156,7 @@
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 5px;
             text-align: center;
         }
     </style>
@@ -180,8 +171,8 @@
 
         <!-- Tab Nạp / Rút -->
         <div class="wallet-tabs">
-            <div class="w-tab">Nạp tiền</div>
-            <div class="w-tab inactive">Rút tiền</div>
+            <div class="w-tab active" id="tab-deposit">Nạp tiền</div>
+            <div class="w-tab" id="tab-withdraw">Rút tiền</div>
         </div>
 
         <div class="wallet-container">
@@ -197,7 +188,7 @@
             <!-- Phương thức thanh toán -->
             <div class="section-box">
                 <div class="section-title">⚡ Phương thức thanh toán</div>
-                <div class="pay-grid">
+                <div class="pay-grid" id="payment-methods">
                     <div class="pay-item active">
                         <span class="p-icon">🏦</span>
                         <span>Ngân hàng đ...</span>
@@ -227,7 +218,7 @@
                         <span>ETH</span>
                     </div>
                     <div class="pay-item">
-                        <span class="p-icon"> thẻ </span>
+                        <span class="p-icon">💳</span>
                         <span>Thẻ Cào ĐT</span>
                     </div>
                 </div>
@@ -236,7 +227,7 @@
             <!-- Cổng nạp -->
             <div class="section-box">
                 <div class="section-title">⚡ Cổng nạp</div>
-                <div class="pay-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="pay-grid" id="gateway-list" style="grid-template-columns: repeat(3, 1fr);">
                     <div class="pay-item active" style="padding: 8px;">HN-Pay1</div>
                     <div class="pay-item" style="padding: 8px;">O-Pay</div>
                     <div class="pay-item" style="padding: 8px;">D-Pay</div>
@@ -246,10 +237,10 @@
             <!-- Số tiền nạp -->
             <div class="section-box">
                 <div class="section-title" style="justify-content: space-between;">
-                    <span>💵 Số tiền Nạp</span>
+                    <span id="amount-title">💵 Số tiền Nạp</span>
                     <span style="font-size: 10px; color: #7a83a0;">đ 100,00 - đ 100.000,00</span>
                 </div>
-                <div class="amount-grid">
+                <div class="amount-grid" id="amount-list">
                     <div class="amount-btn">100</div>
                     <div class="amount-btn">200</div>
                     <div class="amount-btn">500</div>
@@ -262,7 +253,7 @@
                     <div class="amount-btn active">100.000</div>
                 </div>
                 <div class="money-input-wrap">
-                    <input type="text" placeholder="đ">
+                    <input type="text" id="money-input" value="100.000" placeholder="đ">
                     <span class="rate">1 = 1K</span>
                 </div>
             </div>
@@ -270,35 +261,90 @@
             <!-- Nhắc nhở -->
             <div class="section-box">
                 <div class="section-title">ℹ️ Nhắc nhở</div>
-                <div class="notice-box">
+                <div class="notice-box" id="notice-text">
                     Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình. Nếu không, bạn cần liên hệ với chăm sóc khách hàng kèm theo hình ảnh gửi tiền thành công. 2) Xóa 3 số 0 cuối cùng khi nhập số tiền gửi. Ví dụ: Nạp 1.000.000 VNĐ, chỉ cần nhập 1.000 điểm
                 </div>
             </div>
 
             <!-- Nút gửi -->
-            <button class="btn-submit-wallet">Gửi</button>
+            <button class="btn-submit-wallet" id="btn-submit">Gửi</button>
         </div>
 
-        <!-- Bottom Nav giữ nguyên chuẩn sảnh -->
+        <!-- Bottom Nav -->
         <nav class="bottom-nav">
-            <div class="nav-item" onclick="location.href='/'">
+            <a href="/" class="nav-item">
                 <div class="nav-icon">🏠</div>
                 <span>Trang chủ</span>
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật')">
                 <div class="nav-icon">🎁</div>
                 <span>Khuyến mãi</span>
-            </div>
-            <div class="nav-item active">
+            </a>
+            <a href="/deposit" class="nav-item active">
                 <div class="nav-icon">💳</div>
                 <span>Nạp tiền</span>
-            </div>
-            <div class="nav-item" onclick="location.href='/profile'">
+            </a>
+            <a href="/profile" class="nav-item">
                 <div class="nav-icon">👤</div>
                 <span>Tài khoản</span>
-            </div>
+            </a>
         </nav>
     </div>
+
+    <script>
+        const tabDeposit = document.getElementById('tab-deposit');
+        const tabWithdraw = document.getElementById('tab-withdraw');
+        const amountTitle = document.getElementById('amount-title');
+        const noticeText = document.getElementById('notice-text');
+        const btnSubmit = document.getElementById('btn-submit');
+        
+        tabDeposit.addEventListener('click', () => {
+            tabDeposit.classList.add('active');
+            tabWithdraw.classList.remove('active');
+            amountTitle.innerText = '💵 Số tiền Nạp';
+            noticeText.innerText = 'Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình. Nếu không, bạn cần liên hệ với chăm sóc khách hàng kèm theo hình ảnh gửi tiền thành công. 2) Xóa 3 số 0 cuối cùng khi nhập số tiền gửi. Ví dụ: Nạp 1.000.000 VNĐ, chỉ cần nhập 1.000 điểm';
+            btnSubmit.innerText = 'Gửi';
+        });
+
+        tabWithdraw.addEventListener('click', () => {
+            tabWithdraw.classList.add('active');
+            tabDeposit.classList.remove('active');
+            amountTitle.innerText = '💵 Số tiền Rút';
+            noticeText.innerText = 'Lưu ý rút tiền: Hạn mức rút tối thiểu là 200.000 VNĐ, tối đa 500.000.000 VNĐ mỗi ngày. Vui lòng điền đúng thông tin tài khoản ngân hàng nhận tiền.';
+            btnSubmit.innerText = 'Xác nhận rút';
+        });
+
+        const payItems = document.querySelectorAll('#payment-methods .pay-item');
+        payItems.forEach(item => {
+            item.addEventListener('click', () => {
+                payItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        const gateways = document.querySelectorAll('#gateway-list .pay-item');
+        gateways.forEach(item => {
+            item.addEventListener('click', () => {
+                gateways.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        const amountBtns = document.querySelectorAll('.amount-btn');
+        const moneyInput = document.getElementById('money-input');
+        amountBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                amountBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                moneyInput.value = btn.innerText;
+            });
+        });
+
+        btnSubmit.addEventListener('click', () => {
+            const type = tabDeposit.classList.contains('active') ? 'nạp tiền' : 'rút tiền';
+            alert(`Đã gửi yêu cầu ${type} thành công! Hệ thống đang xử lý.`);
+        });
+    </script>
 </body>
-  </html>
-                      
+                        </html>
+                        

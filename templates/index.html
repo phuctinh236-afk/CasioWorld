@@ -25,7 +25,6 @@
             align-items: center;
             gap: 5px;
         }
-        /* Banner slide giả lập */
         .banner {
             padding: 10px 15px;
         }
@@ -62,8 +61,6 @@
             width: 16px;
             border-radius: 4px;
         }
-
-        /* Thanh danh mục game ngang (Tab loại game) */
         .game-tabs {
             display: flex;
             background-color: #1b1e2e;
@@ -71,10 +68,10 @@
             padding: 8px 10px;
             gap: 8px;
             border-bottom: 1px solid #24293f;
-            scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+            scrollbar-width: none;
         }
         .game-tabs::-webkit-scrollbar {
-            display: none; /* Ẩn thanh cuộn trên Chrome/Safari */
+            display: none;
         }
         .g-tab {
             flex: 0 0 auto;
@@ -101,8 +98,6 @@
         .g-tab-icon {
             font-size: 18px;
         }
-
-        /* Lưới game chi tiết */
         .game-section {
             padding: 12px 10px 80px 10px;
         }
@@ -145,12 +140,12 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header (Đã bỏ logo góc trái, chỉ giữ lại số dư bên phải) -->
+        <!-- Header -->
         <div class="header">
             <div class="balance-box">💰 100.000 đ</div>
         </div>
 
-        <!-- Banner Khuyến Mãi -->
+        <!-- Banner -->
         <div class="banner">
             <div class="banner-box">
                 🔥 KHUYẾN MÃI NẠP ĐẦU 100% 🔥
@@ -163,7 +158,7 @@
             </div>
         </div>
 
-        <!-- Thanh danh mục game ngang (Phong cách 1691.jpg) -->
+        <!-- Game Tabs -->
         <div class="game-tabs" id="category-tabs">
             <div class="g-tab active" onclick="switchTab(this, 'HOT')">
                 <span class="g-tab-icon">🔥</span>
@@ -191,11 +186,10 @@
             </div>
         </div>
 
-        <!-- Lưới danh sách game chi tiết -->
+        <!-- Game List -->
         <div class="game-section">
             <div class="game-grid-detailed" id="game-list">
-                <!-- Render mặc định danh mục HOT -->
-                <div class="game-item-card" onclick="alert('Đang vào game Dragon Gems 500')">
+                <div class="game-item-card" onclick="alert('Đang vào game Dragon Gems')">
                     <div class="game-thumb">🐉</div>
                     <div class="game-name">Dragon Gems</div>
                 </div>
@@ -207,7 +201,7 @@
                     <div class="game-thumb">💎</div>
                     <div class="game-name">Fortune Gems</div>
                 </div>
-                <div class="game-thumb-card game-item-card" onclick="alert('Đang vào game Super Elements')">
+                <div class="game-item-card" onclick="alert('Đang vào game Super Elements')">
                     <div class="game-thumb">⚡</div>
                     <div class="game-name">Super Elements</div>
                 </div>
@@ -215,7 +209,7 @@
                     <div class="game-thumb">👑</div>
                     <div class="game-name">Ultra Ace</div>
                 </div>
-                <div class="game-item-card" onclick="alert('Đang vào game Gates of Olympus')">
+                <div class="game-item-card" onclick="alert('Đang vào game NCVIP Gates')">
                     <div class="game-thumb">⚡</div>
                     <div class="game-name">NCVIP Gates</div>
                 </div>
@@ -223,30 +217,14 @@
                     <div class="game-thumb">🦜</div>
                     <div class="game-name">Bountiful Birds</div>
                 </div>
-                <div class="game-item-card" onclick="alert('Đang vào game Aztec Treasures')">
+                <div class="game-item-card" onclick="alert('Đang vào game Aztec Treasure')">
                     <div class="game-thumb">🗿</div>
                     <div class="game-name">Aztec Treasure</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Đang vào game Wild Bounty')">
-                    <div class="game-thumb">🤠</div>
-                    <div class="game-name">Wild Bounty</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Đang vào game Mahjong Ways')">
-                    <div class="game-thumb">🀄</div>
-                    <div class="game-name">Mahjong Ways</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Đang vào game Super Ace')">
-                    <div class="game-thumb">🃏</div>
-                    <div class="game-name">Super Ace</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Đang vào game Jackpot Fishing')">
-                    <div class="game-thumb">🦈</div>
-                    <div class="game-name">Jackpot Fish</div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Nav (Giữ nguyên menu điều hướng dưới, đã bỏ hoàn toàn nút đăng nhập/đăng ký) -->
+        <!-- Bottom Nav -->
         <nav class="bottom-nav">
             <a href="/" class="nav-item active">
                 <div class="nav-icon">🏠</div>
@@ -268,7 +246,6 @@
     </div>
 
     <script>
-        // Dữ liệu mẫu thay đổi game theo danh mục bấm vào
         const gamesData = {
             'HOT': [
                 {icon: '🐉', name: 'Dragon Gems'},
@@ -278,52 +255,34 @@
                 {icon: '👑', name: 'Ultra Ace'},
                 {icon: '⚡', name: 'NCVIP Gates'},
                 {icon: '🦜', name: 'Bountiful Birds'},
-                {icon: '🗿', name: 'Aztec Treasure'},
-                {icon: '🤠', name: 'Wild Bounty'},
-                {icon: '🀄', name: 'Mahjong Ways'},
-                {icon: '🃏', name: 'Super Ace'},
-                {icon: '🦈', name: 'Jackpot Fish'}
+                {icon: '🗿', name: 'Aztec Treasure'}
             ],
             'DA_GA': [
                 {icon: '🐓', name: 'Đá Gà Thomo'},
-                {icon: '🔥', name: 'Đá Gà Cựa Sắt'},
-                {icon: '🏆', name: 'Trực Tiếp SV388'},
-                {icon: '🥇', name: 'Đá Gà Campuchia'}
+                {icon: '🔥', name: 'Đá Gà Cựa Sắt'}
             ],
             'SLOTS': [
                 {icon: '🎰', name: 'Slot Thần Tài'},
-                {icon: '💰', name: 'Kho Báu Aztec'},
-                {icon: '🧧', name: 'Nổ Hũ Phúc Lộc'},
-                {icon: '🔮', name: 'Đường Mạt Chược'},
-                {icon: '👑', name: 'Quyền Năng Zeus'},
-                {icon: '🍀', name: 'Lucky Neko'}
+                {icon: '💰', name: 'Kho Báu Aztec'}
             ],
             'CASINO': [
-                {icon: '🎲', name: 'Baccarat Sâm Ty'},
-                {icon: '🎡', name: 'Roulette Châu Âu'},
-                {icon: '🃏', name: 'Blackjack Live'},
-                {icon: '🐉', name: 'Rồng Hồ (Dragon Tiger)'}
+                {icon: '🎲', name: 'Baccarat Live'},
+                {icon: '🎡', name: 'Roulette'}
             ],
             'GAME_BAI': [
                 {icon: '♠️', name: 'Tiến Lên Miền Nam'},
-                {icon: '♣️', name: 'Phỏm Tá Lả'},
-                {icon: '♦️', name: 'Mậu Binh'},
-                {icon: '♥️', name: 'Liêng Cào Tố'}
+                {icon: '♣️', name: 'Phỏm Tá Lả'}
             ],
             'BAN_CA': [
                 {icon: '🐟', name: 'Bắn Cá Long Vương'},
-                {icon: '🐠', name: 'Bắn Cá Hũ Thần'},
-                {icon: '🐬', name: 'Săn Cá Đại Dương'},
-                {icon: '🐳', name: 'Bắn Cá Hoàng Gia'}
+                {icon: '🐠', name: 'Bắn Cá Hũ Thần'}
             ]
         };
 
         function switchTab(element, category) {
-            // Đổi active cho tab
             document.querySelectorAll('.g-tab').forEach(tab => tab.classList.remove('active'));
             element.classList.add('active');
 
-            // Render lại danh sách game tương ứng
             const gameListContainer = document.getElementById('game-list');
             const items = gamesData[category] || [];
             
@@ -340,5 +299,4 @@
         }
     </script>
 </body>
-                    </html>
-    
+</html>

@@ -4,7 +4,397 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ab666 - Mega Casino World</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #131521;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: #131521;
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        /* Header chính */
+        .header {
+            padding: 12px 15px;
+            background-color: #171a29;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .menu-toggle-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Nút CSKH ở góc phải */
+        .cskh-btn {
+            background: #212537;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #cca352;
+            border: 1px solid #303650;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .cskh-btn:hover {
+            border-color: #cca352;
+        }
+
+        /* Banner */
+        .banner {
+            padding: 10px 15px;
+        }
+        .banner-box {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #2b2f45, #171a29);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #cca352;
+            font-size: 15px;
+            font-weight: bold;
+            border: 1px solid #303650;
+            text-align: center;
+            padding: 10px;
+        }
+        .banner-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #444c6e;
+            border-radius: 50%;
+        }
+        .dot.active {
+            background: #cca352;
+            width: 16px;
+            border-radius: 4px;
+        }
+
+        /* Game Tabs */
+        .game-tabs {
+            display: flex;
+            background-color: #1b1e2e;
+            overflow-x: auto;
+            padding: 8px 10px;
+            gap: 8px;
+            border-bottom: 1px solid #24293f;
+            scrollbar-width: none;
+        }
+        .game-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .g-tab {
+            flex: 0 0 auto;
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 8px;
+            padding: 8px 14px;
+            text-align: center;
+            color: #9fa5b9;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 65px;
+        }
+        .g-tab.active {
+            background-color: #2b2f45;
+            border-color: #cca352;
+            color: #cca352;
+            font-weight: bold;
+        }
+        .g-tab-icon {
+            font-size: 18px;
+        }
+
+        /* Game Section */
+        .game-section {
+            padding: 12px 10px 80px 10px;
+        }
+        .game-grid-detailed {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .game-item-card {
+            background-color: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .game-item-card:hover {
+            border-color: #cca352;
+        }
+        .game-thumb {
+            width: 100%;
+            height: 70px;
+            background: #212537;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border-bottom: 1px solid #24293f;
+        }
+        .game-name {
+            padding: 6px 4px;
+            font-size: 10px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Bottom Nav - Đồng bộ chuẩn 4 nút */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #7a83a0;
+            font-size: 10px;
+            gap: 3px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: #cca352;
+        }
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* --- SIDEBAR DRAWER CSS --- */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 99999;
+            display: none;
+            justify-content: flex-start;
+        }
+        .drawer-overlay.open {
+            display: flex;
+        }
+        .drawer-content {
+            width: 85%;
+            max-width: 360px;
+            height: 100%;
+            background-color: #131521;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.8);
+        }
+        .drawer-header {
+            padding: 15px;
+            background-color: #171a29;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #24293f;
+            color: #cca352;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .drawer-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .drawer-body {
+            padding: 12px;
+        }
+        .drawer-profile-card {
+            background: linear-gradient(135deg, #23273c, #171a29);
+            border: 1px solid #303650;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .drawer-profile-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .drawer-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .drawer-avatar {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #ebd08d, #cca352);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #131521;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .drawer-username {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .drawer-sub {
+            font-size: 10px;
+            color: #cca352;
+        }
+        .drawer-wallet-box {
+            background: linear-gradient(135deg, #dfbc68, #cca352);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #131521;
+            cursor: pointer;
+        }
+        .drawer-wallet-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #2b2208;
+        }
+        .drawer-wallet-balance {
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .drawer-search {
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .drawer-search input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 90%;
+            outline: none;
+            font-size: 12px;
+        }
+        .drawer-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .drawer-menu-item {
+            background-color: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 6px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .drawer-menu-item:hover {
+            border-color: #cca352;
+        }
+        .drawer-menu-item.wide {
+            grid-column: span 2;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 12px 14px;
+            gap: 12px;
+        }
+        .drawer-menu-item.wide .dm-icon {
+            font-size: 22px;
+        }
+        .drawer-menu-item.wide .dm-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #cca352;
+        }
+        .dm-icon { font-size: 20px; }
+        .dm-label { font-size: 11px; color: #cca352; }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -98,7 +488,7 @@
             </div>
         </div>
 
-        <!-- Bottom Nav (Đồng bộ 4 nút) -->
+        <!-- Bottom Nav (Đã đồng bộ chuẩn 4 nút) -->
         <nav class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item active">
                 <div class="nav-icon">🏠</div>
@@ -117,9 +507,8 @@
                 <span>Tài khoản</span>
             </a>
         </nav>
-    </div>
-
-    <!-- SIDEBAR DRAWER MENU -->
+                        </div>
+        <!-- SIDEBAR DRAWER MENU -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()">
         <div class="drawer-content" onclick="event.stopPropagation()">
             <div class="drawer-header">
@@ -200,8 +589,10 @@
                 </div>
             </div>
         </div>
-                    </div>
-                            <script>
+    </div>
+
+    <!-- JavaScript điều khiển Drawer và Tab -->
+    <script>
         function openDrawer() {
             document.getElementById('drawerOverlay').classList.add('open');
         }

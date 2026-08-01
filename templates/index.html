@@ -6,279 +6,403 @@
     <title>Mega Casino World</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        /* Top header bar */
-        .top-header {
+        .header {
+            padding: 12px 15px;
+            background-color: #171a29;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
-            background-color: #171a29;
             border-bottom: 1px solid #24293f;
         }
-        .top-header .left-actions, .top-header .right-actions {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 15px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
+            gap: 12px;
         }
-        .top-header .title {
+        .menu-toggle-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .header-title {
             font-size: 16px;
             font-weight: bold;
             color: #fff;
         }
-
-        /* Profile & Wallet Card (Giống ảnh 1705.jpg) */
-        .user-wallet-section {
-            padding: 12px 15px;
+        .balance-box {
+            background: #212537;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #cca352;
+            border: 1px solid #303650;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
         }
-        .profile-card {
+
+        /* Banner */
+        .banner {
+            padding: 10px 15px;
+        }
+        .banner-box {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #2b2f45, #171a29);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #cca352;
+            font-size: 15px;
+            font-weight: bold;
+            border: 1px solid #303650;
+            text-align: center;
+            padding: 10px;
+        }
+        .banner-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #444c6e;
+            border-radius: 50%;
+        }
+        .dot.active {
+            background: #cca352;
+            width: 16px;
+            border-radius: 4px;
+        }
+
+        /* Game Tabs */
+        .game-tabs {
+            display: flex;
+            background-color: #1b1e2e;
+            overflow-x: auto;
+            padding: 8px 10px;
+            gap: 8px;
+            border-bottom: 1px solid #24293f;
+            scrollbar-width: none;
+        }
+        .game-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .g-tab {
+            flex: 0 0 auto;
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 8px;
+            padding: 8px 14px;
+            text-align: center;
+            color: #9fa5b9;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 65px;
+        }
+        .g-tab.active {
+            background-color: #2b2f45;
+            border-color: #cca352;
+            color: #cca352;
+            font-weight: bold;
+        }
+        .g-tab-icon {
+            font-size: 18px;
+        }
+
+        /* Game Section */
+        .game-section {
+            padding: 12px 10px 80px 10px;
+        }
+        .game-grid-detailed {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .game-item-card {
+            background-color: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .game-item-card:hover {
+            border-color: #cca352;
+        }
+        .game-thumb {
+            width: 100%;
+            height: 70px;
+            background: #212537;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border-bottom: 1px solid #24293f;
+        }
+        .game-name {
+            padding: 6px 4px;
+            font-size: 10px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- SIDEBAR DRAWER (Giống ảnh 2) --- */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: none;
+            justify-content: flex-start;
+        }
+        .drawer-overlay.open {
+            display: flex;
+        }
+        .drawer-content {
+            width: 85%;
+            max-width: 360px;
+            height: 100%;
+            background-color: #131521;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.8);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .drawer-overlay.open .drawer-content {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            padding: 15px;
+            background-color: #171a29;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #24293f;
+            color: #cca352;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .drawer-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .drawer-body {
+            padding: 12px;
+        }
+        .drawer-profile-card {
             background: linear-gradient(135deg, #23273c, #171a29);
             border: 1px solid #303650;
-            border-radius: 10px;
-            padding: 12px 15px;
+            border-radius: 8px;
+            padding: 12px;
             margin-bottom: 10px;
         }
-        .profile-row {
+        .drawer-profile-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             cursor: pointer;
         }
-        .profile-info {
+        .drawer-user-info {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .profile-logo {
-            width: 38px;
-            height: 38px;
+        .drawer-avatar {
+            width: 34px;
+            height: 34px;
             background: linear-gradient(135deg, #ebd08d, #cca352);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
             color: #131521;
+            font-weight: bold;
+            font-size: 15px;
         }
-        .profile-texts .name {
-            font-size: 14px;
+        .drawer-username {
+            font-size: 13px;
             font-weight: bold;
             color: #fff;
         }
-        .profile-texts .sub {
-            font-size: 11px;
+        .drawer-sub {
+            font-size: 10px;
             color: #cca352;
-            margin-top: 2px;
         }
-        .profile-arrow {
-            color: #7a83a0;
-            font-size: 16px;
-        }
-
-        /* Ví chính (Golden box giống ảnh 1705.jpg) */
-        .wallet-main-box {
+        .drawer-wallet-box {
             background: linear-gradient(135deg, #dfbc68, #cca352);
-            border-radius: 8px;
-            padding: 12px 15px;
+            border-radius: 6px;
+            padding: 10px 12px;
             color: #131521;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
         }
-        .wallet-left .w-title {
-            font-size: 12px;
+        .drawer-wallet-title {
+            font-size: 11px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
             color: #2b2208;
         }
-        .wallet-left .w-balance {
-            font-size: 18px;
+        .drawer-wallet-balance {
+            font-size: 15px;
             font-weight: bold;
-            margin-top: 3px;
-            color: #131521;
+            margin-top: 2px;
         }
-        .wallet-icon-right {
-            font-size: 22px;
-            background: rgba(255, 255, 255, 0.2);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Search Bar */
-        .search-container {
-            padding: 0 15px 12px 15px;
-        }
-        .search-box {
+        .drawer-search {
             background-color: #212537;
             border: 1px solid #303650;
-            border-radius: 8px;
-            padding: 10px 15px;
+            border-radius: 6px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: #7a83a0;
-            font-size: 13px;
+            margin-bottom: 12px;
         }
-        .search-box input {
+        .drawer-search input {
             background: transparent;
             border: none;
             color: #fff;
             width: 90%;
             outline: none;
-            font-size: 13px;
+            font-size: 12px;
         }
-
-        /* Menu Grid (Phong cách ảnh 1705.jpg) */
-        .menu-grid-section {
-            padding: 0 15px 80px 15px;
-        }
-        .menu-grid {
+        .drawer-menu-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
-        .menu-grid-item {
+        .drawer-menu-item {
             background-color: #171a29;
             border: 1px solid #24293f;
-            border-radius: 8px;
-            padding: 14px 10px;
+            border-radius: 6px;
+            padding: 10px 6px;
             text-align: center;
             cursor: pointer;
-            transition: 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
-        .menu-grid-item:hover {
+        .drawer-menu-item:hover {
             border-color: #cca352;
         }
-        .m-icon {
-            font-size: 24px;
-        }
-        .m-label {
-            font-size: 12px;
-            color: #cca352;
-            font-weight: 500;
-        }
+        .dm-icon { font-size: 20px; }
+        .dm-label { font-size: 11px; color: #cca352; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Top Header Bar -->
-        <div class="top-header">
-            <div class="left-actions" onclick="location.href='/'">🏠</div>
-            <div class="title">Ab666</div>
-            <div class="right-actions" onclick="alert('Thêm tùy chọn')">⋮</div>
+        <!-- Header (Có nút 3 gạch mở menu bên trái) -->
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
+                <div class="header-title">Ab666</div>
+            </div>
+            <div class="balance-box" onclick="location.href='/deposit'">💰 100.000 đ</div>
         </div>
 
-        <!-- Profile & Wallet Section (Giống ảnh 1705.jpg) -->
-        <div class="user-wallet-section">
-            <div class="profile-card">
-                <!-- Thông tin tài khoản & Hồ sơ -->
-                <div class="profile-row" onclick="location.href='/profile'">
-                    <div class="profile-info">
-                        <div class="profile-logo">MC</div>
-                        <div class="profile-texts">
-                            <div class="name">Phun Cam Kiu</div>
-                            <div class="sub">Hồ Sơ</div>
-                        </div>
-                    </div>
-                    <div class="profile-arrow">➔</div>
-                </div>
-
-                <!-- Ví chính -->
-                <div class="wallet-main-box" onclick="location.href='/deposit'">
-                    <div class="wallet-left">
-                        <div class="w-title">Ví chính 🔄</div>
-                        <div class="w-balance">đ 100.000</div>
-                    </div>
-                    <div class="wallet-icon-right">💳</div>
+        <!-- Banner Khuyến Mãi -->
+        <div class="banner">
+            <div class="banner-box">
+                🔥 KHUYẾN MÃI NẠP ĐẦU 100% 🔥
+                <div class="banner-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" placeholder="Tìm kiếm trò chơi...">
-                <span>🔍</span>
+        <!-- Thanh danh mục game ngang -->
+        <div class="game-tabs" id="category-tabs">
+            <div class="g-tab active" onclick="switchTab(this, 'HOT')">
+                <span class="g-tab-icon">🔥</span>
+                <span>HOT</span>
+            </div>
+            <div class="g-tab" onclick="switchTab(this, 'DA_GA')">
+                <span class="g-tab-icon">🐓</span>
+                <span>ĐÁ GÀ</span>
+            </div>
+            <div class="g-tab" onclick="switchTab(this, 'SLOTS')">
+                <span class="g-tab-icon">🎰</span>
+                <span>Slots</span>
+            </div>
+            <div class="g-tab" onclick="switchTab(this, 'CASINO')">
+                <span class="g-tab-icon">♠️</span>
+                <span>Casino</span>
+            </div>
+            <div class="g-tab" onclick="switchTab(this, 'GAME_BAI')">
+                <span class="g-tab-icon">🃏</span>
+                <span>Game Bài</span>
+            </div>
+            <div class="g-tab" onclick="switchTab(this, 'BAN_CA')">
+                <span class="g-tab-icon">🐟</span>
+                <span>Bắn Cá</span>
             </div>
         </div>
 
-        <!-- Menu Grid (Phong cách ảnh 1705.jpg) -->
-        <div class="menu-grid-section">
-            <div class="menu-grid">
-                <div class="menu-grid-item" onclick="location.href='/deposit'">
-                    <span class="m-icon">💳</span>
-                    <span class="m-label">Nạp tiền</span>
+        <!-- Lưới danh sách game chi tiết -->
+        <div class="game-section">
+            <div class="game-grid-detailed" id="game-list">
+                <div class="game-item-card" onclick="alert('Đang vào game Dragon Gems')">
+                    <div class="game-thumb">🐉</div>
+                    <div class="game-name">Dragon Gems</div>
                 </div>
-                <div class="menu-grid-item" onclick="location.href='/deposit'">
-                    <span class="m-icon">🏧</span>
-                    <span class="m-label">Rút tiền</span>
+                <div class="game-item-card" onclick="alert('Đang vào game Mithai Madness')">
+                    <div class="game-thumb">🍬</div>
+                    <div class="game-name">Mithai Madness</div>
                 </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào mục HOT')">
-                    <span class="m-icon">🔥</span>
-                    <span class="m-label">HOT</span>
+                <div class="game-item-card" onclick="alert('Đang vào game Fortune Gems')">
+                    <div class="game-thumb">💎</div>
+                    <div class="game-name">Fortune Gems</div>
                 </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Đá Gà')">
-                    <span class="m-icon">🐓</span>
-                    <span class="m-label">Đá Gà</span>
+                <div class="game-item-card" onclick="alert('Đang vào game Super Elements')">
+                    <div class="game-thumb">⚡</div>
+                    <div class="game-name">Super Elements</div>
                 </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Slots')">
-                    <span class="m-icon">🎰</span>
-                    <span class="m-label">Slots</span>
+                <div class="game-item-card" onclick="alert('Đang vào game Ultra Ace')">
+                    <div class="game-thumb">👑</div>
+                    <div class="game-name">Ultra Ace</div>
                 </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Casino')">
-                    <span class="m-icon">♠️</span>
-                    <span class="m-label">Casino</span>
+                <div class="game-item-card" onclick="alert('Đang vào game NCVIP Gates')">
+                    <div class="game-thumb">⚡</div>
+                    <div class="game-name">NCVIP Gates</div>
                 </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Game Bài')">
-                    <span class="m-icon">🃏</span>
-                    <span class="m-label">Game bài</span>
+                <div class="game-item-card" onclick="alert('Đang vào game Bountiful Birds')">
+                    <div class="game-thumb">🦜</div>
+                    <div class="game-name">Bountiful Birds</div>
                 </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Bắn Cá')">
-                    <span class="m-icon">🐟</span>
-                    <span class="m-label">Bắn Cá</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Xổ Số')">
-                    <span class="m-icon">🎱</span>
-                    <span class="m-label">Xổ Số</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Thể Thao')">
-                    <span class="m-icon">⚽</span>
-                    <span class="m-label">Thể Thao</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Crash')">
-                    <span class="m-icon">🚀</span>
-                    <span class="m-label">Crash</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Arcade')">
-                    <span class="m-icon">🕹️</span>
-                    <span class="m-label">Arcade</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào Khuyến Mãi')">
-                    <span class="m-icon">🎁</span>
-                    <span class="m-label">Khuyến mãi</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang vào VIP')">
-                    <span class="m-icon">⭐</span>
-                    <span class="m-label">VIP</span>
-                </div>
-                <div class="menu-grid-item" onclick="alert('Đang tải xuống ứng dụng')">
-                    <span class="m-icon">📥</span>
-                    <span class="m-label">Tải xuống</span>
+                <div class="game-item-card" onclick="alert('Đang vào game Aztec Treasure')">
+                    <div class="game-thumb">🗿</div>
+                    <div class="game-name">Aztec Treasure</div>
                 </div>
             </div>
         </div>
@@ -303,6 +427,132 @@
             </a>
         </nav>
     </div>
-</body>
-    </html>
-    
+
+    <!-- SIDEBAR DRAWER MENU (Ảnh 2 khi ấn nút 3 gạch) -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="handleOverlayClick(event)">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <span>MEGA CASINO WORLD</span>
+                <button class="drawer-close" onclick="toggleDrawer(false)">✕</button>
+            </div>
+            <div class="drawer-body">
+                <!-- Thông tin hồ sơ & ví -->
+                <div class="drawer-profile-card">
+                    <div class="drawer-profile-row" onclick="location.href='/profile'">
+                        <div class="drawer-user-info">
+                            <div class="drawer-avatar">MC</div>
+                            <div>
+                                <div class="drawer-username">Phun Cam Kiu</div>
+                                <div class="drawer-sub">Hồ sơ &gt;</div>
+                            </div>
+                        </div>
+                        <div style="color: #7a83a0;">➔</div>
+                    </div>
+                    <div class="drawer-wallet-box" onclick="location.href='/deposit'">
+                        <div>
+                            <div class="drawer-wallet-title">Ví chính chung 🔄</div>
+                            <div class="drawer-wallet-balance">đ 100.000</div>
+                        </div>
+                        <div style="font-size: 20px;">💳</div>
+                    </div>
+                </div>
+
+                <!-- Ô tìm kiếm -->
+                <div class="drawer-search">
+                    <input type="text" placeholder="Tìm kiếm trò chơi">
+                    <span>🔍</span>
+                </div>
+
+                <!-- Lưới menu game và tính năng -->
+                <div class="drawer-menu-grid">
+                    <div class="drawer-menu-item" onclick="location.href='/deposit'">
+                        <span class="dm-icon">💳</span>
+                        <span class="dm-label">Nạp tiền</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="location.href='/deposit'">
+                        <span class="dm-icon">🏧</span>
+                        <span class="dm-label">Rút tiền</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="toggleDrawer(false)">
+                        <span class="dm-icon">🔥</span>
+                        <span class="dm-label">HOT</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Đá Gà')">
+                        <span class="dm-icon">🐓</span>
+                        <span class="dm-label">Đá Gà</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Slots')">
+                        <span class="dm-icon">🎰</span>
+                        <span class="dm-label">Slots</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Casino')">
+                        <span class="dm-icon">♠️</span>
+                        <span class="dm-label">Casino</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Game bài')">
+                        <span class="dm-icon">🃏</span>
+                        <span class="dm-label">Game bài</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Bắn Cá')">
+                        <span class="dm-icon">🐟</span>
+                        <span class="dm-label">Bắn Cá</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Xổ Số')">
+                        <span class="dm-icon">🎱</span>
+                        <span class="dm-label">Xổ Số</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Thể Thao')">
+                        <span class="dm-icon">⚽</span>
+                        <span class="dm-label">Thể Thao</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Crash')">
+                        <span class="dm-icon">🚀</span>
+                        <span class="dm-label">Crash</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Arcade')">
+                        <span class="dm-icon">🕹️</span>
+                        <span class="dm-label">Arcade</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào Khuyến mãi')">
+                        <span class="dm-icon">🎁</span>
+                        <span class="dm-label">Khuyến mãi</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào VIP')">
+                        <span class="dm-icon">⭐</span>
+                        <span class="dm-label">VIP</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang tải xuống ứng dụng')">
+                        <span class="dm-icon">📥</span>
+                        <span class="dm-label">Tải xuống</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gamesData = {
+            'HOT': [
+                {icon: '🐉', name: 'Dragon Gems'},
+                {icon: '🍬', name: 'Mithai Madness'},
+                {icon: '💎', name: 'Fortune Gems'},
+                {icon: '⚡', name: 'Super Elements'},
+                {icon: '👑', name: 'Ultra Ace'},
+                {icon: '⚡', name: 'NCVIP Gates'},
+                {icon: '🦜', name: 'Bountiful Birds'},
+                {icon: '🗿', name: 'Aztec Treasure'}
+            ],
+            'DA_GA': [
+                {icon: '🐓', name: 'Đá Gà Thomo'},
+                {icon: '🔥', name: 'Đá Gà Cựa Sắt'}
+            ],
+            'SLOTS': [
+                {icon: '🎰', name: 'Slot Thần Tài'},
+                {icon: '💰', name: 'Kho Báu Aztec'}
+            ],
+            'CASINO': [
+                {icon: '🎲', name: 'Baccarat Live'},
+                {icon: '🎡', name: 'Roulette'}
+            ],
+            'GAME_BAI': [
+                {icon: '♠️', name: 'Tiến

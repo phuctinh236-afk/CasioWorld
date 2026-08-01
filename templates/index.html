@@ -6,6 +6,25 @@
     <title>Mega Casino World</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background-color: #131521;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
+        }
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #131521;
+            position: relative;
+            padding-bottom: 70px;
+        }
+
+        /* Header chính */
         .header {
             padding: 12px 15px;
             background-color: #171a29;
@@ -13,6 +32,9 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .header-left {
             display: flex;
@@ -23,28 +45,37 @@
             background: none;
             border: none;
             color: #fff;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            padding: 0;
+            padding: 5px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
         .header-title {
             font-size: 16px;
             font-weight: bold;
             color: #fff;
         }
-        .balance-box {
+
+        /* Nút CSKH thay thế ô tiền */
+        .cskh-btn {
             background: #212537;
             padding: 6px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             color: #cca352;
             border: 1px solid #303650;
             display: flex;
             align-items: center;
             gap: 5px;
             cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .cskh-btn:hover {
+            border-color: #cca352;
         }
 
         /* Banner */
@@ -164,15 +195,44 @@
             text-overflow: ellipsis;
         }
 
-        /* --- SIDEBAR DRAWER (Giống ảnh 2) --- */
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #7a83a0;
+            font-size: 10px;
+            gap: 3px;
+        }
+        .nav-item.active {
+            color: #cca352;
+        }
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* --- SIDEBAR DRAWER (Menu trượt từ trái) --- */
         .drawer-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
             display: none;
             justify-content: flex-start;
         }
@@ -188,11 +248,6 @@
             display: flex;
             flex-direction: column;
             box-shadow: 4px 0 15px rgba(0,0,0,0.8);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
-        }
-        .drawer-overlay.open .drawer-content {
-            transform: translateX(0);
         }
         .drawer-header {
             padding: 15px;
@@ -319,13 +374,16 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header (Có nút 3 gạch mở menu bên trái) -->
+        <!-- Header chính (Đảm bảo nút ☰ luôn nổi trên cùng và bắt sự kiện cực nhạy) -->
         <div class="header">
             <div class="header-left">
-                <button class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
+                <button type="button" class="menu-toggle-btn" id="menuBtn">☰</button>
                 <div class="header-title">Ab666</div>
             </div>
-            <div class="balance-box" onclick="location.href='/deposit'">💰 100.000 đ</div>
+            <!-- Nút CSKH thay thế cho ô tiền -->
+            <a href="#" class="cskh-btn" onclick="alert('Đang kết nối đến Chăm Sóc Khách Hàng...'); return false;">
+                🎧 CSKH
+            </a>
         </div>
 
         <!-- Banner Khuyến Mãi -->
@@ -413,7 +471,7 @@
                 <div class="nav-icon">🏠</div>
                 <span>Trang chủ</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật')">
+            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật'); return false;">
                 <div class="nav-icon">🎁</div>
                 <span>Khuyến mãi</span>
             </a>
@@ -428,12 +486,12 @@
         </nav>
     </div>
 
-    <!-- SIDEBAR DRAWER MENU (Ảnh 2 khi ấn nút 3 gạch) -->
-    <div class="drawer-overlay" id="drawerOverlay" onclick="handleOverlayClick(event)">
-        <div class="drawer-content">
+    <!-- SIDEBAR DRAWER MENU -->
+    <div class="drawer-overlay" id="drawerOverlay">
+        <div class="drawer-content" onclick="event.stopPropagation()">
             <div class="drawer-header">
                 <span>MEGA CASINO WORLD</span>
-                <button class="drawer-close" onclick="toggleDrawer(false)">✕</button>
+                <button type="button" class="drawer-close" id="closeDrawerBtn">✕</button>
             </div>
             <div class="drawer-body">
                 <!-- Thông tin hồ sơ & ví -->
@@ -473,7 +531,7 @@
                         <span class="dm-icon">🏧</span>
                         <span class="dm-label">Rút tiền</span>
                     </div>
-                    <div class="drawer-menu-item" onclick="toggleDrawer(false)">
+                    <div class="drawer-menu-item" onclick="closeDrawer()">
                         <span class="dm-icon">🔥</span>
                         <span class="dm-label">HOT</span>
                     </div>
@@ -516,43 +574,4 @@
                     <div class="drawer-menu-item" onclick="alert('Đang vào Khuyến mãi')">
                         <span class="dm-icon">🎁</span>
                         <span class="dm-label">Khuyến mãi</span>
-                    </div>
-                    <div class="drawer-menu-item" onclick="alert('Đang vào VIP')">
-                        <span class="dm-icon">⭐</span>
-                        <span class="dm-label">VIP</span>
-                    </div>
-                    <div class="drawer-menu-item" onclick="alert('Đang tải xuống ứng dụng')">
-                        <span class="dm-icon">📥</span>
-                        <span class="dm-label">Tải xuống</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const gamesData = {
-            'HOT': [
-                {icon: '🐉', name: 'Dragon Gems'},
-                {icon: '🍬', name: 'Mithai Madness'},
-                {icon: '💎', name: 'Fortune Gems'},
-                {icon: '⚡', name: 'Super Elements'},
-                {icon: '👑', name: 'Ultra Ace'},
-                {icon: '⚡', name: 'NCVIP Gates'},
-                {icon: '🦜', name: 'Bountiful Birds'},
-                {icon: '🗿', name: 'Aztec Treasure'}
-            ],
-            'DA_GA': [
-                {icon: '🐓', name: 'Đá Gà Thomo'},
-                {icon: '🔥', name: 'Đá Gà Cựa Sắt'}
-            ],
-            'SLOTS': [
-                {icon: '🎰', name: 'Slot Thần Tài'},
-                {icon: '💰', name: 'Kho Báu Aztec'}
-            ],
-            'CASINO': [
-                {icon: '🎲', name: 'Baccarat Live'},
-                {icon: '🎡', name: 'Roulette'}
-            ],
-            'GAME_BAI': [
-                {icon: '♠️', name: 'Tiến
+              

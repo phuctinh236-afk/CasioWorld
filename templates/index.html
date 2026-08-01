@@ -34,7 +34,7 @@
             border-bottom: 1px solid #24293f;
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
         }
         .header-left {
             display: flex;
@@ -47,7 +47,7 @@
             color: #fff;
             font-size: 22px;
             cursor: pointer;
-            padding: 5px;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -59,7 +59,7 @@
             color: #fff;
         }
 
-        /* Nút CSKH thay thế ô tiền */
+        /* Nút CSKH ở góc phải */
         .cskh-btn {
             background: #212537;
             padding: 6px 12px;
@@ -199,8 +199,10 @@
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
+            max-width: 480px;
             background-color: #171a29;
             border-top: 1px solid #24293f;
             display: flex;
@@ -224,7 +226,7 @@
             font-size: 20px;
         }
 
-        /* --- SIDEBAR DRAWER (Menu trượt từ trái) --- */
+        /* --- SIDEBAR DRAWER CSS --- */
         .drawer-overlay {
             position: fixed;
             top: 0;
@@ -232,7 +234,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
+            z-index: 99999;
             display: none;
             justify-content: flex-start;
         }
@@ -374,14 +376,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header chính (Đảm bảo nút ☰ luôn nổi trên cùng và bắt sự kiện cực nhạy) -->
+        <!-- Header chính -->
         <div class="header">
             <div class="header-left">
-                <button type="button" class="menu-toggle-btn" id="menuBtn">☰</button>
+                <button type="button" class="menu-toggle-btn" onclick="openDrawer()">☰</button>
                 <div class="header-title">Ab666</div>
             </div>
-            <!-- Nút CSKH thay thế cho ô tiền -->
-            <a href="#" class="cskh-btn" onclick="alert('Đang kết nối đến Chăm Sóc Khách Hàng...'); return false;">
+            <a href="#" class="cskh-btn" onclick="alert('Đang kết nối Chăm Sóc Khách Hàng...'); return false;">
                 🎧 CSKH
             </a>
         </div>
@@ -399,7 +400,7 @@
             </div>
         </div>
 
-        <!-- Thanh danh mục game ngang -->
+        <!-- Danh mục game ngang -->
         <div class="game-tabs" id="category-tabs">
             <div class="g-tab active" onclick="switchTab(this, 'HOT')">
                 <span class="g-tab-icon">🔥</span>
@@ -427,7 +428,7 @@
             </div>
         </div>
 
-        <!-- Lưới danh sách game chi tiết -->
+        <!-- Lưới danh sách game -->
         <div class="game-section">
             <div class="game-grid-detailed" id="game-list">
                 <div class="game-item-card" onclick="alert('Đang vào game Dragon Gems')">
@@ -485,13 +486,12 @@
             </a>
         </nav>
     </div>
-
-    <!-- SIDEBAR DRAWER MENU -->
-    <div class="drawer-overlay" id="drawerOverlay">
+        <!-- SIDEBAR DRAWER MENU -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()">
         <div class="drawer-content" onclick="event.stopPropagation()">
             <div class="drawer-header">
                 <span>MEGA CASINO WORLD</span>
-                <button type="button" class="drawer-close" id="closeDrawerBtn">✕</button>
+                <button type="button" class="drawer-close" onclick="closeDrawer()">✕</button>
             </div>
             <div class="drawer-body">
                 <!-- Thông tin hồ sơ & ví -->
@@ -521,7 +521,7 @@
                     <span>🔍</span>
                 </div>
 
-                <!-- Lưới menu game và tính năng -->
+                <!-- Lưới menu đầy đủ -->
                 <div class="drawer-menu-grid">
                     <div class="drawer-menu-item" onclick="location.href='/deposit'">
                         <span class="dm-icon">💳</span>
@@ -574,4 +574,86 @@
                     <div class="drawer-menu-item" onclick="alert('Đang vào Khuyến mãi')">
                         <span class="dm-icon">🎁</span>
                         <span class="dm-label">Khuyến mãi</span>
-              
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang vào VIP')">
+                        <span class="dm-icon">⭐</span>
+                        <span class="dm-label">VIP</span>
+                    </div>
+                    <div class="drawer-menu-item" onclick="alert('Đang tải xuống ứng dụng')">
+                        <span class="dm-icon">📥</span>
+                        <span class="dm-label">Tải xuống</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gamesData = {
+            'HOT': [
+                {icon: '🐉', name: 'Dragon Gems'},
+                {icon: '🍬', name: 'Mithai Madness'},
+                {icon: '💎', name: 'Fortune Gems'},
+                {icon: '⚡', name: 'Super Elements'},
+                {icon: '👑', name: 'Ultra Ace'},
+                {icon: '⚡', name: 'NCVIP Gates'},
+                {icon: '🦜', name: 'Bountiful Birds'},
+                {icon: '🗿', name: 'Aztec Treasure'}
+            ],
+            'DA_GA': [
+                {icon: '🐓', name: 'Đá Gà Thomo'},
+                {icon: '🔥', name: 'Đá Gà Cựa Sắt'}
+            ],
+            'SLOTS': [
+                {icon: '🎰', name: 'Slot Thần Tài'},
+                {icon: '💰', name: 'Kho Báu Aztec'}
+            ],
+            'CASINO': [
+                {icon: '🎲', name: 'Baccarat Live'},
+                {icon: '🎡', name: 'Roulette'}
+            ],
+            'GAME_BAI': [
+                {icon: '♠️', name: 'Tiến Lên Miền Nam'},
+                {icon: '♣️', name: 'Phỏm Tá Lả'}
+            ],
+            'BAN_CA': [
+                {icon: '🐟', name: 'Bắn Cá Long Vương'},
+                {icon: '🐠', name: 'Bắn Cá Hũ Thần'}
+            ]
+        };
+
+        function switchTab(element, category) {
+            document.querySelectorAll('.g-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            const gameListContainer = document.getElementById('game-list');
+            const items = gamesData[category] || [];
+            
+            let html = '';
+            items.forEach(game => {
+                html += `
+                    <div class="game-item-card" onclick="alert('Đang vào ${game.name}')">
+                        <div class="game-thumb">${game.icon}</div>
+                        <div class="game-name">${game.name}</div>
+                    </div>
+                `;
+            });
+            gameListContainer.innerHTML = html;
+        }
+
+        function openDrawer() {
+            const overlay = document.getElementById('drawerOverlay');
+            if (overlay) {
+                overlay.classList.add('open');
+            }
+        }
+
+        function closeDrawer() {
+            const overlay = document.getElementById('drawerOverlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+    </script>
+</body>
+</html>

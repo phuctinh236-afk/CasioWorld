@@ -1,32 +1,27 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+.games{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    padding:15px;
 }
 
-body{
-    background:#171b2f;
-    color:white;
-    font-family:Arial,sans-serif;
-}
-
-.topbar{
-    background:#1d233b;
-    height:70px;
+.game{
+    aspect-ratio:1/1;
+    background:#2c3150;
+    border-radius:14px;
     display:flex;
+    flex-direction:column;
+    justify-content:center;
     align-items:center;
-    justify-content:space-between;
-    padding:0 15px;
-    border-bottom:2px solid #caa14d;
 }
 
-.logo{
-    color:#d9b15d;
-    font-size:24px;
-    font-weight:bold;
+.game img{
+    width:52px;
+    height:52px;
+    margin-bottom:10px;
 }
 
-.balance{
-    color:#ffd65c;
-    font-size:18px;
+.game span{
+    font-size:13px;
+    text-align:center;
 }

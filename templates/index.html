@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Casino - Trang chủ</title>
+    <title>Mega Casino World</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .header {
-            padding: 15px;
+            padding: 12px 15px;
             background-color: #171a29;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             border-bottom: 1px solid #24293f;
-        }
-        .logo {
-            color: #cca352;
-            font-weight: bold;
-            font-size: 18px;
         }
         .balance-box {
             background: #212537;
@@ -26,88 +21,232 @@
             font-size: 13px;
             color: #cca352;
             border: 1px solid #303650;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+        /* Banner slide giả lập */
         .banner {
-            padding: 15px;
+            padding: 10px 15px;
         }
-        .section-title {
-            padding: 0 15px;
+        .banner-box {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #2b2f45, #171a29);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #cca352;
             font-size: 15px;
             font-weight: bold;
+            border: 1px solid #303650;
+            text-align: center;
+            padding: 10px;
+        }
+        .banner-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #444c6e;
+            border-radius: 50%;
+        }
+        .dot.active {
+            background: #cca352;
+            width: 16px;
+            border-radius: 4px;
+        }
+
+        /* Thanh danh mục game ngang (Tab loại game) */
+        .game-tabs {
+            display: flex;
+            background-color: #1b1e2e;
+            overflow-x: auto;
+            padding: 8px 10px;
+            gap: 8px;
+            border-bottom: 1px solid #24293f;
+            scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+        }
+        .game-tabs::-webkit-scrollbar {
+            display: none; /* Ẩn thanh cuộn trên Chrome/Safari */
+        }
+        .g-tab {
+            flex: 0 0 auto;
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 8px;
+            padding: 8px 14px;
+            text-align: center;
+            color: #9fa5b9;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 65px;
+        }
+        .g-tab.active {
+            background-color: #2b2f45;
+            border-color: #cca352;
             color: #cca352;
-            margin: 15px 0 10px 0;
+            font-weight: bold;
         }
-        .game-grid {
+        .g-tab-icon {
+            font-size: 18px;
+        }
+
+        /* Lưới game chi tiết */
+        .game-section {
+            padding: 12px 10px 80px 10px;
+        }
+        .game-grid-detailed {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 0 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
-        .game-card {
-            background: #171a29;
+        .game-item-card {
+            background-color: #171a29;
             border: 1px solid #24293f;
             border-radius: 8px;
-            padding: 20px 10px;
+            overflow: hidden;
             text-align: center;
-            color: #fff;
-            font-size: 12px;
             cursor: pointer;
             transition: 0.2s;
         }
-        .game-card:hover {
+        .game-item-card:hover {
             border-color: #cca352;
         }
-        .game-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
+        .game-thumb {
+            width: 100%;
+            height: 70px;
+            background: #212537;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border-bottom: 1px solid #24293f;
+        }
+        .game-name {
+            padding: 6px 4px;
+            font-size: 10px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
+        <!-- Header (Đã bỏ logo góc trái, chỉ giữ lại số dư bên phải) -->
         <div class="header">
-            <div class="logo">👑 MEGA CASINO</div>
             <div class="balance-box">💰 100.000 đ</div>
         </div>
 
-        <!-- Banner -->
+        <!-- Banner Khuyến Mãi -->
         <div class="banner">
-            <div style="width:100%; height:140px; background: linear-gradient(135deg, #2b2f45, #171a29); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#cca352; font-size:18px; border: 1px solid #303650; text-align: center; padding: 10px;">
+            <div class="banner-box">
                 🔥 KHUYẾN MÃI NẠP ĐẦU 100% 🔥
+                <div class="banner-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Game List -->
-        <div class="section-title">🎮 Danh mục trò chơi</div>
-        <div class="game-grid">
-            <div class="game-card" onclick="alert('Đang vào sảnh Slot Game...')">
-                <div class="game-icon">🎰</div>
-                <span>Slot Game</span>
+        <!-- Thanh danh mục game ngang (Phong cách 1691.jpg) -->
+        <div class="game-tabs" id="category-tabs">
+            <div class="g-tab active" onclick="switchTab(this, 'HOT')">
+                <span class="g-tab-icon">🔥</span>
+                <span>HOT</span>
             </div>
-            <div class="game-card" onclick="alert('Đang vào sảnh Casino Live...')">
-                <div class="game-icon">🎲</div>
-                <span>Live Casino</span>
+            <div class="g-tab" onclick="switchTab(this, 'DA_GA')">
+                <span class="g-tab-icon">🐓</span>
+                <span>ĐÁ GÀ</span>
             </div>
-            <div class="game-card" onclick="alert('Đang vào sảnh Bắn Cá...')">
-                <div class="game-icon">🐟</div>
-                <span>Bắn Cá</span>
+            <div class="g-tab" onclick="switchTab(this, 'SLOTS')">
+                <span class="g-tab-icon">🎰</span>
+                <span>Slots</span>
             </div>
-            <div class="game-card" onclick="alert('Đang vào sảnh Thể Thao...')">
-                <div class="game-icon">⚽</div>
-                <span>Thể Thao</span>
+            <div class="g-tab" onclick="switchTab(this, 'CASINO')">
+                <span class="g-tab-icon">♠️</span>
+                <span>Casino</span>
             </div>
-            <div class="game-card" onclick="alert('Đang vào sảnh Xổ Số...')">
-                <div class="game-icon">🎟️</div>
-                <span>Xổ Số</span>
-            </div>
-            <div class="game-card" onclick="alert('Đang vào sảnh Game Bài...')">
-                <div class="game-icon">🃏</div>
+            <div class="g-tab" onclick="switchTab(this, 'GAME_BAI')">
+                <span class="g-tab-icon">🃏</span>
                 <span>Game Bài</span>
             </div>
+            <div class="g-tab" onclick="switchTab(this, 'BAN_CA')">
+                <span class="g-tab-icon">🐟</span>
+                <span>Bắn Cá</span>
+            </div>
         </div>
 
-        <!-- Bottom Nav -->
+        <!-- Lưới danh sách game chi tiết -->
+        <div class="game-section">
+            <div class="game-grid-detailed" id="game-list">
+                <!-- Render mặc định danh mục HOT -->
+                <div class="game-item-card" onclick="alert('Đang vào game Dragon Gems 500')">
+                    <div class="game-thumb">🐉</div>
+                    <div class="game-name">Dragon Gems</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Mithai Madness')">
+                    <div class="game-thumb">🍬</div>
+                    <div class="game-name">Mithai Madness</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Fortune Gems')">
+                    <div class="game-thumb">💎</div>
+                    <div class="game-name">Fortune Gems</div>
+                </div>
+                <div class="game-thumb-card game-item-card" onclick="alert('Đang vào game Super Elements')">
+                    <div class="game-thumb">⚡</div>
+                    <div class="game-name">Super Elements</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Ultra Ace')">
+                    <div class="game-thumb">👑</div>
+                    <div class="game-name">Ultra Ace</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Gates of Olympus')">
+                    <div class="game-thumb">⚡</div>
+                    <div class="game-name">NCVIP Gates</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Bountiful Birds')">
+                    <div class="game-thumb">🦜</div>
+                    <div class="game-name">Bountiful Birds</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Aztec Treasures')">
+                    <div class="game-thumb">🗿</div>
+                    <div class="game-name">Aztec Treasure</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Wild Bounty')">
+                    <div class="game-thumb">🤠</div>
+                    <div class="game-name">Wild Bounty</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Mahjong Ways')">
+                    <div class="game-thumb">🀄</div>
+                    <div class="game-name">Mahjong Ways</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Super Ace')">
+                    <div class="game-thumb">🃏</div>
+                    <div class="game-name">Super Ace</div>
+                </div>
+                <div class="game-item-card" onclick="alert('Đang vào game Jackpot Fishing')">
+                    <div class="game-thumb">🦈</div>
+                    <div class="game-name">Jackpot Fish</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav (Giữ nguyên menu điều hướng dưới, đã bỏ hoàn toàn nút đăng nhập/đăng ký) -->
         <nav class="bottom-nav">
             <a href="/" class="nav-item active">
                 <div class="nav-icon">🏠</div>
@@ -127,6 +266,79 @@
             </a>
         </nav>
     </div>
+
+    <script>
+        // Dữ liệu mẫu thay đổi game theo danh mục bấm vào
+        const gamesData = {
+            'HOT': [
+                {icon: '🐉', name: 'Dragon Gems'},
+                {icon: '🍬', name: 'Mithai Madness'},
+                {icon: '💎', name: 'Fortune Gems'},
+                {icon: '⚡', name: 'Super Elements'},
+                {icon: '👑', name: 'Ultra Ace'},
+                {icon: '⚡', name: 'NCVIP Gates'},
+                {icon: '🦜', name: 'Bountiful Birds'},
+                {icon: '🗿', name: 'Aztec Treasure'},
+                {icon: '🤠', name: 'Wild Bounty'},
+                {icon: '🀄', name: 'Mahjong Ways'},
+                {icon: '🃏', name: 'Super Ace'},
+                {icon: '🦈', name: 'Jackpot Fish'}
+            ],
+            'DA_GA': [
+                {icon: '🐓', name: 'Đá Gà Thomo'},
+                {icon: '🔥', name: 'Đá Gà Cựa Sắt'},
+                {icon: '🏆', name: 'Trực Tiếp SV388'},
+                {icon: '🥇', name: 'Đá Gà Campuchia'}
+            ],
+            'SLOTS': [
+                {icon: '🎰', name: 'Slot Thần Tài'},
+                {icon: '💰', name: 'Kho Báu Aztec'},
+                {icon: '🧧', name: 'Nổ Hũ Phúc Lộc'},
+                {icon: '🔮', name: 'Đường Mạt Chược'},
+                {icon: '👑', name: 'Quyền Năng Zeus'},
+                {icon: '🍀', name: 'Lucky Neko'}
+            ],
+            'CASINO': [
+                {icon: '🎲', name: 'Baccarat Sâm Ty'},
+                {icon: '🎡', name: 'Roulette Châu Âu'},
+                {icon: '🃏', name: 'Blackjack Live'},
+                {icon: '🐉', name: 'Rồng Hồ (Dragon Tiger)'}
+            ],
+            'GAME_BAI': [
+                {icon: '♠️', name: 'Tiến Lên Miền Nam'},
+                {icon: '♣️', name: 'Phỏm Tá Lả'},
+                {icon: '♦️', name: 'Mậu Binh'},
+                {icon: '♥️', name: 'Liêng Cào Tố'}
+            ],
+            'BAN_CA': [
+                {icon: '🐟', name: 'Bắn Cá Long Vương'},
+                {icon: '🐠', name: 'Bắn Cá Hũ Thần'},
+                {icon: '🐬', name: 'Săn Cá Đại Dương'},
+                {icon: '🐳', name: 'Bắn Cá Hoàng Gia'}
+            ]
+        };
+
+        function switchTab(element, category) {
+            // Đổi active cho tab
+            document.querySelectorAll('.g-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            // Render lại danh sách game tương ứng
+            const gameListContainer = document.getElementById('game-list');
+            const items = gamesData[category] || [];
+            
+            let html = '';
+            items.forEach(game => {
+                html += `
+                    <div class="game-item-card" onclick="alert('Đang vào ${game.name}')">
+                        <div class="game-thumb">${game.icon}</div>
+                        <div class="game-name">${game.name}</div>
+                    </div>
+                `;
+            });
+            gameListContainer.innerHTML = html;
+        }
+    </script>
 </body>
-    </html>
+                    </html>
     

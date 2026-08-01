@@ -1,27 +1,235 @@
-.games{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:12px;
-    padding:15px;
+/* Reset cơ bản */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.game{
-    aspect-ratio:1/1;
-    background:#2c3150;
-    border-radius:14px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
+body {
+    background-color: #0d0f17; /* Đen nền ngoài */
+    display: flex;
+    justify-content: center;
 }
 
-.game img{
-    width:52px;
-    height:52px;
-    margin-bottom:10px;
+/* Khung giả lập mobile chuẩn 1:1 */
+.app-container {
+    width: 100%;
+    max-width: 420px; /* Chuẩn kích thước màn hình điện thoại */
+    background-color: #131521;
+    color: #ffffff;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 70px; /* Cách ra cho bottom nav */
+    overflow-x: hidden;
 }
 
-.game span{
-    font-size:13px;
-    text-align:center;
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 15px;
 }
+
+.menu-btn {
+    font-size: 20px;
+    color: #ebd08d;
+    cursor: pointer;
+}
+
+.logo {
+    color: #ebd08d;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+
+.support-btn {
+    background-color: #242738;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: #9fa5b9;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Banner VIP */
+.banner {
+    background: linear-gradient(90deg, #442a8a 0%, #2e5cb8 100%);
+    margin: 0 15px;
+    border-radius: 12px;
+    padding: 22px 10px 16px;
+    text-align: center;
+    position: relative;
+}
+
+.banner h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 12px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+.dot.active {
+    width: 14px;
+    background-color: #ffc107;
+    border-radius: 4px;
+}
+
+/* Announcement (Thông báo) */
+.announcement {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #9ba0b4;
+    font-size: 12px;
+}
+
+.horn {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+/* Categories (Thanh Thể Loại) */
+.categories {
+    display: flex;
+    gap: 10px;
+    padding: 0 15px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+}
+
+.categories::-webkit-scrollbar {
+    display: none; /* Ẩn thanh cuộn */
+}
+
+.cat-item {
+    background-color: #212537;
+    min-width: 68px;
+    height: 68px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    color: #7c84a0;
+    font-weight: 600;
+    flex-shrink: 0;
+    gap: 5px;
+}
+
+.cat-item.active {
+    border: 1.5px solid #d7ad66;
+    color: #d7ad66;
+}
+
+.cat-item .cat-icon {
+    font-size: 18px;
+}
+
+.cat-item.text-only {
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* Game Grid (Lưới 4 cột) */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 0 15px;
+}
+
+.game-card {
+    border-radius: 12px;
+    padding: 15px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    aspect-ratio: 3 / 4; /* Giữ form chữ nhật đứng */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.game-card.green {
+    background: linear-gradient(180deg, #22b15e, #178c48);
+}
+
+.game-card.orange {
+    background: linear-gradient(180deg, #fd9d24, #eb7a0b);
+}
+
+.game-card.red {
+    background: linear-gradient(180deg, #e74e44, #c92c2b);
+}
+
+.game-icon {
+    font-size: 26px; /* Thay bằng img tag ở đây sau */
+}
+
+.game-name {
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    padding: 0 4px;
+}
+
+/* Bottom Nav (Thanh điều hướng) */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    background-color: #131521;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #212537;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #7a83a0;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.nav-item .nav-icon {
+    font-size: 20px;
+}
+
+.nav-item.active {
+    color: #d7ad66;
+    }
+    

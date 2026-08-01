@@ -3,134 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Casino World</title>
-    <!-- Link file CSS chuẩn Flask -->
+    <title>Mega Casino - Trang chủ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .header {
+            padding: 15px;
+            background-color: #171a29;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #24293f;
+        }
+        .logo {
+            color: #cca352;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .balance-box {
+            background: #212537;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #cca352;
+            border: 1px solid #303650;
+        }
+        .banner {
+            padding: 15px;
+        }
+        .section-title {
+            padding: 0 15px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #cca352;
+            margin: 15px 0 10px 0;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 15px;
+        }
+        .game-card {
+            background: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 8px;
+            padding: 20px 10px;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .game-card:hover {
+            border-color: #cca352;
+        }
+        .game-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
         <!-- Header -->
-        <header class="header">
-            <div class="menu-btn">☰</div>
-            <div class="logo">MEGA CASINO WORLD</div>
-            <div class="support-btn">💬 CSKH</div>
-        </header>
+        <div class="header">
+            <div class="logo">👑 MEGA CASINO</div>
+            <div class="balance-box">💰 100.000 đ</div>
+        </div>
 
-        <!-- Banner VIP -->
+        <!-- Banner -->
         <div class="banner">
-            <h2>👑 VIP CLUB - ĐẶC QUYỀN ĐỘC QUYỀN 👑</h2>
-            <div class="dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
+            <div style="width:100%; height:140px; background: linear-gradient(135deg, #2b2f45, #171a29); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#cca352; font-size:18px; border: 1px solid #303650; text-align: center; padding: 10px;">
+                🔥 KHUYẾN MÃI NẠP ĐẦU 100% 🔥
             </div>
         </div>
 
-        <!-- Thông báo chạy chữ -->
-        <div class="announcement">
-            <span class="horn">📢</span>
-            <marquee scrollamount="4">Thông báo: Chào mừng thành viên mới tham gia sảnh game Tài Xỉu 1...</marquee>
-        </div>
-
-        <!-- Thanh Thể Loại (Categories) -->
-        <div class="categories">
-            <div class="cat-item active">
-                <span class="cat-icon">🔥</span>
-                <span>HOT</span>
-            </div>
-            <div class="cat-item">
-                <span class="cat-icon">🐓</span>
-                <span>ĐÁ GÀ</span>
-            </div>
-            <div class="cat-item">
-                <span class="cat-icon">🎰</span>
-                <span>Slots</span>
-            </div>
-            <div class="cat-item text-only">
-                <span>Casino</span>
-            </div>
-            <div class="cat-item text-only">
-                <span>Game<br>Bài</span>
-            </div>
-        </div>
-
-        <!-- Lưới Game (Game Grid 4 cột) -->
+        <!-- Game List -->
+        <div class="section-title">🎮 Danh mục trò chơi</div>
         <div class="game-grid">
-            <!-- Hàng 1 -->
-            <div class="game-card green">
+            <div class="game-card" onclick="alert('Đang vào sảnh Slot Game...')">
+                <div class="game-icon">🎰</div>
+                <span>Slot Game</span>
+            </div>
+            <div class="game-card" onclick="alert('Đang vào sảnh Casino Live...')">
                 <div class="game-icon">🎲</div>
-                <div class="game-name">Tài Xỉu VIP</div>
+                <span>Live Casino</span>
             </div>
-            <div class="game-card orange">
-                <div class="game-icon">🐉</div>
-                <div class="game-name">Dragon Gems</div>
+            <div class="game-card" onclick="alert('Đang vào sảnh Bắn Cá...')">
+                <div class="game-icon">🐟</div>
+                <span>Bắn Cá</span>
             </div>
-            <div class="game-card orange">
-                <div class="game-icon">🍬</div>
-                <div class="game-name">Mithai Madn...</div>
+            <div class="game-card" onclick="alert('Đang vào sảnh Thể Thao...')">
+                <div class="game-icon">⚽</div>
+                <span>Thể Thao</span>
             </div>
-            <div class="game-card orange">
-                <div class="game-icon">🦅</div>
-                <div class="game-name">Fortune Gods</div>
+            <div class="game-card" onclick="alert('Đang vào sảnh Xổ Số...')">
+                <div class="game-icon">🎟️</div>
+                <span>Xổ Số</span>
             </div>
-
-            <!-- Hàng 2 -->
-            <div class="game-card orange">
-                <div class="game-icon">👑</div>
-                <div class="game-name">NCVIP Super</div>
-            </div>
-            <div class="game-card orange">
+            <div class="game-card" onclick="alert('Đang vào sảnh Game Bài...')">
                 <div class="game-icon">🃏</div>
-                <div class="game-name">Ultra Ace</div>
-            </div>
-            <div class="game-card orange">
-                <div class="game-icon">⚡</div>
-                <div class="game-name">NCVIP Gates</div>
-            </div>
-            <div class="game-card orange">
-                <div class="game-icon">🦜</div>
-                <div class="game-name">NC Bountiful</div>
-            </div>
-
-            <!-- Hàng 3 -->
-            <div class="game-card red">
-                <div class="game-icon">🀄</div>
-                <div class="game-name">Mahjong Ways</div>
-            </div>
-            <div class="game-card orange">
-                <div class="game-icon">💰</div>
-                <div class="game-name">Pinata Wins</div>
-            </div>
-            <div class="game-card orange">
-                <div class="game-icon">🦈</div>
-                <div class="game-name">Jackpot Fish</div>
-            </div>
-            <div class="game-card orange">
-                <div class="game-icon">🎡</div>
-                <div class="game-name">Crazy Time</div>
+                <span>Game Bài</span>
             </div>
         </div>
 
-        <!-- Thanh Điều Hướng Dưới Cùng (Bottom Nav) -->
+        <!-- Bottom Nav -->
         <nav class="bottom-nav">
-            <div class="nav-item active">
+            <a href="/" class="nav-item active">
                 <div class="nav-icon">🏠</div>
                 <span>Trang chủ</span>
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật')">
                 <div class="nav-icon">🎁</div>
                 <span>Khuyến mãi</span>
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="/deposit" class="nav-item">
                 <div class="nav-icon">💳</div>
                 <span>Nạp tiền</span>
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="/profile" class="nav-item">
                 <div class="nav-icon">👤</div>
                 <span>Tài khoản</span>
-            </div>
+            </a>
         </nav>
     </div>
 </body>
-                    </html>
-                    
+    </html>
+    

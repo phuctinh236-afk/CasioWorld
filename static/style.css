@@ -3,11 +3,11 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background-color: #0f0f0f;
+    background-color: #131521;
     color: #fff;
     display: flex;
     justify-content: center;
@@ -17,8 +17,8 @@ body {
 
 .app-container {
     width: 100%;
-    max-width: 420px;
-    background: #1a1a1a;
+    max-width: 480px;
+    background: #131521;
     min-height: 100vh;
     position: relative;
     overflow-y: auto;
@@ -28,10 +28,11 @@ body {
 
 /* Phần Đầu Trang Cá Nhân */
 .profile-header {
-    background: linear-gradient(135deg, #ff4e00, #ec9f05);
+    background: linear-gradient(135deg, #2b2f45, #171a29);
     padding: 20px;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+    border-bottom: 1px solid #303650;
 }
 
 .profile-top-row {
@@ -44,16 +45,18 @@ body {
 .profile-title {
     font-size: 18px;
     font-weight: bold;
+    color: #cca352;
 }
 
 .cskh-btn-top {
-    background: rgba(0,0,0,0.25);
-    padding: 6px 12px;
+    background: #212537;
+    padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
     cursor: pointer;
-    border: none;
-    color: #fff;
+    border: 1px solid #303650;
+    color: #cca352;
+    font-weight: 600;
 }
 
 .welcome-text {
@@ -62,20 +65,22 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #9fa5b9;
 }
 
 .logout-link {
-    color: #fff;
+    color: #cca352;
     text-decoration: underline;
     font-size: 12px;
     cursor: pointer;
 }
 
 .balance-box {
-    font-size: 26px;
+    font-size: 24px;
     font-weight: bold;
-    margin: 12px 0;
+    margin: 15px 0;
     letter-spacing: 0.5px;
+    color: #cca352;
 }
 
 .action-buttons {
@@ -86,7 +91,7 @@ body {
 
 .btn-action {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
     border: none;
     font-weight: bold;
@@ -95,20 +100,21 @@ body {
     font-size: 14px;
 }
 
-.btn-deposit { background: #fff; color: #ff4e00; }
-.btn-withdraw { background: rgba(0,0,0,0.3); color: #fff; }
+.btn-deposit { background: linear-gradient(135deg, #dfbc68, #cca352); color: #131521; }
+.btn-withdraw { background: #212537; color: #fff; border: 1px solid #303650; }
 
 /* Lưới Chức Năng (Menu Grid) */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 10px;
     padding: 15px;
 }
 
 .menu-item {
-    background: #ff5722;
-    border-radius: 12px;
+    background: #171a29;
+    border: 1px solid #24293f;
+    border-radius: 10px;
     padding: 15px 8px;
     text-align: center;
     cursor: pointer;
@@ -117,7 +123,11 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 90px;
-    box-shadow: 0 4px 10px rgba(255, 87, 34, 0.2);
+    transition: 0.2s;
+}
+
+.menu-item:hover {
+    border-color: #cca352;
 }
 
 .menu-item:active {
@@ -130,41 +140,50 @@ body {
 }
 
 .menu-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    color: #fff;
+    color: #cca352;
     text-align: center;
 }
 
-/* Thanh Điều Hướng Dưới Cùng */
+/* Thanh Điều Hướng Dưới Cùng (Bottom Nav) */
 .bottom-nav {
-    position: absolute;
+    position: fixed;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
-    background: #111;
+    max-width: 480px;
+    background-color: #171a29;
+    border-top: 1px solid #24293f;
     display: flex;
     justify-content: space-around;
-    padding: 10px 0;
-    border-top: 1px solid #333;
-    z-index: 10;
+    padding: 8px 0;
+    z-index: 900;
 }
 
 .nav-item {
-    text-align: center;
-    color: #888;
-    font-size: 11px;
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-decoration: none;
+    color: #7a83a0;
+    font-size: 10px;
+    gap: 3px;
     background: none;
     border: none;
+    cursor: pointer;
 }
 
 .nav-item.active {
-    color: #ff5722;
+    color: #cca352;
 }
 
-/* MODAL & POPUP (Ẩn mặc định) */
+.nav-icon {
+    font-size: 20px;
+}
+
+/* MODAL & POPUP */
 .fullscreen-modal {
     display: none !important;
     position: fixed;
@@ -185,7 +204,8 @@ body {
 .fs-modal-content {
     width: 90%;
     max-width: 380px;
-    background: #1f1f1f;
+    background: #171a29;
+    border: 1px solid #303650;
     border-radius: 12px;
     overflow: hidden;
     color: #fff;
@@ -193,12 +213,14 @@ body {
 }
 
 .fs-header {
-    background: #2c2c2c;
+    background: #212537;
     padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: bold;
+    color: #cca352;
+    border-bottom: 1px solid #303650;
 }
 
 .fs-close {
@@ -216,19 +238,20 @@ body {
 .filter-input, .filter-select {
     width: 100%;
     padding: 10px;
-    background: #2a2a2a;
-    border: 1px solid #444;
+    background: #212537;
+    border: 1px solid #303650;
     color: #fff;
     border-radius: 6px;
-    margin-bottom: 12px;
+    font-size: 12px;
+    outline: none;
 }
 
 .search-action-btn, .cskh-action-btn {
     width: 100%;
     padding: 12px;
-    background: #ff5722;
+    background: linear-gradient(135deg, #dfbc68, #cca352);
     border: none;
-    color: #fff;
+    color: #131521;
     font-weight: bold;
     border-radius: 6px;
     cursor: pointer;
@@ -236,14 +259,16 @@ body {
     text-align: center;
     display: block;
     text-decoration: none;
+    font-size: 13px;
 }
 
 .search-result-box {
     margin-top: 15px;
     padding: 15px;
-    background: #252525;
+    background: #212537;
+    border: 1px solid #303650;
     border-radius: 6px;
     text-align: center;
-    font-size: 13px;
-    color: #aaa;
+    font-size: 12px;
+    color: #9fa5b9;
 }

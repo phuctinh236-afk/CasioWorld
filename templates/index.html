@@ -317,9 +317,6 @@
             border-radius: 6px;
             padding: 10px 12px;
             color: #131521;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             cursor: pointer;
         }
         .drawer-wallet-title {
@@ -365,10 +362,26 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 4px;
         }
         .drawer-menu-item:hover {
             border-color: #cca352;
+        }
+        .drawer-menu-item.wide {
+            grid-column: span 2;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 12px 14px;
+            gap: 12px;
+        }
+        .drawer-menu-item.wide .dm-icon {
+            font-size: 22px;
+        }
+        .drawer-menu-item.wide .dm-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #cca352;
         }
         .dm-icon { font-size: 20px; }
         .dm-label { font-size: 11px; color: #cca352; }
@@ -476,7 +489,7 @@
                 <div class="nav-icon">🎁</div>
                 <span>Khuyến mãi</span>
             </a>
-            <a href="/deposit" class="nav-item">
+            <a href="/deposit" class="nav-item" onclick="handleDepositFromNav(event)">
                 <div class="nav-icon">💳</div>
                 <span>Nạp tiền</span>
             </a>
@@ -494,7 +507,7 @@
                 <button type="button" class="drawer-close" onclick="closeDrawer()">✕</button>
             </div>
             <div class="drawer-body">
-                <!-- Thông tin hồ sơ & ví (Bấm vào ví sẽ làm mới số dư thay vì chuyển trang) -->
+                <!-- Thông tin hồ sơ & ví (Đã xóa túi hồng, bấm vào ví để làm mới số dư) -->
                 <div class="drawer-profile-card">
                     <div class="drawer-profile-row" onclick="location.href='/profile'">
                         <div class="drawer-user-info">
@@ -507,11 +520,8 @@
                         <div style="color: #7a83a0;">➔</div>
                     </div>
                     <div class="drawer-wallet-box" onclick="refreshWallet(this)">
-                        <div>
-                            <div class="drawer-wallet-title">Ví chính chung <span id="refreshIcon" style="display:inline-block; transition: transform 0.5s;">🔄</span></div>
-                            <div class="drawer-wallet-balance" id="walletBalance">đ 100.000</div>
-                        </div>
-                        <div style="font-size: 20px;">👛</div>
+                        <div class="drawer-wallet-title">Ví chính chung <span id="refreshIcon" style="display:inline-block; transition: transform 0.5s;">🔄</span></div>
+                        <div class="drawer-wallet-balance" id="walletBalance">đ 100.000</div>
                     </div>
                 </div>
 
@@ -521,13 +531,13 @@
                     <span>🔍</span>
                 </div>
 
-                <!-- Lưới menu 1:1 chuẩn (Nạp tiền hình chữ nhật nằm ngang chiếm 2 cột) -->
+                <!-- Lưới menu 1:1 chuẩn (Nạp tiền cộng ví, Rút tiền trừ ví) -->
                 <div class="drawer-menu-grid">
-                    <div class="drawer-menu-item wide" onclick="location.href='/deposit'">
+                    <div class="drawer-menu-item wide" onclick="handleDeposit()">
                         <span class="dm-icon">💳</span>
                         <span class="dm-label">Nạp tiền</span>
                     </div>
-                    <div class="drawer-menu-item" onclick="location.href='/deposit'">
+                    <div class="drawer-menu-item" onclick="handleWithdraw()">
                         <span class="dm-icon">🏧</span>
                         <span class="dm-label">Rút tiền</span>
                     </div>
@@ -589,6 +599,71 @@
     </div>
 
     <script>
+        // Quản lý số dư ví bằng localStorage để cộng trừ chuẩn xác
+        function getBalance() {
+            let bal = localStorage.getItem('wallet_balance');
+            return bal !== null ? parseInt(bal) : 100000;
+        }
+
+        function setBalance(amount) {
+            localStorage.setItem('wallet_balance', amount);
+            updateBalanceDisplay();
+        }
+
+        function updateBalanceDisplay() {
+            const bal = getBalance();
+            const formatted = 'đ ' + bal.toLocaleString('vi-VN');
+            document.querySelectorAll('#walletBalance').forEach(el => {
+                el.innerText = formatted;
+            });
+        }
+
+        // Tự động cập nhật hiển thị số dư khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {
+            updateBalanceDisplay();
+        });
+
+        // Nạp tiền: Nhập số tiền để CỘNG (+) vào ví
+        function handleDeposit() {
+            let input = prompt("Nhập số tiền muốn nạp (đ):", "50000");
+            if (input !== null) {
+                let amount = parseInt(input);
+                if (!isNaN(amount) && amount > 0) {
+                    let current = getBalance();
+                    setBalance(current + amount);
+                    alert("Nạp tiền thành công! Đã cộng thêm " + amount.toLocaleString('vi-VN') + " đ vào ví.");
+                    closeDrawer();
+                } else {
+                    alert("Vui lòng nhập số tiền hợp lệ!");
+                }
+            }
+        }
+
+        function handleDepositFromNav(e) {
+            e.preventDefault();
+            handleDeposit();
+        }
+
+        // Rút tiền: Nhập số tiền để TRỪ (-) khỏi ví
+        function handleWithdraw() {
+            let input = prompt("Nhập số tiền muốn rút (đ):", "50000");
+            if (input !== null) {
+                let amount = parseInt(input);
+                if (!isNaN(amount) && amount > 0) {
+                    let current = getBalance();
+                    if (amount <= current) {
+                        setBalance(current - amount);
+                        alert("Rút tiền thành công! Đã trừ " + amount.toLocaleString('vi-VN') + " đ khỏi ví.");
+                        closeDrawer();
+                    } else {
+                        alert("Số dư trong ví không đủ để rút!");
+                    }
+                } else {
+                    alert("Vui lòng nhập số tiền hợp lệ!");
+                }
+            }
+        }
+
         const gamesData = {
             'HOT': [
                 {icon: '🐉', name: 'Dragon Gems'},
@@ -655,15 +730,13 @@
             }
         }
 
-        // Hàm làm mới ví khi ấn vào khung ví (không chuyển trang)
         function refreshWallet(element) {
             const icon = document.getElementById('refreshIcon');
             icon.style.transform = 'rotate(360deg)';
             setTimeout(() => {
                 icon.style.transform = 'rotate(0deg)';
             }, 500);
-
-            // Giả lập cập nhật số dư hoặc thông báo làm mới
+            updateBalanceDisplay();
             alert('Đã làm mới số dư ví chính!');
         }
     </script>

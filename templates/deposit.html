@@ -1,1 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ví của tôi - Mega Casino</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .wallet-container {
+            padding: 15px;
+            padding-bottom: 90px;
+        }
+        /* Top bar ví */
+        .wallet-header {
+            background-color: #cca352;
+            color: #131521;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .wallet-header .close-btn {
+            font-size: 18px;
+            text-decoration: none;
+            color: #131521;
+        }
+        /* Tab chuyển đổi Nạp / Rút */
+        .wallet-tabs {
+            display: flex;
+            background-color: #1b1e2e;
+            padding: 10px 15px;
+            gap: 10px;
+        }
+        .w-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: #9c7c32;
+            color: #fff;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .w-tab.inactive {
+            background-color: #2b2f45;
+            color: #9fa5b9;
+        }
+        /* Card box */
+        .section-box {
+            background-color: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            color: #cca352;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        /* Select dropdown */
+        .custom-select {
+            width: 100%;
+            background-color: #212537;
+            border: 1px solid #303650;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        /* Payment methods grid */
+        .pay-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .pay-item {
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 6px;
+            padding: 12px 8px;
+            text-align: center;
+            color: #fff;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .pay-item.active {
+            border-color: #cca352;
+            background-color: #2b2b20;
+        }
+        .pay-item img, .pay-item .p-icon {
+            font-size: 20px;
+        }
+        /* Amount grid */
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .amount-btn {
+            background-color: #212537;
+            border: 1px solid #303650;
+            color: #fff;
+            padding: 10px 0;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+        .amount-btn.active {
+            border-color: #cca352;
+            background-color: #2b2b20;
+        }
+        /* Custom input money */
+        .money-input-wrap {
+            position: relative;
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 6px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .money-input-wrap input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            width: 70%;
+            outline: none;
+        }
+        .money-input-wrap .rate {
+            color: #7a83a0;
+            font-size: 12px;
+        }
+        /* Notice box */
+        .notice-box {
+            font-size: 11px;
+            color: #9fa5b9;
+            line-height: 1.5;
+        }
+        /* Submit Button */
+        .btn-submit-wallet {
+            width: 100%;
+            background: linear-gradient(180deg, #ebd08d 0%, #cca352 100%);
+            color: #131521;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Ví -->
+        <div class="wallet-header">
+            <span>Ví của tôi</span>
+            <a href="/" class="close-btn">✕</a>
+        </div>
 
+        <!-- Tab Nạp / Rút -->
+        <div class="wallet-tabs">
+            <div class="w-tab">Nạp tiền</div>
+            <div class="w-tab inactive">Rút tiền</div>
+        </div>
+
+        <div class="wallet-container">
+            <!-- Chọn khuyến mãi -->
+            <div class="section-box" style="padding: 10px 15px;">
+                <select class="custom-select">
+                    <option>Chọn khuyến mãi: Nạp Tiền Thông Thường</option>
+                    <option>Thưởng chào mừng thành viên mới</option>
+                    <option>Hoàn trả mỗi ngày</option>
+                </select>
+            </div>
+
+            <!-- Phương thức thanh toán -->
+            <div class="section-box">
+                <div class="section-title">⚡ Phương thức thanh toán</div>
+                <div class="pay-grid">
+                    <div class="pay-item active">
+                        <span class="p-icon">🏦</span>
+                        <span>Ngân hàng đ...</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon">🟢</span>
+                        <span>MOMOPAY</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon">🔵</span>
+                        <span>ZaloPay</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon">🔴</span>
+                        <span>ViettelPay</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon">₮</span>
+                        <span>USDT TRC20</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon">₿</span>
+                        <span>BTC</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon">Ξ</span>
+                        <span>ETH</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="p-icon"> thẻ </span>
+                        <span>Thẻ Cào ĐT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cổng nạp -->
+            <div class="section-box">
+                <div class="section-title">⚡ Cổng nạp</div>
+                <div class="pay-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="pay-item active" style="padding: 8px;">HN-Pay1</div>
+                    <div class="pay-item" style="padding: 8px;">O-Pay</div>
+                    <div class="pay-item" style="padding: 8px;">D-Pay</div>
+                </div>
+            </div>
+
+            <!-- Số tiền nạp -->
+            <div class="section-box">
+                <div class="section-title" style="justify-content: space-between;">
+                    <span>💵 Số tiền Nạp</span>
+                    <span style="font-size: 10px; color: #7a83a0;">đ 100,00 - đ 100.000,00</span>
+                </div>
+                <div class="amount-grid">
+                    <div class="amount-btn">100</div>
+                    <div class="amount-btn">200</div>
+                    <div class="amount-btn">500</div>
+                    <div class="amount-btn">1.000</div>
+                    <div class="amount-btn">2.000</div>
+                    <div class="amount-btn">5.000</div>
+                    <div class="amount-btn">10.000</div>
+                    <div class="amount-btn">20.000</div>
+                    <div class="amount-btn">50.000</div>
+                    <div class="amount-btn active">100.000</div>
+                </div>
+                <div class="money-input-wrap">
+                    <input type="text" placeholder="đ">
+                    <span class="rate">1 = 1K</span>
+                </div>
+            </div>
+
+            <!-- Nhắc nhở -->
+            <div class="section-box">
+                <div class="section-title">ℹ️ Nhắc nhở</div>
+                <div class="notice-box">
+                    Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình. Nếu không, bạn cần liên hệ với chăm sóc khách hàng kèm theo hình ảnh gửi tiền thành công. 2) Xóa 3 số 0 cuối cùng khi nhập số tiền gửi. Ví dụ: Nạp 1.000.000 VNĐ, chỉ cần nhập 1.000 điểm
+                </div>
+            </div>
+
+            <!-- Nút gửi -->
+            <button class="btn-submit-wallet">Gửi</button>
+        </div>
+
+        <!-- Bottom Nav giữ nguyên chuẩn sảnh -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="location.href='/'">
+                <div class="nav-icon">🏠</div>
+                <span>Trang chủ</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">💳</div>
+                <span>Nạp tiền</span>
+            </div>
+            <div class="nav-item" onclick="location.href='/profile'">
+                <div class="nav-icon">👤</div>
+                <span>Tài khoản</span>
+            </div>
+        </nav>
+    </div>
+</body>
+  </html>
+                      

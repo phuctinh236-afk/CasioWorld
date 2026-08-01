@@ -8,6 +8,7 @@
     <style>
         .wallet-container {
             padding: 15px;
+            padding-bottom: 80px;
         }
         .wallet-header {
             background-color: #cca352;
@@ -213,14 +214,6 @@
                         <span class="p-icon">₿</span>
                         <span>BTC</span>
                     </div>
-                    <div class="pay-item">
-                        <span class="p-icon">Ξ</span>
-                        <span>ETH</span>
-                    </div>
-                    <div class="pay-item">
-                        <span class="p-icon">💳</span>
-                        <span>Thẻ Cào ĐT</span>
-                    </div>
                 </div>
             </div>
 
@@ -302,7 +295,7 @@
             tabDeposit.classList.add('active');
             tabWithdraw.classList.remove('active');
             amountTitle.innerText = '💵 Số tiền Nạp';
-            noticeText.innerText = 'Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình. Nếu không, bạn cần liên hệ với chăm sóc khách hàng kèm theo hình ảnh gửi tiền thành công. 2) Xóa 3 số 0 cuối cùng khi nhập số tiền gửi. Ví dụ: Nạp 1.000.000 VNĐ, chỉ cần nhập 1.000 điểm';
+            noticeText.innerText = 'Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình...';
             btnSubmit.innerText = 'Gửi';
         });
 
@@ -310,7 +303,7 @@
             tabWithdraw.classList.add('active');
             tabDeposit.classList.remove('active');
             amountTitle.innerText = '💵 Số tiền Rút';
-            noticeText.innerText = 'Lưu ý rút tiền: Hạn mức rút tối thiểu là 200.000 VNĐ, tối đa 500.000.000 VNĐ mỗi ngày. Vui lòng điền đúng thông tin tài khoản ngân hàng nhận tiền.';
+            noticeText.innerText = 'Lưu ý rút tiền: Hạn mức rút tối thiểu là 200.000 VNĐ, tối đa 500.000.000 VNĐ mỗi ngày.';
             btnSubmit.innerText = 'Xác nhận rút';
         });
 
@@ -332,6 +325,8 @@
 
         const amountBtns = document.querySelectorAll('.amount-btn');
         const moneyInput = document.getElementById('money-input');
+        
+        // Khi chọn mốc tiền nhanh
         amountBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 amountBtns.forEach(b => b.classList.remove('active'));
@@ -340,11 +335,22 @@
             });
         });
 
+        // Xử lý khi gõ phím trực tiếp vào ô nhập tiền (gõ thêm số 0 sẽ tự động nhân lên và định dạng lại)
+        moneyInput.addEventListener('input', (e) => {
+            let rawVal = moneyInput.value.replace(/\D/g, ''); // Chỉ giữ lại số
+            if (rawVal === '') {
+                moneyInput.value = '';
+                return;
+            }
+            let num = parseInt(rawVal, 10);
+            moneyInput.value = num.toLocaleString('vi-VN'); // Tự động chấm phân cách hàng nghìn
+        });
+
         btnSubmit.addEventListener('click', () => {
             const type = tabDeposit.classList.contains('active') ? 'nạp tiền' : 'rút tiền';
-            alert(`Đã gửi yêu cầu ${type} thành công! Hệ thống đang xử lý.`);
+            alert(`Đã gửi yêu cầu ${type} thành công! Số tiền: ${moneyInput.value} VNĐ`);
         });
     </script>
 </body>
-                        </html>
-                        
+    </html>
+    

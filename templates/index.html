@@ -1,31 +1,136 @@
-<div class="header">...</div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Casino World</title>
+    <!-- Link file CSS chuẩn Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="menu-btn">☰</div>
+            <div class="logo">MEGA CASINO WORLD</div>
+            <div class="support-btn">💬 CSKH</div>
+        </header>
 
-<div class="banner">...</div>
+        <!-- Banner VIP -->
+        <div class="banner">
+            <h2>👑 VIP CLUB - ĐẶC QUYỀN ĐỘC QUYỀN 👑</h2>
+            <div class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
 
-<div class="notice">...</div>
+        <!-- Thông báo chạy chữ -->
+        <div class="announcement">
+            <span class="horn">📢</span>
+            <marquee scrollamount="4">Thông báo: Chào mừng thành viên mới tham gia sảnh game Tài Xỉu 1...</marquee>
+        </div>
 
-<div class="category">
-    <button>🔥 HOT</button>
-    <button>🎰 Slots</button>
-    <button>🎲 Casino</button>
-    <button>🃏 Game bài</button>
-</div>
+        <!-- Thanh Thể Loại (Categories) -->
+        <div class="categories">
+            <div class="cat-item active">
+                <span class="cat-icon">🔥</span>
+                <span>HOT</span>
+            </div>
+            <div class="cat-item">
+                <span class="cat-icon">🐓</span>
+                <span>ĐÁ GÀ</span>
+            </div>
+            <div class="cat-item">
+                <span class="cat-icon">🎰</span>
+                <span>Slots</span>
+            </div>
+            <div class="cat-item text-only">
+                <span>Casino</span>
+            </div>
+            <div class="cat-item text-only">
+                <span>Game<br>Bài</span>
+            </div>
+        </div>
 
-<div class="games">
-    <div class="game">
-        <img src="/assets/games/taixiu.png">
-        <span>Tài Xỉu VIP</span>
+        <!-- Lưới Game (Game Grid 4 cột) -->
+        <div class="game-grid">
+            <!-- Hàng 1 -->
+            <div class="game-card green">
+                <div class="game-icon">🎲</div>
+                <div class="game-name">Tài Xỉu VIP</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🐉</div>
+                <div class="game-name">Dragon Gems</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🍬</div>
+                <div class="game-name">Mithai Madn...</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🦅</div>
+                <div class="game-name">Fortune Gods</div>
+            </div>
+
+            <!-- Hàng 2 -->
+            <div class="game-card orange">
+                <div class="game-icon">👑</div>
+                <div class="game-name">NCVIP Super</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🃏</div>
+                <div class="game-name">Ultra Ace</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">⚡</div>
+                <div class="game-name">NCVIP Gates</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🦜</div>
+                <div class="game-name">NC Bountiful</div>
+            </div>
+
+            <!-- Hàng 3 -->
+            <div class="game-card red">
+                <div class="game-icon">🀄</div>
+                <div class="game-name">Mahjong Ways</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">💰</div>
+                <div class="game-name">Pinata Wins</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🦈</div>
+                <div class="game-name">Jackpot Fish</div>
+            </div>
+            <div class="game-card orange">
+                <div class="game-icon">🎡</div>
+                <div class="game-name">Crazy Time</div>
+            </div>
+        </div>
+
+        <!-- Thanh Điều Hướng Dưới Cùng (Bottom Nav) -->
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <span>Trang chủ</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">💳</div>
+                <span>Nạp tiền</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Tài khoản</span>
+            </div>
+        </nav>
     </div>
-
-    <div class="game">
-        <img src="/assets/games/dragon.png">
-        <span>Dragon Gems</span>
-    </div>
-</div>
-
-<div class="navbar">
-    <div>🏠 Trang chủ</div>
-    <div>🎁 Khuyến mãi</div>
-    <div>💳 Ví</div>
-    <div>👤 Tài khoản</div>
-</div>
+</body>
+                    </html>
+                    

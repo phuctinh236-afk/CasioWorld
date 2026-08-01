@@ -1,1 +1,32 @@
-/* CasioWorld CSS */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#171b2f;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+.topbar{
+    background:#1d233b;
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 15px;
+    border-bottom:2px solid #caa14d;
+}
+
+.logo{
+    color:#d9b15d;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.balance{
+    color:#ffd65c;
+    font-size:18px;
+}

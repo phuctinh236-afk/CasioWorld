@@ -1,27 +1,114 @@
-    <!-- MODAL TRUNG TÂM GIAO DỊCH -->
-    <div class="fullscreen-modal" id="transactionModal">
-        <div class="fs-header">
-            <span>Trung Tâm Giao Dịch</span>
-            <button class="fs-close" onclick="closeTransactionCenter()">✕</button>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ab666 - Trang Cá Nhân</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- TRANG CÁ NHÂN (Profile) -->
+        <div class="profile-header">
+            <div class="profile-top-row">
+                <span class="profile-title">Trang Cá Nhân</span>
+                <button class="cskh-btn-top" onclick="openCSKH()">🎧 CSKH</button>
+            </div>
+            <div class="welcome-text">
+                <span>Xin chào, pphuc8386</span>
+                <span class="logout-link">đăng xuất 🚪</span>
+            </div>
+            <div class="balance-box">50.100.000 VND 🔄</div>
+            <div class="action-buttons">
+                <button class="btn-action btn-deposit">💳 Nạp Tiền</button>
+                <button class="btn-action btn-withdraw">👛 Rút Tiền</button>
+            </div>
         </div>
-        <div class="fs-body">
-            <div class="filter-card">
+
+        <!-- LƯỚI MENU CHỨC NĂNG -->
+        <div class="menu-grid">
+            <div class="menu-item">
+                <div class="menu-icon">👥</div>
+                <div class="menu-label">Giới thiệu bạn bè</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">✉️</div>
+                <div class="menu-label">Hộp Thư</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Chi tiết đặt cược</div>
+            </div>
+            <!-- Bấm vào đây để mở Trung tâm giao dịch -->
+            <div class="menu-item" onclick="openTransactionCenter()">
+                <div class="menu-icon">📄</div>
+                <div class="menu-label">Trung tâm giao dịch</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">🎁</div>
+                <div class="menu-label">Khu sự kiện</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">❤️</div>
+                <div class="menu-label">Yêu Thích</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">🔒</div>
+                <div class="menu-label">Bảo Mật</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">🔔</div>
+                <div class="menu-label">Thông Báo</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">🔄</div>
+                <div class="menu-label">Hoàn Trả</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">💎</div>
+                <div class="menu-label">VIP</div>
+            </div>
+        </div>
+
+        <!-- THANH ĐIỀU HƯỚNG DƯỚI (BOTTOM NAV) -->
+        <div class="bottom-nav">
+            <button class="nav-item">🏠<br>Trang Chủ</button>
+            <button class="nav-item">🎁<br>Khuyến Mãi</button>
+            <button class="nav-item">💳<br>Nạp - Rút</button>
+            <button class="nav-item" onclick="openCSKH()">💬<br>CSKH 24/7</button>
+            <button class="nav-item active">👤<br>Thành Viên</button>
+        </div>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- CÁC MODAL ĐƯỢC ĐẶT Ở NGOÀI CÙNG (ẨN MẶC ĐỊNH BỞI CSS)        -->
+    <!-- ======================================================= -->
+
+    <!-- Modal Trung Tâm Giao Dịch -->
+    <div class="fullscreen-modal" id="transactionModal">
+        <div class="fs-modal-content">
+            <div class="fs-header">
+                <span>Trung Tâm Giao Dịch</span>
+                <button class="fs-close" onclick="closeTransactionCenter()">✕</button>
+            </div>
+            <div class="fs-body">
                 <div class="filter-row">
-                    <span class="filter-label">Loại giao dịch</span>
+                    <span style="font-size: 13px; color: #ccc;">Loại giao dịch</span>
                     <select class="filter-select">
                         <option>Tất cả giao dịch</option>
                         <option>Nạp tiền</option>
                         <option>Rút tiền</option>
-                        <option>Chuyển quỹ</option>
                     </select>
                 </div>
                 <div class="filter-row">
-                    <span class="filter-label">Khoảng thời gian</span>
+                    <span style="font-size: 13px; color: #ccc;">Từ ngày</span>
                     <input type="text" class="filter-input" value="2026/08/01 00:00:00">
-                    <div style="text-align:center; color:#666; font-size:12px; margin-bottom:8px;">-</div>
+                    <span style="font-size: 13px; color: #ccc;">Đến ngày</span>
                     <input type="text" class="filter-input" value="2026/08/01 23:59:59">
                 </div>
-                <button class="search-action-btn" onclick="alert('Đang tìm kiếm giao dịch...')">Tìm kiếm</button>
+                <button class="search-action-btn" onclick="alert('Đang tìm kiếm lịch sử giao dịch...')">Tìm kiếm</button>
                 <div class="search-result-box">
                     🔍 Vui lòng thiết lập điều kiện và nhấn Tìm kiếm
                 </div>
@@ -29,77 +116,39 @@
         </div>
     </div>
 
-    <!-- MODAL CHĂM SÓC KHÁCH HÀNG (CSKH) -->
+    <!-- Modal CSKH -->
     <div class="fullscreen-modal" id="cskhModal">
-        <div class="fs-header">
-            <span>Hỗ Trợ Trực Tuyến CSKH</span>
-            <button class="fs-close" onclick="closeCSKH()">✕</button>
-        </div>
-        <div class="fs-body">
-            <div class="cskh-content-box">
-                <div class="cskh-icon-big">💬</div>
-                <div class="cskh-title">Trung Tâm Hỗ Trợ 24/7</div>
-                <div class="cskh-desc">Đội ngũ chăm sóc khách hàng của chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc mọi nơi về nạp rút, tài khoản và khuyến mãi.</div>
-                <a href="#" class="cskh-action-btn" onclick="alert('Đang kết nối với nhân viên CSKH...'); return false;">💬 Chat Trực Tuyến (Live Chat)</a>
-                <a href="#" class="cskh-action-btn" onclick="alert('Mở Telegram CSKH: @MegaCasinoSupport'); return false;">✈️ Liên Hệ Telegram</a>
-                <a href="#" class="cskh-action-btn" onclick="alert('Mở Zalo CSKH: 0987654321'); return false;">📞 Hỗ Trợ Zalo / Hotline</a>
+        <div class="fs-modal-content">
+            <div class="fs-header">
+                <span>Hỗ Trợ Trực Tuyến CSKH</span>
+                <button class="fs-close" onclick="closeCSKH()">✕</button>
             </div>
-        </div>
-    </div>
-        <!-- MODAL ĐĂNG NHẬP -->
-    <div class="auth-overlay" id="loginModal">
-        <div class="auth-modal-box">
-            <div class="auth-header">
-                <span>Đăng nhập</span>
-                <button class="auth-close" onclick="window.location.href='./'">✕</button>
-            </div>
-            <div class="auth-body">
-                <div class="auth-logo-area">MEGA CASINO WORLD</div>
-                <div class="auth-input-group">
-                    <div class="auth-input-label">Tên đăng nhập</div>
-                    <input type="text" class="auth-input-field" id="loginUser" placeholder="gồm 4 ~ 16 ký tự">
-                </div>
-                <div class="auth-input-group">
-                    <div class="auth-input-label">Mật khẩu</div>
-                    <input type="password" class="auth-input-field" id="loginPass" placeholder="6–20 ký tự và số">
-                </div>
-                <button class="auth-submit-btn" onclick="submitLogin()">Đăng nhập</button>
-                <div class="auth-switch-text">
-                    Bạn chưa có tài khoản? <a href="#" onclick="openRegisterModal(); return false;">Đăng ký</a>
-                </div>
+            <div class="fs-body" style="text-align: center;">
+                <div style="font-size: 32px; margin-bottom: 10px;">💬</div>
+                <div style="font-weight: bold; margin-bottom: 5px;">Trung Tâm Hỗ Trợ 24/7</div>
+                <p style="font-size: 12px; color: #aaa; margin-bottom: 15px;">Đội ngũ CSKH luôn sẵn sàng giải đáp thắc mắc của bạn mọi lúc mọi nơi.</p>
+                <a href="#" class="cskh-action-btn" onclick="alert('Đang kết nối Live Chat...'); return false;">💬 Chat Trực Tuyến</a>
+                <a href="#" class="cskh-action-btn" onclick="alert('Mở Telegram hỗ trợ...'); return false;">✈️ Liên Hệ Telegram</a>
             </div>
         </div>
     </div>
 
-    <!-- MODAL ĐĂNG KÝ -->
-    <div class="auth-overlay" id="registerModal">
-        <div class="auth-modal-box">
-            <div class="auth-header">
-                <span>Đăng ký</span>
-                <button class="auth-close" onclick="window.location.href='./'">✕</button>
-            </div>
-            <div class="auth-body">
-                <div class="auth-input-group">
-                    <div class="auth-input-label">Chọn đơn vị tiền tệ</div>
-                    <select class="auth-input-field"><option>🇻🇳 VND</option></select>
-                </div>
-                <div class="auth-input-group">
-                    <div class="auth-input-label">Tên đăng nhập</div>
-                    <input type="text" class="auth-input-field" placeholder="gồm 4 ~ 16 ký tự">
-                </div>
-                <div class="auth-input-group">
-                    <div class="auth-input-label">Mật khẩu</div>
-                    <input type="password" class="auth-input-field" placeholder="6–20 ký tự và số">
-                </div>
-                <div class="auth-input-group">
-                    <div class="auth-input-label">Số điện thoại (+84)</div>
-                    <input type="text" class="auth-input-field" placeholder="Điền số điện thoại">
-                </div>
-                <button class="auth-submit-btn" onclick="submitRegister()">Đăng ký tài khoản</button>
-                <div class="auth-switch-text">
-                    Đã có tài khoản? <a href="#" onclick="openLoginModal(); return false;">Đăng nhập</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+
+    <!-- JAVASCRIPT ĐIỀU KHIỂN BẬT/TẮT MODAL -->
+    <script>
+        function openTransactionCenter() {
+            document.getElementById('transactionModal').classList.add('active');
+        }
+        function closeTransactionCenter() {
+            document.getElementById('transactionModal').classList.remove('active');
+        }
+
+        function openCSKH() {
+            document.getElementById('cskhModal').classList.add('active');
+        }
+        function closeCSKH() {
+            document.getElementById('cskhModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

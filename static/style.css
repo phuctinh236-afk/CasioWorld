@@ -1,13 +1,14 @@
+/* Reset & Cấu hình chung */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #0f121b;
-    color: #ffffff;
+    background-color: #0f0f0f;
+    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,48 +17,255 @@ body {
 
 .app-container {
     width: 100%;
-    max-width: 480px;
-    background-color: #131521;
+    max-width: 420px;
+    background: #1a1a1a;
     min-height: 100vh;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.8);
-    overflow-x: hidden;
+    overflow-y: auto;
     padding-bottom: 70px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-/* Bottom Navigation */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 480px;
-    height: 60px;
-    background-color: #171a29;
-    border-top: 1px solid #24293f;
+/* Phần Đầu Trang Cá Nhân */
+.profile-header {
+    background: linear-gradient(135deg, #ff4e00, #ec9f05);
+    padding: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.profile-top-row {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    z-index: 1000;
+    margin-bottom: 12px;
 }
 
-.nav-item {
+.profile-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.cskh-btn-top {
+    background: rgba(0,0,0,0.25);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+    color: #fff;
+}
+
+.welcome-text {
+    font-size: 13px;
+    opacity: 0.95;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-link {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.balance-box {
+    font-size: 26px;
+    font-weight: bold;
+    margin: 12px 0;
+    letter-spacing: 0.5px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+}
+
+.btn-deposit { background: #fff; color: #ff4e00; }
+.btn-withdraw { background: rgba(0,0,0,0.3); color: #fff; }
+
+/* Lưới Chức Năng (Menu Grid) */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 15px;
+}
+
+.menu-item {
+    background: #ff5722;
+    border-radius: 12px;
+    padding: 15px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #7a83a0;
+    justify-content: center;
+    min-height: 90px;
+    box-shadow: 0 4px 10px rgba(255, 87, 34, 0.2);
+}
+
+.menu-item:active {
+    transform: scale(0.95);
+}
+
+.menu-icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.menu-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+}
+
+/* Thanh Điều Hướng Dưới Cùng (Bottom Nav) */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #333;
+    z-index: 10;
+}
+
+.nav-item {
+    text-align: center;
+    color: #888;
     font-size: 11px;
     cursor: pointer;
     text-decoration: none;
-    flex: 1;
+    background: none;
+    border: none;
 }
 
 .nav-item.active {
-    color: #cca352;
+    color: #ff5722;
 }
 
-.nav-icon {
-    font-size: 20px;
-    margin-bottom: 2px;
+/* MODAL & POPUP (Mặc định bắt buộc phải ẩn đi bằng display: none !important) */
+.fullscreen-modal, 
+.auth-overlay {
+    display: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Khi Javascript thêm class active thì mới hiện lên */
+.fullscreen-modal.active, 
+.auth-overlay.active {
+    display: flex !important;
+}
+
+.fs-modal-content, .auth-modal-box {
+    width: 90%;
+    max-width: 380px;
+    background: #1f1f1f;
+    border-radius: 12px;
+    overflow: hidden;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fs-header, .auth-header {
+    background: #2c2c2c;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.fs-close, .auth-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.fs-body, .auth-body {
+    padding: 20px;
+}
+
+.filter-input, .auth-input-field, .filter-select {
+    width: 100%;
+    padding: 10px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.search-action-btn, .auth-submit-btn, .cskh-action-btn {
+    width: 100%;
+    padding: 12px;
+    background: #ff5722;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    text-align: center;
+    display: block;
+    text-decoration: none;
+}
+
+.search-result-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #252525;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.auth-switch-text {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.auth-switch-text a {
+    color: #ff5722;
+    text-decoration: none;
 }

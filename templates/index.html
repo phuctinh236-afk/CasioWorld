@@ -494,7 +494,7 @@
                 <button type="button" class="drawer-close" onclick="closeDrawer()">✕</button>
             </div>
             <div class="drawer-body">
-                <!-- Thông tin hồ sơ & ví -->
+                <!-- Thông tin hồ sơ & ví (Bấm vào ví sẽ làm mới số dư thay vì chuyển trang) -->
                 <div class="drawer-profile-card">
                     <div class="drawer-profile-row" onclick="location.href='/profile'">
                         <div class="drawer-user-info">
@@ -506,12 +506,12 @@
                         </div>
                         <div style="color: #7a83a0;">➔</div>
                     </div>
-                    <div class="drawer-wallet-box" onclick="location.href='/deposit'">
+                    <div class="drawer-wallet-box" onclick="refreshWallet(this)">
                         <div>
-                            <div class="drawer-wallet-title">Ví chính chung 🔄</div>
-                            <div class="drawer-wallet-balance">đ 100.000</div>
+                            <div class="drawer-wallet-title">Ví chính chung <span id="refreshIcon" style="display:inline-block; transition: transform 0.5s;">🔄</span></div>
+                            <div class="drawer-wallet-balance" id="walletBalance">đ 100.000</div>
                         </div>
-                        <div style="font-size: 20px;">💳</div>
+                        <div style="font-size: 20px;">👛</div>
                     </div>
                 </div>
 
@@ -521,9 +521,9 @@
                     <span>🔍</span>
                 </div>
 
-                <!-- Lưới menu đầy đủ -->
+                <!-- Lưới menu 1:1 chuẩn (Nạp tiền hình chữ nhật nằm ngang chiếm 2 cột) -->
                 <div class="drawer-menu-grid">
-                    <div class="drawer-menu-item" onclick="location.href='/deposit'">
+                    <div class="drawer-menu-item wide" onclick="location.href='/deposit'">
                         <span class="dm-icon">💳</span>
                         <span class="dm-label">Nạp tiền</span>
                     </div>
@@ -653,6 +653,18 @@
             if (overlay) {
                 overlay.classList.remove('open');
             }
+        }
+
+        // Hàm làm mới ví khi ấn vào khung ví (không chuyển trang)
+        function refreshWallet(element) {
+            const icon = document.getElementById('refreshIcon');
+            icon.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                icon.style.transform = 'rotate(0deg)';
+            }, 500);
+
+            // Giả lập cập nhật số dư hoặc thông báo làm mới
+            alert('Đã làm mới số dư ví chính!');
         }
     </script>
 </body>

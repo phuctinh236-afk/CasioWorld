@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ab666 - Trang Cá Nhân</title>
-    <!-- Đã sửa liên kết CSS chuẩn cho Flask -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -18,74 +17,79 @@
             </div>
             <div class="welcome-text">
                 <span>Xin chào, pphuc8386</span>
-                <span class="logout-link">đăng xuất 🚪</span>
+                <span class="logout-link" onclick="alert('Đã đăng xuất')">đăng xuất 🚪</span>
             </div>
-            <div class="balance-box">50.100.000 VND 🔄</div>
+            <div class="balance-box">đ 50.100.000 🔄</div>
             <div class="action-buttons">
-                <button class="btn-action btn-deposit">💳 Nạp Tiền</button>
-                <button class="btn-action btn-withdraw">👛 Rút Tiền</button>
+                <button class="btn-action btn-deposit" onclick="location.href='{{ url_for('deposit') }}'">💳 Nạp Tiền</button>
+                <button class="btn-action btn-withdraw" onclick="alert('Mở Rút Tiền')">👛 Rút Tiền</button>
             </div>
         </div>
 
         <!-- LƯỚI MENU CHỨC NĂNG -->
         <div class="menu-grid">
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Giới thiệu bạn bè')">
                 <div class="menu-icon">👥</div>
                 <div class="menu-label">Giới thiệu bạn bè</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Hộp thư')">
                 <div class="menu-icon">✉️</div>
                 <div class="menu-label">Hộp Thư</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Chi tiết đặt cược')">
                 <div class="menu-icon">📋</div>
                 <div class="menu-label">Chi tiết đặt cược</div>
             </div>
-            <!-- Bấm vào đây để mở Trung tâm giao dịch -->
             <div class="menu-item" onclick="openTransactionCenter()">
                 <div class="menu-icon">📄</div>
                 <div class="menu-label">Trung tâm giao dịch</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Khu sự kiện')">
                 <div class="menu-icon">🎁</div>
                 <div class="menu-label">Khu sự kiện</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Yêu thích')">
                 <div class="menu-icon">❤️</div>
                 <div class="menu-label">Yêu Thích</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Bảo mật')">
                 <div class="menu-icon">🔒</div>
                 <div class="menu-label">Bảo Mật</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Thông báo')">
                 <div class="menu-icon">🔔</div>
                 <div class="menu-label">Thông Báo</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('Hoàn trả')">
                 <div class="menu-icon">🔄</div>
                 <div class="menu-label">Hoàn Trả</div>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('VIP')">
                 <div class="menu-icon">💎</div>
                 <div class="menu-label">VIP</div>
             </div>
         </div>
 
         <!-- THANH ĐIỀU HƯỚNG DƯỚI (BOTTOM NAV) -->
-        <div class="bottom-nav">
-            <button class="nav-item">🏠<br>Trang Chủ</button>
-            <button class="nav-item">🎁<br>Khuyến Mãi</button>
-            <button class="nav-item">💳<br>Nạp - Rút</button>
-            <button class="nav-item" onclick="openCSKH()">💬<br>CSKH 24/7</button>
-            <button class="nav-item active">👤<br>Thành Viên</button>
-        </div>
+        <nav class="bottom-nav">
+            <a href="{{ url_for('index') }}" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Trang chủ</span>
+            </a>
+            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật'); return false;">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
+            </a>
+            <a href="{{ url_for('deposit') }}" class="nav-item">
+                <div class="nav-icon">💳</div>
+                <span>Nạp tiền</span>
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <span>Tài khoản</span>
+            </a>
+        </nav>
     </div>
-
-
-    <!-- ======================================================= -->
-    <!-- CÁC MODAL ĐƯỢC ĐẶT Ở NGOÀI CÙNG (ẨN MẶC ĐỊNH BỞI CSS)        -->
-    <!-- ======================================================= -->
 
     <!-- Modal Trung Tâm Giao Dịch -->
     <div class="fullscreen-modal" id="transactionModal">
@@ -95,18 +99,18 @@
                 <button class="fs-close" onclick="closeTransactionCenter()">✕</button>
             </div>
             <div class="fs-body">
-                <div class="filter-row">
-                    <span style="font-size: 13px; color: #ccc;">Loại giao dịch</span>
+                <div style="margin-bottom: 12px;">
+                    <span style="font-size: 13px; color: #ccc; display: block; margin-bottom: 5px;">Loại giao dịch</span>
                     <select class="filter-select">
                         <option>Tất cả giao dịch</option>
                         <option>Nạp tiền</option>
                         <option>Rút tiền</option>
                     </select>
                 </div>
-                <div class="filter-row">
-                    <span style="font-size: 13px; color: #ccc;">Từ ngày</span>
+                <div style="margin-bottom: 12px;">
+                    <span style="font-size: 13px; color: #ccc; display: block; margin-bottom: 5px;">Từ ngày</span>
                     <input type="text" class="filter-input" value="2026/08/01 00:00:00">
-                    <span style="font-size: 13px; color: #ccc;">Đến ngày</span>
+                    <span style="font-size: 13px; color: #ccc; display: block; margin-top: 8px; margin-bottom: 5px;">Đến ngày</span>
                     <input type="text" class="filter-input" value="2026/08/01 23:59:59">
                 </div>
                 <button class="search-action-btn" onclick="alert('Đang tìm kiếm lịch sử giao dịch...')">Tìm kiếm</button>
@@ -126,14 +130,13 @@
             </div>
             <div class="fs-body" style="text-align: center;">
                 <div style="font-size: 32px; margin-bottom: 10px;">💬</div>
-                <div style="font-weight: bold; margin-bottom: 5px;">Trung Tâm Hỗ Trợ 24/7</div>
+                <div style="font-weight: bold; margin-bottom: 5px; color: #cca352;">Trung Tâm Hỗ Trợ 24/7</div>
                 <p style="font-size: 12px; color: #aaa; margin-bottom: 15px;">Đội ngũ CSKH luôn sẵn sàng giải đáp thắc mắc của bạn mọi lúc mọi nơi.</p>
                 <a href="#" class="cskh-action-btn" onclick="alert('Đang kết nối Live Chat...'); return false;">💬 Chat Trực Tuyến</a>
-                <a href="#" class="cskh-action-btn" onclick="alert('Mở Telegram hỗ trợ...'); return false;">✈️ Liên Hệ Telegram</a>
+                <a href="#" class="cskh-action-btn" style="background: #229ED9; margin-top: 8px; color: #fff;" onclick="alert('Mở Telegram hỗ trợ...'); return false;">✈️ Liên Hệ Telegram</a>
             </div>
         </div>
     </div>
-
 
     <!-- JAVASCRIPT ĐIỀU KHIỂN BẬT/TẮT MODAL -->
     <script>

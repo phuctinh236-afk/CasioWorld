@@ -112,7 +112,6 @@ body {
     padding: 15px 8px;
     text-align: center;
     cursor: pointer;
-    transition: 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -137,7 +136,7 @@ body {
     text-align: center;
 }
 
-/* Thanh Điều Hướng Dưới Cùng (Bottom Nav) */
+/* Thanh Điều Hướng Dưới Cùng */
 .bottom-nav {
     position: absolute;
     bottom: 0;
@@ -165,9 +164,8 @@ body {
     color: #ff5722;
 }
 
-/* MODAL & POPUP (Mặc định bắt buộc phải ẩn đi bằng display: none !important) */
-.fullscreen-modal, 
-.auth-overlay {
+/* MODAL & POPUP (Ẩn mặc định) */
+.fullscreen-modal {
     display: none !important;
     position: fixed;
     top: 0;
@@ -180,13 +178,11 @@ body {
     align-items: center;
 }
 
-/* Khi Javascript thêm class active thì mới hiện lên */
-.fullscreen-modal.active, 
-.auth-overlay.active {
+.fullscreen-modal.active {
     display: flex !important;
 }
 
-.fs-modal-content, .auth-modal-box {
+.fs-modal-content {
     width: 90%;
     max-width: 380px;
     background: #1f1f1f;
@@ -194,15 +190,9 @@ body {
     overflow: hidden;
     color: #fff;
     box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-    animation: fadeIn 0.2s ease-in-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fs-header, .auth-header {
+.fs-header {
     background: #2c2c2c;
     padding: 15px;
     display: flex;
@@ -211,7 +201,7 @@ body {
     font-weight: bold;
 }
 
-.fs-close, .auth-close {
+.fs-close {
     background: none;
     border: none;
     color: #fff;
@@ -219,11 +209,11 @@ body {
     cursor: pointer;
 }
 
-.fs-body, .auth-body {
+.fs-body {
     padding: 20px;
 }
 
-.filter-input, .auth-input-field, .filter-select {
+.filter-input, .filter-select {
     width: 100%;
     padding: 10px;
     background: #2a2a2a;
@@ -233,7 +223,7 @@ body {
     margin-bottom: 12px;
 }
 
-.search-action-btn, .auth-submit-btn, .cskh-action-btn {
+.search-action-btn, .cskh-action-btn {
     width: 100%;
     padding: 12px;
     background: #ff5722;
@@ -256,16 +246,4 @@ body {
     text-align: center;
     font-size: 13px;
     color: #aaa;
-}
-
-.auth-switch-text {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 13px;
-    color: #aaa;
-}
-
-.auth-switch-text a {
-    color: #ff5722;
-    text-decoration: none;
 }

@@ -1,344 +1,42 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lobbygame_1</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        body {
-            background-color: #131521;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            min-height: 100vh;
-            background-color: #131521;
-            position: relative;
-            padding-bottom: 70px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            overflow-y: auto;
-        }
-        .header {
-            padding: 12px 15px;
-            background-color: #171a29;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #24293f;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .menu-toggle-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-        .header-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .cskh-btn {
-            background: #212537;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #cca352;
-            border: 1px solid #303650;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .banner {
-            padding: 10px 15px;
-        }
-        .banner-box {
-            width: 100%;
-            height: 120px;
-            background: linear-gradient(135deg, #2b2f45, #171a29);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #cca352;
-            font-size: 15px;
-            font-weight: bold;
-            border: 1px solid #303650;
-            text-align: center;
-            padding: 10px;
-            overflow: hidden;
-        }
-        .banner-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .banner-dots {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 6px;
-        }
-        .dot {
-            width: 6px;
-            height: 6px;
-            background: #444c6e;
-            border-radius: 50%;
-        }
-        .dot.active {
-            background: #cca352;
-            width: 16px;
-            border-radius: 4px;
-        }
-        .game-tabs {
-            display: flex;
-            background-color: #1b1e2e;
-            overflow-x: auto;
-            padding: 8px 10px;
-            gap: 8px;
-            border-bottom: 1px solid #24293f;
-            scrollbar-width: none;
-        }
-        .game-tabs::-webkit-scrollbar {
-            display: none;
-        }
-        .g-tab {
-            flex: 0 0 auto;
-            background-color: #212537;
-            border: 1px solid #303650;
-            border-radius: 8px;
-            padding: 8px 14px;
-            text-align: center;
-            color: #9fa5b9;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            min-width: 65px;
-        }
-        .g-tab.active {
-            background-color: #2b2f45;
-            border-color: #cca352;
-            color: #cca352;
-            font-weight: bold;
-        }
-        .g-tab-icon {
-            font-size: 18px;
-        }
-        .game-section {
-            padding: 12px 10px 80px 10px;
-        }
-        .game-grid-detailed {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-        .game-item-card {
-            background-color: #171a29;
-            border: 1px solid #24293f;
-            border-radius: 8px;
-            overflow: hidden;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-            padding-bottom: 6px;
-        }
-        .game-item-card:hover {
-            border-color: #cca352;
-        }
-        .game-thumb-box {
-            width: 48px;
-            height: 48px;
-            margin: 10px auto 4px auto;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #2b2f45, #1d2133);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #303650;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        .game-thumb-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .game-thumb-box::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            background: linear-gradient(135deg, transparent 50%, #cca352 50%);
-            border-top-right-radius: 8px;
-            z-index: 2;
-        }
-        .game-name {
-            padding: 2px 3px;
-            font-size: 10px;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            background-color: #171a29;
-            border-top: 1px solid #24293f;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            z-index: 900;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #7a83a0;
-            font-size: 10px;
-            gap: 3px;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        .nav-item.active {
-            color: #cca352;
-        }
-        .nav-icon {
-            font-size: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="app-container">
-        <div class="header">
-            <div class="header-left">
-                <button type="button" class="menu-toggle-btn">☰</button>
-                <div class="header-title">Lobbygame_1</div>
-            </div>
-            <a href="{{ url_for('cskh') }}" class="cskh-btn">
-                🎧 CSKH
-            </a>
-        </div>
+from flask import Flask, render_template
 
-        <div class="banner">
-            <div class="banner-box">
-                <img src="{{ url_for('static', filename='assets/banner1.jpg') }}" alt="Banner">
-                <div class="banner-dots">
-                    <div class="dot active"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-            </div>
-        </div>
+app = Flask(__name__)
 
-        <div class="game-tabs">
-            <div class="g-tab active"><span class="g-tab-icon">🔥</span><span>HOT</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🐓</span><span>ĐÁ GÀ</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🎰</span><span>Slots</span></div>
-            <div class="g-tab"><span class="g-tab-icon">♠️</span><span>Casino</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🃏</span><span>Game Bài</span></div>
-        </div>
+# Trang chủ (Lobby game)
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-        <div class="game-section">
-            <div class="game-grid-detailed">
-                <div class="game-item-card" onclick="alert('Vào game Dragon Gems')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}"></div>
-                    <div class="game-name">Dragon Gems</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Mithai Madness')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}"></div>
-                    <div class="game-name">Mithai Madness</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Fortune Garuda')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}"></div>
-                    <div class="game-name">Fortune Garuda</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game NCVIP Super Elements')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}"></div>
-                    <div class="game-name">NCVIP Super...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Ultra Ace')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}"></div>
-                    <div class="game-name">Ultra Ace</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game NCVIP Gates')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}"></div>
-                    <div class="game-name">NCVIP Gates</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game NC Bountiful Birds')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}"></div>
-                    <div class="game-name">NC Bountif...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Treasures of Aztec')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}"></div>
-                    <div class="game-name">Treasures o...</div>
-                </div>
-            </div>
-        </div>
+# Trang tài khoản / cá nhân
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
-        <!-- Thanh điều hướng dưới chuẩn gốc: Trang chủ | Khuyến mãi | Nạp tiền | Tài khoản -->
-        <nav class="bottom-nav">
-            <a href="{{ url_for('index') }}" class="nav-item active">
-                <div class="nav-icon">🏠</div>
-                <span>Trang chủ</span>
-            </a>
-            <a href="{{ url_for('promotions') }}" class="nav-item">
-                <div class="nav-icon">🎁</div>
-                <span>Khuyến mãi</span>
-            </a>
-            <a href="{{ url_for('deposit') }}" class="nav-item">
-                <div class="nav-icon">💳</div>
-                <span>Nạp tiền</span>
-            </a>
-            <a href="{{ url_for('profile') }}" class="nav-item">
-                <div class="nav-icon">👤</div>
-                <span>Tài khoản</span>
-            </a>
-        </nav>
-    </div>
-</body>
-</html>
+# Trang nạp tiền
+@app.route('/deposit')
+def deposit():
+    return render_template('deposit.html')
+
+# Trang chăm sóc khách hàng (CSKH)
+@app.route('/cskh')
+def cskh():
+    return render_template('cskh.html')
+
+# Trang khuyến mãi
+@app.route('/promotions')
+def promotions():
+    return render_template('promotions.html')
+
+# Trang đặc quyền VIP
+@app.route('/vip')
+def vip():
+    return render_template('vip.html')
+
+# Trang chi tiết VIP (có bảng tổng cược, tổng nạp, thưởng tháng...)
+@app.route('/vip-details')
+def vip_details():
+    return render_template('vip_details.html')
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+    

@@ -3,6 +3,7 @@ import random
 import string
 import traceback
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from jinja2 import TemplateNotFound
 
 app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
@@ -12,8 +13,39 @@ app.config['DEBUG'] = True
 payment_orders = {}
 
 # -------------------------------------------------------------
-# KHIÊN BẢO VỆ: TỰ ĐỘNG BẮT MỌI LỖI, KHÔNG BAO GIỜ SẬP WEB NỮA
+# HỆ THỐNG AN TOÀN: TỰ ĐỘNG HIỂN THỊ GIAO DIỆN DỰ PHÒNG NẾU THIẾU FILE HTML
 # -------------------------------------------------------------
+def render_safe(template_name, **kwargs):
+    try:
+        return render_template(template_name, **kwargs)
+    except TemplateNotFound:
+        title = template_name.replace('.html', '').replace('_', ' ').upper()
+        return f"""
+        <!DOCTYPE html>
+        <html lang="vi">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{title}</title>
+            <style>
+                body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; text-align: center; }}
+                .container {{ max-width: 450px; margin: 60px auto; background: #1e293b; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #334155; }}
+                h2 {{ color: #38bdf8; margin-bottom: 15px; font-size: 22px; }}
+                p {{ color: #94a3b8; font-size: 14px; line-height: 1.6; }}
+                .btn {{ display: inline-block; margin-top: 25px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }}
+                .btn:hover {{ opacity: 0.9; transform: translateY(-2px); }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>✨ {title}</h2>
+                <p>Tính năng này đang hoạt động. Giao diện chi tiết sẽ hiển thị ngay khi bạn cập nhật file mẫu lên hệ thống.</p>
+                <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
+            </div>
+        </body>
+        </html>
+        """
+
 @app.errorhandler(404)
 def not_found_error(error):
     return redirect(url_for('index'))
@@ -22,8 +54,7 @@ def not_found_error(error):
 @app.errorhandler(Exception)
 def handle_exception(e):
     tb = traceback.format_exc()
-    # Nếu lỗi liên quan đến thiếu đường dẫn/endpoint hoặc thiếu file HTML, tự động đá về trang chủ mượt mà
-    if "BuildError" in tb or "TemplateNotFound" in tb or "NotFound" in tb:
+    if "BuildError" in tb or "NotFound" in tb:
         return redirect(url_for('index'))
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
@@ -68,70 +99,67 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. KHAI BÁO TẤT CẢ CÁC TRANG (BAO GỒM CẢ CÁC ALIAS HAY GẶP)
+# 1. ĐỊNH TUYẾN TẤT CẢ CÁC TRANG
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    return render_safe('index.html')
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    return render_safe('profile.html')
 
 @app.route('/promotions')
 def promotions():
-    return render_template('promotions.html')
+    return render_safe('promotions.html')
 
 @app.route('/vip')
-def vip():
-    return render_template('vip.html')
-
 @app.route('/vip_details')
-def vip_details():
-    return render_template('vip_details.html')
+def vip():
+    return render_safe('vip.html')
 
 @app.route('/cskh')
 def cskh():
-    return render_template('cskh.html')
+    return render_safe('cskh.html')
 
 @app.route('/withdraw')
 def withdraw():
-    return render_template('withdraw.html')
+    return render_safe('withdraw.html')
 
 @app.route('/activity')
 def activity():
-    return render_template('activity.html')
+    return render_safe('activity.html')
 
 @app.route('/transaction_center')
 def transaction_center():
-    return render_template('transaction_center.html')
+    return render_safe('transaction_center.html')
 
 @app.route('/history', endpoint='bet history')
 @app.route('/bet_history')
 @app.route('/bet-history')
 def history():
-    return render_template('history.html')
+    return render_safe('history.html')
 
 @app.route('/bank_card')
 def bank_card():
-    return render_template('bank_card.html')
+    return render_safe('bank_card.html')
 
 @app.route('/security')
 def security():
-    return render_template('security.html')
+    return render_safe('security.html')
 
 @app.route('/messages')
 def messages():
-    return render_template('messages.html')
+    return render_safe('messages.html')
 
 @app.route('/referral')
 def referral():
-    return render_template('referral.html')
+    return render_safe('referral.html')
 
 @app.route('/mailbox')
 def mailbox():
-    return render_template('mailbox.html')
+    return render_safe('mailbox.html')
 
 # -------------------------------------------------------------
 # 2. ĐĂNG NHẬP & ĐĂNG KÝ
@@ -142,13 +170,13 @@ def login():
         session['username'] = request.form.get('username', 'User')
         session['balance'] = 0
         return redirect(url_for('index'))
-    return render_template('login.html')
+    return render_safe('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return redirect(url_for('login'))
-    return render_template('register.html')
+    return render_safe('register.html')
 
 @app.route('/logout')
 def logout():
@@ -156,7 +184,7 @@ def logout():
     return redirect(url_for('index'))
 
 # -------------------------------------------------------------
-# 3. TRANG NẠP TIỀN & TỰ ĐỘNG CỘNG TIỀN VÀO VÍ
+# 3. TRANG NẠP TIỀN & XỬ LÝ THANH TOÁN
 # -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
@@ -168,7 +196,7 @@ def deposit():
             amount_points = 50
         amount_vnd = int(amount_points * 1000)
         return redirect(url_for('payment', amount=amount_vnd))
-    return render_template('deposit.html')
+    return render_safe('deposit.html')
 
 @app.route('/payment')
 def payment():
@@ -197,7 +225,7 @@ def payment():
     
     qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
     
-    return render_template('payment.html', bank=bank_info, qr_url=qr_url)
+    return render_safe('payment.html', bank=bank_info, qr_url=qr_url)
 
 @app.route('/api/check_payment/<path:memo>')
 def check_payment(memo):
@@ -225,7 +253,6 @@ def test_pay(memo):
         return f"<h3>Thành công! Đã giả lập nạp tiền cho đơn: {memo}. Số dư hiện tại: {session['balance']}</h3><a href='/'>Quay lại trang chủ</a>"
     return "Không tìm thấy mã đơn!"
 
-# BẮT MỌI ĐƯỜNG DẪN CÒN LẠI ĐỂ KHÔNG BAO GIỜ BỊ 404
 @app.route('/<path:subpath>')
 def catch_all(subpath):
     return redirect(url_for('index'))

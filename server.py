@@ -100,7 +100,8 @@ def activity():
 def transaction_center():
     return render_template('transaction_center.html')
 
-@app.route('/history')
+# ĐĂNG KÝ ENDPOINT KHỚP CHÍNH XÁC VỚI PROFILE.HTML ('bet history')
+@app.route('/history', endpoint='bet history')
 @app.route('/bet_history')
 @app.route('/bet-history')
 def history():
@@ -220,4 +221,4 @@ def test_pay(memo):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    
+           

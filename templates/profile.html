@@ -3,80 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ab666 - Trang Cá Nhân</title>
+    <title>Trang Cá Nhân - Ab666</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #131521; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow-y: auto; }
+        
+        .header { padding: 12px 15px; background-color: #171a29; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; }
+        .header-title { font-size: 16px; font-weight: bold; color: #cca352; }
+        .cskh-btn { background: #212537; padding: 4px 10px; border-radius: 15px; font-size: 11px; color: #cca352; border: 1px solid #303650; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+
+        .profile-top { padding: 15px; background: linear-gradient(135deg, #1b1e2e, #131521); border-bottom: 1px solid #24293f; }
+        .profile-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .username-text { font-size: 12px; color: #9fa5b9; }
+        .username-text span { color: #fff; font-weight: bold; }
+        .logout-link { font-size: 11px; color: #e06c75; text-decoration: none; }
+
+        .balance-box { font-size: 24px; font-weight: bold; color: #cca352; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .balance-box span { font-size: 16px; }
+
+        .action-buttons { display: flex; gap: 10px; }
+        .btn-action { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: bold; text-align: center; text-decoration: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-deposit { background: linear-gradient(135deg, #cca352, #e6c679); color: #131521; }
+        .btn-withdraw { background: #212537; color: #fff; border: 1px solid #303650; }
+
+        .menu-grid { padding: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .menu-card { background-color: #171a29; border: 1px solid #24293f; border-radius: 10px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-decoration: none; color: #fff; cursor: pointer; transition: 0.2s; height: 95px; }
+        .menu-card:hover { border-color: #cca352; }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 11px; color: #cfd3dc; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background-color: #171a29; border-top: 1px solid #24293f; display: flex; justify-content: space-around; padding: 8px 0; z-index: 900; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #7a83a0; font-size: 10px; gap: 3px; }
+        .nav-item.active { color: #cca352; }
+        .nav-icon { font-size: 20px; }
+    </style>
 </head>
 <body>
-
     <div class="app-container">
-        <!-- TRANG CÁ NHÂN (Profile) -->
-        <div class="profile-header">
-            <div class="profile-top-row">
-                <span class="profile-title">Trang Cá Nhân</span>
-                <button class="cskh-btn-top" onclick="openCSKH()">🎧 CSKH</button>
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">Trang Cá Nhân</div>
+            <a href="{{ url_for('cskh') }}" class="cskh-btn">🎧 CSKH</a>
+        </div>
+
+        <!-- Thông tin số dư & Nạp rút -->
+        <div class="profile-top">
+            <div class="profile-info-row">
+                <div class="username-text">Xin chào, <span>pphuc8386</span></div>
+                <a href="#" class="logout-link" onclick="alert('Đã đăng xuất'); return false;">đăng xuất 🚪</a>
             </div>
-            <div class="welcome-text">
-                <span>Xin chào, pphuc8386</span>
-                <span class="logout-link" onclick="alert('Đã đăng xuất')">đăng xuất 🚪</span>
+            <div class="balance-box">
+                <span>đ</span> 50.100.000 🔄
             </div>
-            <div class="balance-box">đ 50.100.000 🔄</div>
             <div class="action-buttons">
-                <button class="btn-action btn-deposit" onclick="location.href='{{ url_for('deposit') }}'">💳 Nạp Tiền</button>
-                <button class="btn-action btn-withdraw" onclick="alert('Mở Rút Tiền')">👛 Rút Tiền</button>
+                <a href="{{ url_for('deposit') }}" class="btn-action btn-deposit">💳 Nạp Tiền</a>
+                <a href="#" class="btn-action btn-withdraw" onclick="alert('Chức năng Rút Tiền'); return false;">👛 Rút Tiền</a>
             </div>
         </div>
 
-        <!-- LƯỚI MENU CHỨC NĂNG -->
+        <!-- Lưới chức năng (Đúng theo ảnh 3) -->
         <div class="menu-grid">
-            <div class="menu-item" onclick="alert('Giới thiệu bạn bè')">
+            <a href="#" class="menu-card" onclick="alert('Giới thiệu bạn bè'); return false;">
                 <div class="menu-icon">👥</div>
                 <div class="menu-label">Giới thiệu bạn bè</div>
-            </div>
-            <div class="menu-item" onclick="alert('Hộp thư')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Hộp thư'); return false;">
                 <div class="menu-icon">✉️</div>
                 <div class="menu-label">Hộp Thư</div>
-            </div>
-            <div class="menu-item" onclick="alert('Chi tiết đặt cược')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Chi tiết đặt cược'); return false;">
                 <div class="menu-icon">📋</div>
                 <div class="menu-label">Chi tiết đặt cược</div>
-            </div>
-            <div class="menu-item" onclick="openTransactionCenter()">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Trung tâm giao dịch'); return false;">
                 <div class="menu-icon">📄</div>
                 <div class="menu-label">Trung tâm giao dịch</div>
-            </div>
-            <div class="menu-item" onclick="alert('Khu sự kiện')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Khu sự kiện'); return false;">
                 <div class="menu-icon">🎁</div>
                 <div class="menu-label">Khu sự kiện</div>
-            </div>
-            <div class="menu-item" onclick="alert('Yêu thích')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Yêu thích'); return false;">
                 <div class="menu-icon">❤️</div>
                 <div class="menu-label">Yêu Thích</div>
-            </div>
-            <div class="menu-item" onclick="alert('Bảo mật')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Bảo mật'); return false;">
                 <div class="menu-icon">🔒</div>
                 <div class="menu-label">Bảo Mật</div>
-            </div>
-            <div class="menu-item" onclick="alert('Thông báo')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Thông báo'); return false;">
                 <div class="menu-icon">🔔</div>
                 <div class="menu-label">Thông Báo</div>
-            </div>
-            <div class="menu-item" onclick="alert('Hoàn trả')">
+            </a>
+            <a href="#" class="menu-card" onclick="alert('Hoàn trả'); return false;">
                 <div class="menu-icon">🔄</div>
                 <div class="menu-label">Hoàn Trả</div>
-            </div>
-            <div class="menu-item" onclick="alert('VIP')">
+            </a>
+            <!-- Nút VIP trỏ thẳng tới trang VIP -->
+            <a href="{{ url_for('vip') }}" class="menu-card">
                 <div class="menu-icon">💎</div>
                 <div class="menu-label">VIP</div>
-            </div>
+            </a>
         </div>
 
-        <!-- THANH ĐIỀU HƯỚNG DƯỚI (BOTTOM NAV) -->
+        <!-- Bottom Nav -->
         <nav class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item">
                 <div class="nav-icon">🏠</div>
                 <span>Trang chủ</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật'); return false;">
+            <a href="{{ url_for('promotions') }}" class="nav-item">
                 <div class="nav-icon">🎁</div>
                 <span>Khuyến mãi</span>
             </a>
@@ -90,69 +128,5 @@
             </a>
         </nav>
     </div>
-
-    <!-- Modal Trung Tâm Giao Dịch -->
-    <div class="fullscreen-modal" id="transactionModal">
-        <div class="fs-modal-content">
-            <div class="fs-header">
-                <span>Trung Tâm Giao Dịch</span>
-                <button class="fs-close" onclick="closeTransactionCenter()">✕</button>
-            </div>
-            <div class="fs-body">
-                <div style="margin-bottom: 12px;">
-                    <span style="font-size: 13px; color: #ccc; display: block; margin-bottom: 5px;">Loại giao dịch</span>
-                    <select class="filter-select">
-                        <option>Tất cả giao dịch</option>
-                        <option>Nạp tiền</option>
-                        <option>Rút tiền</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <span style="font-size: 13px; color: #ccc; display: block; margin-bottom: 5px;">Từ ngày</span>
-                    <input type="text" class="filter-input" value="2026/08/01 00:00:00">
-                    <span style="font-size: 13px; color: #ccc; display: block; margin-top: 8px; margin-bottom: 5px;">Đến ngày</span>
-                    <input type="text" class="filter-input" value="2026/08/01 23:59:59">
-                </div>
-                <button class="search-action-btn" onclick="alert('Đang tìm kiếm lịch sử giao dịch...')">Tìm kiếm</button>
-                <div class="search-result-box">
-                    🔍 Vui lòng thiết lập điều kiện và nhấn Tìm kiếm
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal CSKH -->
-    <div class="fullscreen-modal" id="cskhModal">
-        <div class="fs-modal-content">
-            <div class="fs-header">
-                <span>Hỗ Trợ Trực Tuyến CSKH</span>
-                <button class="fs-close" onclick="closeCSKH()">✕</button>
-            </div>
-            <div class="fs-body" style="text-align: center;">
-                <div style="font-size: 32px; margin-bottom: 10px;">💬</div>
-                <div style="font-weight: bold; margin-bottom: 5px; color: #cca352;">Trung Tâm Hỗ Trợ 24/7</div>
-                <p style="font-size: 12px; color: #aaa; margin-bottom: 15px;">Đội ngũ CSKH luôn sẵn sàng giải đáp thắc mắc của bạn mọi lúc mọi nơi.</p>
-                <a href="#" class="cskh-action-btn" onclick="alert('Đang kết nối Live Chat...'); return false;">💬 Chat Trực Tuyến</a>
-                <a href="#" class="cskh-action-btn" style="background: #229ED9; margin-top: 8px; color: #fff;" onclick="alert('Mở Telegram hỗ trợ...'); return false;">✈️ Liên Hệ Telegram</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT ĐIỀU KHIỂN BẬT/TẮT MODAL -->
-    <script>
-        function openTransactionCenter() {
-            document.getElementById('transactionModal').classList.add('active');
-        }
-        function closeTransactionCenter() {
-            document.getElementById('transactionModal').classList.remove('active');
-        }
-
-        function openCSKH() {
-            document.getElementById('cskhModal').classList.add('active');
-        }
-        function closeCSKH() {
-            document.getElementById('cskhModal').classList.remove('active');
-        }
-    </script>
 </body>
 </html>

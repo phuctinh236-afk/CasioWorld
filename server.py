@@ -2,6 +2,7 @@ import os
 import random
 import string
 import traceback
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from jinja2 import TemplateNotFound
 
@@ -9,16 +10,24 @@ app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
-# Bộ lưu trữ đơn nạp tiền
+# Bộ lưu trữ đơn nạp tiền và danh sách ghi nhớ lỗi hệ thống
 payment_orders = {}
+error_logs = []
+
+def log_error(err_msg):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    error_logs.insert(0, {"time": timestamp, "detail": err_msg})
+    if len(error_logs) > 50:  # Giữ tối đa 50 lỗi gần nhất
+        error_logs.pop()
 
 # -------------------------------------------------------------
-# HỆ THỐNG AN TOÀN: GIAO DIỆN DỰ PHÒNG KHI CHƯA CÓ FILE HTML
+# GIAO DIỆN DỰ PHÒNG KHI THIẾU FILE HTML
 # -------------------------------------------------------------
 def render_safe(template_name, **kwargs):
     try:
         return render_template(template_name, **kwargs)
-    except TemplateNotFound:
+    except TemplateNotFound as e:
+        log_error(f"Thiếu file giao diện (TemplateNotFound): {template_name}")
         title = template_name.replace('.html', '').replace('_', ' ').upper()
         return f"""
         <!DOCTYPE html>
@@ -39,32 +48,85 @@ def render_safe(template_name, **kwargs):
         <body>
             <div class="container">
                 <h2>✨ {title}</h2>
-                <p>Trang này đang hoạt động bình thường. Giao diện chi tiết sẽ hiển thị khi bạn nạp file mẫu tương ứng.</p>
+                <p>Trang này đang hoạt động. Giao diện chi tiết sẽ hiển thị khi bạn cập nhật file mẫu.</p>
                 <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
             </div>
         </body>
         </html>
         """
 
+# -------------------------------------------------------------
+# TRANG KIỂM TRA LỖI: /ktraloibug
+# -------------------------------------------------------------
+@app.route('/ktraloibug')
+def ktraloibug():
+    logs_html = ""
+    if not error_logs:
+        logs_html = "<p style='color: #4ade80; font-size: 16px;'>🎉 Tuyệt vời! Chưa phát hiện lỗi nào gần đây.</p>"
+    else:
+        for idx, item in enumerate(error_logs, 1):
+            logs_html += f"""
+            <div style="background: #1e293b; border-left: 4px solid #ef4444; padding: 15px; margin-bottom: 15px; border-radius: 6px; text-align: left;">
+                <span style="color: #38bdf8; font-weight: bold;">#{idx} [{item['time']}]</span>
+                <pre style="color: #fca5a5; margin-top: 8px; white-space: pre-wrap; font-family: monospace; font-size: 13px;">{item['detail']}</pre>
+            </div>
+            """
+
+    return f"""
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bảng Kiểm Tra Lỗi Hệ Thống</title>
+        <style>
+            body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; text-align: center; }}
+            .wrapper {{ max-width: 800px; margin: 30px auto; background: #090d16; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
+            h2 {{ color: #f87171; margin-bottom: 5px; }}
+            p.sub {{ color: #94a3b8; font-size: 13px; margin-bottom: 25px; }}
+            .btn-group {{ margin-top: 25px; display: flex; justify-content: center; gap: 15px; }}
+            .btn {{ background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }}
+            .btn-clear {{ background: #ef4444; }}
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <h2>🛠️ HỆ THỐNG GIÁM SÁT LỖI (/ktraloibug)</h2>
+            <p class="sub">Danh sách các lỗi phát sinh trong phiên hoạt động của server</p>
+            {logs_html}
+            <div class="btn-group">
+                <a href="/" class="btn">⬅ Về Trang Chủ</a>
+                <a href="/ktraloibug/clear" class="btn btn-clear">🧹 Xóa Sạch Lịch Sử Lỗi</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+@app.route('/ktraloibug/clear')
+def clear_bugs():
+    global error_logs
+    error_logs.clear()
+    return redirect(url_for('ktraloibug'))
+
 @app.errorhandler(404)
 def not_found_error(error):
-    return f"""
-    <div style="padding: 40px; font-family: sans-serif; background: #0f172a; color: #f8fafc; text-align: center;">
-        <h2 style="color: #ef4444;">⚠️ Không tìm thấy đường dẫn (404)</h2>
-        <p style="color: #94a3b8; margin: 15px 0;">Đường dẫn bạn vừa bấm không khớp với cấu hình server.</p>
-        <a href="/" style="display: inline-block; background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">⬅ Quay lại Trang chủ</a>
-    </div>
-    """, 404
+    log_error(f"Lỗi 404 - Không tìm thấy đường dẫn: {request.path}")
+    return redirect(url_for('index'))
 
 @app.errorhandler(500)
 @app.errorhandler(Exception)
 def handle_exception(e):
     tb = traceback.format_exc()
+    log_error(tb)
+    if "BuildError" in tb or "NotFound" in tb:
+        return redirect(url_for('index'))
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #1e1e1e; color: #ff5555;">
         <h2>⚠️ LỖI HỆ THỐNG (500):</h2>
         <pre style="background: #2d2d2d; color: #55ff55; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
-        <br><a href="/" style="color: #38bdf8; font-size: 16px;">⬅ Quay lại Trang chủ</a>
+        <br><a href="/ktraloibug" style="color: #38bdf8; font-size: 16px;">🔍 Xem chi tiết tại /ktraloibug</a> | 
+        <a href="/" style="color: #38bdf8; font-size: 16px;">⬅ Quay lại Trang chủ</a>
     </div>
     """, 500
 
@@ -104,7 +166,7 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. ĐỊNH TUYẾN TOÀN BỘ CÁC TRANG & BIẾN THỂ ĐƯỜNG DẪN
+# ĐỊNH TUYẾN CÁC TRANG CHÍNH
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -117,7 +179,6 @@ def index():
 def profile():
     return render_safe('profile.html')
 
-# Phủ sóng mọi biến thể của Khuyến Mãi
 @app.route('/promotions')
 @app.route('/promotion')
 @app.route('/khuyen_mai')
@@ -129,7 +190,6 @@ def profile():
 def promotions():
     return render_safe('promotions.html')
 
-# Phủ sóng mọi biến thể của Thành Viên / VIP / Tài Khoản
 @app.route('/vip')
 @app.route('/vip_details')
 @app.route('/member')
@@ -198,9 +258,6 @@ def referral():
 def mailbox():
     return render_safe('mailbox.html')
 
-# -------------------------------------------------------------
-# 2. ĐĂNG NHẬP & ĐĂNG KÝ
-# -------------------------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 @app.route('/login.html', methods=['GET', 'POST'])
 def login():
@@ -222,9 +279,6 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# -------------------------------------------------------------
-# 3. TRANG NẠP TIỀN & XỬ LÝ THANH TOÁN
-# -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
 @app.route('/deposit.html', methods=['GET', 'POST'])
 def deposit():
@@ -264,7 +318,7 @@ def payment():
         "memo": memo_code
     }
     
-    qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
+    qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-{qr_only}.png?amount={amount_vnd}&addInfo={memo_code}" if False else f"https://img.vietqr.io/image/TCB-8992362013-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
     
     return render_safe('payment.html', bank=bank_info, qr_url=qr_url)
 
@@ -296,3 +350,4 @@ def test_pay(memo):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+    

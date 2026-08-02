@@ -101,6 +101,8 @@ def transaction_center():
     return render_template('transaction_center.html')
 
 @app.route('/history')
+@app.route('/bet_history')
+@app.route('/bet-history')
 def history():
     return render_template('history.html')
 
@@ -120,11 +122,9 @@ def messages():
 def referral():
     return render_template('referral.html')
 
-# --- ĐÂY LÀ TRANG VỪA ĐƯỢC THÊM ĐỂ FIX LỖI ẢNH 1904 ---
 @app.route('/mailbox')
 def mailbox():
     return render_template('mailbox.html')
-# ------------------------------------------------------
 
 # -------------------------------------------------------------
 # 2. ĐĂNG NHẬP & ĐĂNG KÝ
@@ -220,4 +220,4 @@ def test_pay(memo):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-           
+    

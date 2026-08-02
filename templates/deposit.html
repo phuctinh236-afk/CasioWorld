@@ -3,281 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ví của tôi - Mega Casino</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Nạp & Rút Tiền - Ví Lobby</title>
     <style>
-        .wallet-container {
-            padding: 15px;
-            padding-bottom: 80px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        .wallet-header {
+        body {
+            background-color: #131521;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: #131521;
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .header {
+            padding: 12px 15px;
+            background-color: #171a29;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .back-btn {
+            color: #cca352;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .wallet-card {
+            background: linear-gradient(135deg, #2b2f45, #171a29);
+            margin: 15px;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #303650;
+            text-align: center;
+        }
+        .wallet-label {
+            font-size: 13px;
+            color: #9fa5b9;
+            margin-bottom: 5px;
+        }
+        .wallet-balance {
+            font-size: 24px;
+            font-weight: bold;
+            color: #cca352;
+        }
+        .tabs-container {
+            display: flex;
+            background-color: #171a29;
+            margin: 0 15px;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #24293f;
+        }
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #9fa5b9;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
             background-color: #cca352;
             color: #131521;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 16px;
         }
-        .wallet-header .close-btn {
-            font-size: 18px;
-            text-decoration: none;
-            color: #131521;
-        }
-        .wallet-tabs {
-            display: flex;
-            background-color: #1b1e2e;
-            padding: 10px 15px;
-            gap: 10px;
-        }
-        .w-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            background-color: #2b2f45;
-            color: #9fa5b9;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .w-tab.active {
-            background-color: #9c7c32;
-            color: #fff;
-        }
-        .section-box {
-            background-color: #171a29;
-            border: 1px solid #24293f;
-            border-radius: 8px;
+        .form-section {
             padding: 15px;
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .input-group {
             margin-bottom: 15px;
         }
-        .section-title {
-            color: #cca352;
+        .input-group label {
+            display: block;
             font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: #9fa5b9;
+            margin-bottom: 6px;
         }
-        .custom-select {
+        .input-group input {
             width: 100%;
-            background-color: #212537;
-            border: 1px solid #303650;
-            color: #fff;
             padding: 12px;
-            border-radius: 6px;
-            font-size: 13px;
+            background-color: #171a29;
+            border: 1px solid #303650;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
             outline: none;
         }
-        .pay-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
+        .input-group input:focus {
+            border-color: #cca352;
         }
-        .pay-item {
-            background-color: #212537;
-            border: 1px solid #303650;
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #cca352, #b38f3e);
+            border: none;
+            border-radius: 8px;
+            color: #131521;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .alert {
+            margin: 0 15px 15px 15px;
+            padding: 10px;
             border-radius: 6px;
-            padding: 12px 8px;
+            font-size: 13px;
             text-align: center;
-            color: #fff;
-            font-size: 11px;
+        }
+        .alert.success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+        .alert.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .pay-item.active {
-            border-color: #cca352;
-            background-color: #2b2b20;
-        }
-        .p-icon { font-size: 20px; }
-        .amount-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .amount-btn {
-            background-color: #212537;
-            border: 1px solid #303650;
-            color: #fff;
-            padding: 10px 0;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .amount-btn.active {
-            border-color: #cca352;
-            background-color: #2b2b20;
-        }
-        .money-input-wrap {
-            position: relative;
-            background-color: #212537;
-            border: 1px solid #303650;
-            border-radius: 6px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .money-input-wrap input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 16px;
-            width: 70%;
-            outline: none;
-        }
-        .money-input-wrap .rate {
+            text-decoration: none;
             color: #7a83a0;
-            font-size: 12px;
+            font-size: 10px;
+            gap: 3px;
         }
-        .notice-box {
-            font-size: 11px;
-            color: #9fa5b9;
-            line-height: 1.5;
+        .nav-item.active {
+            color: #cca352;
         }
-        .btn-submit-wallet {
-            width: 100%;
-            background: linear-gradient(180deg, #ebd08d 0%, #cca352 100%);
-            color: #131521;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 5px;
-            text-align: center;
+        .nav-icon {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header Ví -->
-        <div class="wallet-header">
-            <span>Ví của tôi</span>
-            <a href="/" class="close-btn">✕</a>
+        <!-- Header -->
+        <div class="header">
+            <a href="{{ url_for('index') }}" class="back-btn">‹ Trang chủ</a>
+            <div class="header-title">Nạp & Rút Ví Tổng</div>
+            <div style="width: 50px;"></div>
         </div>
 
-        <!-- Tab Nạp / Rút -->
-        <div class="wallet-tabs">
-            <div class="w-tab active" id="tab-deposit">Nạp tiền</div>
-            <div class="w-tab" id="tab-withdraw">Rút tiền</div>
+        <!-- Số dư Ví Lobby -->
+        <div class="wallet-card">
+            <div class="wallet-label">💎 Số Dư Ví Lobby (Dùng chung tất cả game)</div>
+            <div class="wallet-balance">{{ "{:,.0f}".format(balance) }} VND</div>
         </div>
 
-        <div class="wallet-container">
-            <!-- Chọn khuyến mãi -->
-            <div class="section-box" style="padding: 10px 15px;">
-                <select class="custom-select">
-                    <option>Chọn khuyến mãi: Nạp Tiền Thông Thường</option>
-                    <option>Thưởng chào mừng thành viên mới</option>
-                    <option>Hoàn trả mỗi ngày</option>
-                </select>
-            </div>
+        {% if message %}
+        <div class="alert {{ msg_type }}">{{ message }}</div>
+        {% endif %}
 
-            <!-- Phương thức thanh toán -->
-            <div class="section-box">
-                <div class="section-title">⚡ Phương thức thanh toán</div>
-                <div class="pay-grid" id="payment-methods">
-                    <div class="pay-item active">
-                        <span class="p-icon">🏦</span>
-                        <span>Ngân hàng đ...</span>
-                    </div>
-                    <div class="pay-item">
-                        <span class="p-icon">🟢</span>
-                        <span>MOMOPAY</span>
-                    </div>
-                    <div class="pay-item">
-                        <span class="p-icon">🔵</span>
-                        <span>ZaloPay</span>
-                    </div>
-                    <div class="pay-item">
-                        <span class="p-icon">🔴</span>
-                        <span>ViettelPay</span>
-                    </div>
-                    <div class="pay-item">
-                        <span class="p-icon">₮</span>
-                        <span>USDT TRC20</span>
-                    </div>
-                    <div class="pay-item">
-                        <span class="p-icon">₿</span>
-                        <span>BTC</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cổng nạp -->
-            <div class="section-box">
-                <div class="section-title">⚡ Cổng nạp</div>
-                <div class="pay-grid" id="gateway-list" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="pay-item active" style="padding: 8px;">HN-Pay1</div>
-                    <div class="pay-item" style="padding: 8px;">O-Pay</div>
-                    <div class="pay-item" style="padding: 8px;">D-Pay</div>
-                </div>
-            </div>
-
-            <!-- Số tiền nạp -->
-            <div class="section-box">
-                <div class="section-title" style="justify-content: space-between;">
-                    <span id="amount-title">💵 Số tiền Nạp</span>
-                    <span style="font-size: 10px; color: #7a83a0;">đ 100,00 - đ 100.000,00</span>
-                </div>
-                <div class="amount-grid" id="amount-list">
-                    <div class="amount-btn">100</div>
-                    <div class="amount-btn">200</div>
-                    <div class="amount-btn">500</div>
-                    <div class="amount-btn">1.000</div>
-                    <div class="amount-btn">2.000</div>
-                    <div class="amount-btn">5.000</div>
-                    <div class="amount-btn">10.000</div>
-                    <div class="amount-btn">20.000</div>
-                    <div class="amount-btn">50.000</div>
-                    <div class="amount-btn active">100.000</div>
-                </div>
-                <div class="money-input-wrap">
-                    <input type="text" id="money-input" value="100.000" placeholder="đ">
-                    <span class="rate">1 = 1K</span>
-                </div>
-            </div>
-
-            <!-- Nhắc nhở -->
-            <div class="section-box">
-                <div class="section-title">ℹ️ Nhắc nhở</div>
-                <div class="notice-box" id="notice-text">
-                    Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình. Nếu không, bạn cần liên hệ với chăm sóc khách hàng kèm theo hình ảnh gửi tiền thành công. 2) Xóa 3 số 0 cuối cùng khi nhập số tiền gửi. Ví dụ: Nạp 1.000.000 VNĐ, chỉ cần nhập 1.000 điểm
-                </div>
-            </div>
-
-            <!-- Nút gửi -->
-            <button class="btn-submit-wallet" id="btn-submit">Gửi</button>
+        <!-- Tab chuyển đổi Nạp / Rút -->
+        <div class="tabs-container">
+            <button type="button" class="tab-btn active" onclick="switchTab('deposit')" id="btn-deposit">Nạp Tiền (+)</button>
+            <button type="button" class="tab-btn" onclick="switchTab('withdraw')" id="btn-withdraw">Rút Tiền (-)</button>
         </div>
 
-        <!-- Bottom Nav -->
+        <!-- Form Nạp Tiền -->
+        <form method="POST" class="form-section active" id="form-deposit">
+            <input type="hidden" name="action" value="deposit">
+            <div class="input-group">
+                <label>Số tiền nạp vào Ví Lobby (VND):</label>
+                <input type="number" name="amount" placeholder="Nhập số tiền..." min="10000" step="1000" required>
+            </div>
+            <button type="submit" class="submit-btn">Xác Nhận Nạp Tiền</button>
+        </form>
+
+        <!-- Form Rút Tiền -->
+        <form method="POST" class="form-section" id="form-withdraw">
+            <input type="hidden" name="action" value="withdraw">
+            <div class="input-group">
+                <label>Số tiền rút từ Ví Lobby (VND):</label>
+                <input type="number" name="amount" placeholder="Nhập số tiền..." min="50000" step="1000" required>
+            </div>
+            <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff;">Xác Nhận Rút Tiền</button>
+        </form>
+
+        <!-- Thanh điều hướng dưới -->
         <nav class="bottom-nav">
-            <a href="/" class="nav-item">
+            <a href="{{ url_for('index') }}" class="nav-item">
                 <div class="nav-icon">🏠</div>
                 <span>Trang chủ</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Tính năng khuyến mãi đang cập nhật')">
+            <a href="{{ url_for('promotions') }}" class="nav-item">
                 <div class="nav-icon">🎁</div>
                 <span>Khuyến mãi</span>
             </a>
-            <a href="/deposit" class="nav-item active">
+            <a href="{{ url_for('deposit') }}" class="nav-item active">
                 <div class="nav-icon">💳</div>
                 <span>Nạp tiền</span>
             </a>
-            <a href="/profile" class="nav-item">
+            <a href="{{ url_for('profile') }}" class="nav-item">
                 <div class="nav-icon">👤</div>
                 <span>Tài khoản</span>
             </a>
@@ -285,72 +247,20 @@
     </div>
 
     <script>
-        const tabDeposit = document.getElementById('tab-deposit');
-        const tabWithdraw = document.getElementById('tab-withdraw');
-        const amountTitle = document.getElementById('amount-title');
-        const noticeText = document.getElementById('notice-text');
-        const btnSubmit = document.getElementById('btn-submit');
-        
-        tabDeposit.addEventListener('click', () => {
-            tabDeposit.classList.add('active');
-            tabWithdraw.classList.remove('active');
-            amountTitle.innerText = '💵 Số tiền Nạp';
-            noticeText.innerText = 'Lưu ý: Để đẩy nhanh quá trình gửi tiền, vui lòng 1) nhập chính xác NỘI DUNG CHUYỂN KHOẢN được hiển thị trên màn hình...';
-            btnSubmit.innerText = 'Gửi';
-        });
+        function switchTab(type) {
+            document.getElementById('btn-deposit').classList.remove('active');
+            document.getElementById('btn-withdraw').classList.remove('active');
+            document.getElementById('form-deposit').classList.remove('active');
+            document.getElementById('form-withdraw').classList.remove('active');
 
-        tabWithdraw.addEventListener('click', () => {
-            tabWithdraw.classList.add('active');
-            tabDeposit.classList.remove('active');
-            amountTitle.innerText = '💵 Số tiền Rút';
-            noticeText.innerText = 'Lưu ý rút tiền: Hạn mức rút tối thiểu là 200.000 VNĐ, tối đa 500.000.000 VNĐ mỗi ngày.';
-            btnSubmit.innerText = 'Xác nhận rút';
-        });
-
-        const payItems = document.querySelectorAll('#payment-methods .pay-item');
-        payItems.forEach(item => {
-            item.addEventListener('click', () => {
-                payItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-            });
-        });
-
-        const gateways = document.querySelectorAll('#gateway-list .pay-item');
-        gateways.forEach(item => {
-            item.addEventListener('click', () => {
-                gateways.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-            });
-        });
-
-        const amountBtns = document.querySelectorAll('.amount-btn');
-        const moneyInput = document.getElementById('money-input');
-        
-        // Khi chọn mốc tiền nhanh
-        amountBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                amountBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                moneyInput.value = btn.innerText;
-            });
-        });
-
-        // Xử lý khi gõ phím trực tiếp vào ô nhập tiền (gõ thêm số 0 sẽ tự động nhân lên và định dạng lại)
-        moneyInput.addEventListener('input', (e) => {
-            let rawVal = moneyInput.value.replace(/\D/g, ''); // Chỉ giữ lại số
-            if (rawVal === '') {
-                moneyInput.value = '';
-                return;
+            if (type === 'deposit') {
+                document.getElementById('btn-deposit').classList.add('active');
+                document.getElementById('form-deposit').classList.add('active');
+            } else {
+                document.getElementById('btn-withdraw').classList.add('active');
+                document.getElementById('form-withdraw').classList.add('active');
             }
-            let num = parseInt(rawVal, 10);
-            moneyInput.value = num.toLocaleString('vi-VN'); // Tự động chấm phân cách hàng nghìn
-        });
-
-        btnSubmit.addEventListener('click', () => {
-            const type = tabDeposit.classList.contains('active') ? 'nạp tiền' : 'rút tiền';
-            alert(`Đã gửi yêu cầu ${type} thành công! Số tiền: ${moneyInput.value} VNĐ`);
-        });
+        }
     </script>
 </body>
-    </html>
-    
+</html>

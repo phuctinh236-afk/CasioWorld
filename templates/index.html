@@ -77,7 +77,6 @@
             text-decoration: none;
             font-weight: 600;
         }
-        
         /* Sidebar Menu Drawer */
         .drawer-overlay {
             position: fixed;
@@ -85,22 +84,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            z-index: 999;
+            background: rgba(0,0,0,0.6);
+            z-index: 998;
             display: none;
         }
         .drawer-menu {
             position: fixed;
             top: 0;
-            left: -320px;
-            width: 320px;
+            left: -280px;
+            width: 280px;
             height: 100%;
-            background-color: #171a29;
-            z-index: 1000;
-            transition: 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #24293f;
+            background: #171a29;
+            z-index: 999;
+            transition: left 0.3s ease;
             overflow-y: auto;
         }
         .drawer-menu.open {
@@ -108,31 +104,33 @@
         }
         .drawer-header {
             padding: 15px;
-            background: linear-gradient(135deg, #2b2f45, #171a29);
+            background: #131521;
             border-bottom: 1px solid #24293f;
             position: relative;
+        }
+        .drawer-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
         }
         .user-info-box {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .user-details {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         .user-avatar {
-            width: 45px;
-            height: 45px;
-            background: #cca352;
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            background: #212537;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #131521;
             font-size: 18px;
         }
         .user-name-text {
@@ -141,7 +139,7 @@
             color: #fff;
         }
         .user-profile-link {
-            font-size: 11px;
+            font-size: 12px;
             color: #cca352;
             text-decoration: none;
         }
@@ -155,6 +153,7 @@
             align-items: center;
             font-weight: bold;
             overflow: hidden;
+            margin: 15px 12px 0 12px;
         }
         .wallet-info-content {
             overflow: hidden;
@@ -166,21 +165,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .drawer-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-        }
         .drawer-grid {
             padding: 12px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
         .drawer-item {
             background-color: #212537;
@@ -202,8 +191,7 @@
         .drawer-item-icon {
             font-size: 20px;
         }
-
-        .banner {
+                .banner {
             padding: 10px 15px;
         }
         .banner-box {
@@ -233,20 +221,18 @@
         .dot {
             width: 5px;
             height: 5px;
-            background: rgba(255,255,255,0.4);
+            background: #555;
             border-radius: 50%;
         }
         .dot.active {
             background: #cca352;
-            width: 14px;
-            border-radius: 3px;
         }
         .game-tabs {
             display: flex;
             background-color: #171a29;
             overflow-x: auto;
             padding: 8px 10px;
-            gap: 8px;
+            gap: 6px;
             border-bottom: 1px solid #24293f;
             scrollbar-width: none;
         }
@@ -278,15 +264,13 @@
         .g-tab-icon {
             font-size: 16px;
         }
-
-        /* ===== CẤU HÌNH Ô GAME FULL 1 ẢNH ===== */
         .game-section {
             padding: 10px 10px 80px 10px;
         }
         .game-grid-detailed {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
         .game-item-card {
             background-color: #171a29;
@@ -311,8 +295,6 @@
             object-fit: cover;
             display: block;
         }
-
-        /* Thanh Điều Hướng Dưới Cùng */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -354,9 +336,7 @@
                 <button type="button" class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
                 <div class="header-title">Lobbygame_1</div>
             </div>
-            <a href="{{ url_for('cskh') }}" class="cskh-btn">
-                🎧 CSKH
-            </a>
+            <a href="{{ url_for('cskh') }}" class="cskh-btn">💬 CSKH</a>
         </div>
 
         <!-- Sidebar Menu Drawer -->
@@ -365,41 +345,38 @@
             <div class="drawer-header">
                 <button type="button" class="drawer-close-btn" onclick="toggleDrawer(false)">✕</button>
                 <div class="user-info-box">
-                    <div class="user-details">
-                        <div class="user-avatar">💎</div>
-                        <div>
-                            <div class="user-name-text">Phun Cam Kiu</div>
-                            <a href="{{ url_for('profile') }}" class="user-profile-link">Hồ Sơ ›</a>
-                        </div>
+                    <div class="user-avatar">💎</div>
+                    <div>
+                        <div class="user-name-text">Phun Cam Kiu</div>
+                        <a href="{{ url_for('profile') }}" class="user-profile-link">Hồ Sơ</a>
                     </div>
-                </div>
-                <div class="wallet-box-mini">
-                    <div class="wallet-info-content">
-                        <div style="font-size: 10px; font-weight: normal;">Ví chính (VND)</div>
-                        <div class="balance-val">
-                            đ{% if balance > 1e9 %}{{ "{:.2e}".format(balance) }}{% else %}{{ "{:,.2f}".format(balance) }}{% endif %}
-                        </div>
-                    </div>
-                    <div>💳</div>
                 </div>
             </div>
-
+            <div class="wallet-box-mini">
+                <div class="wallet-info-content">
+                    <div style="font-size: 10px; font-weight: normal;">Ví chính (VND)</div>
+                    <div class="balance-val">
+                        {% if balance > 1e9 %}{{ "%.2e"|format(balance) }}{% else %}{{ "%.2f"|format(balance) }}{% endif %}
+                    </div>
+                </div>
+                <div>💳</div>
+            </div>
             <div class="drawer-grid">
-                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💳</span><span>Nạp tiền</span></a>
-                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">📥</span><span>Rút tiền</span></a>
+                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💰</span><span>Nạp tiền</span></a>
+                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💳</span><span>Rút tiền</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🔥</span><span>HOT</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🐓</span><span>ĐÁ GÀ</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">♠️</span><span>Casino</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎴</span><span>Game bài</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🐟</span><span>Bắn Cá</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎱</span><span>Xổ Số</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎲</span><span>Casino</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎮</span><span>Game Bài</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎣</span><span>Bắn Cá</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎟️</span><span>Xổ Số</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">⚽</span><span>Thể Thao</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🚀</span><span>Crash</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🕹️</span><span>Arcade</span></a>
                 <a href="{{ url_for('promotions') }}" class="drawer-item"><span class="drawer-item-icon">🎁</span><span>Khuyến mãi</span></a>
                 <a href="{{ url_for('vip') }}" class="drawer-item"><span class="drawer-item-icon">⭐</span><span>VIP</span></a>
-                <a href="{{ url_for('profile') }}" class="drawer-item"><span class="drawer-item-icon">📥</span><span>Tải xuống</span></a>
+                <a href="{{ url_for('profile') }}" class="drawer-item"><span class="drawer-item-icon">👤</span><span>Tài khoản</span></a>
             </div>
         </div>
 
@@ -419,36 +396,36 @@
             <div class="g-tab active"><span class="g-tab-icon">🔥</span><span>HOT</span></div>
             <div class="g-tab"><span class="g-tab-icon">🐓</span><span>ĐÁ GÀ</span></div>
             <div class="g-tab"><span class="g-tab-icon">🎰</span><span>Slots</span></div>
-            <div class="g-tab"><span class="g-tab-icon">♠️</span><span>Casino</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🃏</span><span>Game Bài</span></div>
+            <div class="g-tab"><span class="g-tab-icon">🎲</span><span>Casino</span></div>
+            <div class="g-tab"><span class="g-tab-icon">🎮</span><span>Game Bài</span></div>
         </div>
-                <!-- DANH SÁCH GAME HIỂN THỊ FULL 1 Ô ÁNH -->
+
         <div class="game-section">
             <div class="game-grid-detailed">
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt="Dragon Gems"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt="Mithai Madness"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt="Fortune Garuda"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt="NCVIP Super"></div>
-                
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt="Ultra Ace"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt="NCVIP Gates"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}" alt="NC Bountiful Birds"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt="Treasures of Aztec"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt=""></div>
 
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt="Wild Bounty"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt="Dragon Gems"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt=""></div>
 
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt="Pinata Wins"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt="Super Ace"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt="Tongits Go"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt="Jackpot Fishing"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt=""></div>
 
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_niubi.jpg') }}" alt="Super Niubi"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt="Lucky Neko"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt="Chinese New Year"></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chicken_dash.jpg') }}" alt="Chicken Dash"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt=""></div>
+
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_niubi.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt=""></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chicken_dash.jpg') }}" alt=""></div>
             </div>
         </div>
 

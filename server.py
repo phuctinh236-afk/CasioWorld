@@ -1,76 +1,74 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, redirect, url_for
 
 app = Flask(__name__)
-app.secret_key = 'super_secret_key_lobby'  # Khóa bí mật để quản lý session ví
 
-@app.before_request
-def init_session():
-    # Khởi tạo ví lobby mặc định có 500,000 VND nếu chưa có
-    if 'balance' not in session:
-        session['balance'] = 500000.0
-
-# Trang chủ (Lobby game)
 @app.route('/')
 def index():
-    return render_template('index.html', balance=session['balance'])
+    balance = 50100000.0
+    return render_template('index.html', balance=balance)
 
-# Trang tài khoản / cá nhân
 @app.route('/profile')
 def profile():
-    return render_template('profile.html', balance=session['balance'])
+    balance = 50100000.0
+    username = "pphuc8386"
+    return render_template('profile.html', balance=balance, username=username)
 
-# Trang nạp / rút tiền chung
-@app.route('/deposit', methods=['GET', 'POST'])
+@app.route('/deposit')
 def deposit():
-    message = None
-    msg_type = None  # 'success' hoặc 'error'
-    
-    if request.method == 'POST':
-        action = request.form.get('action')  # 'deposit' (Nạp) hoặc 'withdraw' (Rút)
-        try:
-            amount = float(request.form.get('amount', 0))
-            if amount <= 0:
-                message = "Vui lòng nhập số tiền lớn hơn 0!"
-                msg_type = 'error'
-            else:
-                if action == 'deposit':
-                    session['balance'] += amount
-                    message = f"Nạp thành công {amount:,.0f} VND vào Ví Lobby!"
-                    msg_type = 'success'
-                elif action == 'withdraw':
-                    if session['balance'] >= amount:
-                        session['balance'] -= amount
-                        message = f"Rút thành công {amount:,.0f} VND từ Ví Lobby!"
-                        msg_type = 'success'
-                    else:
-                        message = "Số dư Ví Lobby không đủ để thực hiện lệnh rút!"
-                        msg_type = 'error'
-        except ValueError:
-            message = "Số tiền không hợp lệ!"
-            msg_type = 'error'
+    return render_template('deposit.html')
 
-    return render_template('deposit.html', balance=session['balance'], message=message, msg_type=msg_type)
+@app.route('/withdraw')
+def withdraw():
+    return "Trang Rút Tiền"
 
-# Trang chăm sóc khách hàng (CSKH)
+@app.route('/transaction-center')
+def transaction_center():
+    return "Trang Trung Tâm Giao Dịch"
+
 @app.route('/cskh')
 def cskh():
-    return render_template('cskh.html', balance=session['balance'])
+    return render_template('cskh.html')
 
-# Trang khuyến mãi
-@app.route('/promotions')
-def promotions():
-    return render_template('promotions.html', balance=session['balance'])
-
-# Trang đặc quyền VIP
 @app.route('/vip')
 def vip():
-    return render_template('vip.html', balance=session['balance'])
+    return render_template('vip.html')
 
-# Trang chi tiết VIP
 @app.route('/vip-details')
 def vip_details():
-    return render_template('vip_details.html', balance=session['balance'])
+    return render_template('vip_details.html')
+
+@app.route('/promotions')
+def promotions():
+    return "Trang Khuyến Mãi"
+
+@app.route('/referral')
+def referral():
+    return "Trang Giới Thiệu Bạn Bè"
+
+@app.route('/mailbox')
+def mailbox():
+    return "Trang Hộp Thư"
+
+@app.route('/bet-history')
+def bet_history():
+    return "Trang Chi Tiết Đặt Cược"
+
+@app.route('/security')
+def security():
+    return "Trang Bảo Mật"
+
+@app.route('/notifications')
+def notifications():
+    return "Trang Thông Báo"
+
+@app.route('/rebate')
+def rebate():
+    return "Trang Hoàn Trả"
+
+@app.route('/logout')
+def logout():
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
-                        
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    

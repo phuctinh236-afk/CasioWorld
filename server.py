@@ -8,11 +8,11 @@ app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
-# Bộ lưu trữ đơn nạp tiền trong bộ nhớ tạm (Mã memo -> thông tin đơn)
+# Bộ lưu trữ đơn nạp tiền
 payment_orders = {}
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI CHẨN ĐOÁN (Hiện rõ lỗi nếu có thay vì trang đen 500)
+# BỘ BẪY LỖI CHẨN ĐOÁN: Báo chính xác dòng lỗi nếu có
 # -------------------------------------------------------------
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -20,20 +20,13 @@ def handle_exception(e):
     tb = traceback.format_exc()
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
-        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE:</h2>
+        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG GIAO DIỆN / CODE:</h2>
         <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
     </div>
     """, 500
 
-# Helper render an toàn (tránh sập nếu thiếu file html)
-def safe_render(template_name):
-    try:
-        return render_template(template_name)
-    except Exception:
-        return render_template('index.html')
-
 # -------------------------------------------------------------
-# CUNG CẤP TẤT CẢ BIẾN CẦN THIẾT CHO CÁC FILE HTML
+# CUNG CẤP ĐẦY ĐỦ BIẾN CHO TẤT CẢ TRANG HTML
 # -------------------------------------------------------------
 @app.context_processor
 def inject_defaults():
@@ -69,7 +62,7 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. TRANG CHÍNH & CÁC ROUTE PHỤ TRÁNH LỖI GIAO DIỆN
+# 1. KHAI BÁO TRỰC TIẾP CÁC TRANG CHÍNH & NÚT BẤM
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -78,54 +71,54 @@ def index():
 
 @app.route('/profile')
 def profile():
-    return safe_render('profile.html')
-
-@app.route('/vip')
-def vip():
-    return safe_render('vip.html')
-
-@app.route('/vip_details')
-def vip_details():
-    return safe_render('vip_details.html')
-
-@app.route('/cskh')
-def cskh():
-    return safe_render('cskh.html')
+    return render_template('profile.html')
 
 @app.route('/promotions')
 def promotions():
-    return safe_render('promotions.html')
+    return render_template('promotions.html')
+
+@app.route('/vip')
+def vip():
+    return render_template('vip.html')
+
+@app.route('/vip_details')
+def vip_details():
+    return render_template('vip_details.html')
+
+@app.route('/cskh')
+def cskh():
+    return render_template('cskh.html')
 
 @app.route('/withdraw')
 def withdraw():
-    return safe_render('withdraw.html')
+    return render_template('withdraw.html')
 
 @app.route('/activity')
 def activity():
-    return safe_render('activity.html')
+    return render_template('activity.html')
 
 @app.route('/transaction_center')
 def transaction_center():
-    return safe_render('transaction_center.html')
+    return render_template('transaction_center.html')
 
 @app.route('/history')
 def history():
-    return safe_render('history.html')
+    return render_template('history.html')
 
 @app.route('/bank_card')
 def bank_card():
-    return safe_render('bank_card.html')
+    return render_template('bank_card.html')
 
 @app.route('/security')
 def security():
-    return safe_render('security.html')
+    return render_template('security.html')
 
 @app.route('/messages')
 def messages():
-    return safe_render('messages.html')
+    return render_template('messages.html')
 
 # -------------------------------------------------------------
-# 2. ĐĂNG NHẬP / ĐĂNG KÝ
+# 2. ĐĂNG NHẬP & ĐĂNG KÝ
 # -------------------------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -133,13 +126,13 @@ def login():
         session['username'] = request.form.get('username', 'User')
         session['balance'] = 0
         return redirect(url_for('index'))
-    return safe_render('login.html')
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return redirect(url_for('login'))
-    return safe_render('register.html')
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
@@ -159,7 +152,7 @@ def deposit():
             amount_points = 50
         amount_vnd = int(amount_points * 1000)
         return redirect(url_for('payment', amount=amount_vnd))
-    return safe_render('deposit.html')
+    return render_template('deposit.html')
 
 @app.route('/payment')
 def payment():
@@ -221,3 +214,4 @@ def test_pay(memo):
 # -------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+    

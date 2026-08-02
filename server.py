@@ -12,7 +12,7 @@ app.config['DEBUG'] = True
 payment_orders = {}
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI CHẨN ĐOÁN: Báo chính xác dòng lỗi nếu có
+# BỘ BẪY LỖI CHẨN ĐOÁN
 # -------------------------------------------------------------
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -26,7 +26,7 @@ def handle_exception(e):
     """, 500
 
 # -------------------------------------------------------------
-# CUNG CẤP ĐẦY ĐỦ BIẾN CHO TẤT CẢ TRANG HTML
+# CUNG CẤP BIẾN CHO HTML
 # -------------------------------------------------------------
 @app.context_processor
 def inject_defaults():
@@ -57,12 +57,11 @@ def inject_defaults():
     )
 
 def generate_memo():
-    """Tạo mã nội dung chuyển khoản dạng: chuyen tien DMCNA + 7 số/chữ"""
     random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. KHAI BÁO TRỰC TIẾP CÁC TRANG CHÍNH & NÚT BẤM
+# 1. KHAI BÁO CÁC TRANG CHÍNH & NÚT BẤM
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -116,6 +115,11 @@ def security():
 @app.route('/messages')
 def messages():
     return render_template('messages.html')
+
+# ĐÂY LÀ TRANG VỪA ĐƯỢC THÊM VÀO ĐỂ SỬA LỖI:
+@app.route('/referral')
+def referral():
+    return render_template('referral.html')
 
 # -------------------------------------------------------------
 # 2. ĐĂNG NHẬP & ĐĂNG KÝ
@@ -209,9 +213,5 @@ def test_pay(memo):
         return f"<h3>Thành công! Đã giả lập nạp tiền cho đơn: {memo}. Số dư hiện tại: {session['balance']}</h3><a href='/'>Quay lại trang chủ</a>"
     return "Không tìm thấy mã đơn!"
 
-# -------------------------------------------------------------
-# KHỞI CHẠY SERVER
-# -------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    

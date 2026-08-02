@@ -1,65 +1,111 @@
 import os
-import sqlite3
+import random
+import string
 import traceback
-from flask import Flask, render_template, request, redirect, url_for, session, g
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
 app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
-# -------------------------------------------------------------
-# BỘ BẪY LỖI CHẨN ĐOÁN
-# -------------------------------------------------------------
-@app.errorhandler(500)
-@app.errorhandler(Exception)
-def handle_exception(e):
-    tb = traceback.format_exc()
-    return f"""
-    <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
-        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE:</h2>
-        <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
-    </div>
-    """, 500
+# Bộ lưu trữ đơn nạp tiền trong bộ nhớ tạm (Mã memo -> thông tin đơn)
+payment_orders = {}
 
 # -------------------------------------------------------------
-# CUNG CẤP TẤT CẢ BIẾN CẦN THIẾT CHO PROFILE & GAME
+# CUNG CẤP BIẾN TOÀN CỤC CHO TEMPLATE
 # -------------------------------------------------------------
 @app.context_processor
 def inject_defaults():
-    balance_val = session.get('balance', session.get('points', 0))
+    balance_val = session.get('balance', 0)
     user_data = {
         'id': session.get('user_id', 888888),
-        'user_id': session.get('user_id', 888888),
         'username': session.get('username', 'GUEST'),
-        'points': session.get('points', 0),
-        'money': session.get('money', 0),
-        'vip': session.get('vip', 1),
-        'vip_level': session.get('vip', 1),
         'balance': balance_val,
-        'phone': session.get('phone', '09******88'),
-        'bank_name': 'TECHCOMBANK',
-        'bank_account': '8992362013',
-        'account_name': 'LỶ KIM HẰNG'
+        'points': balance_val
     }
-    return dict(
-        user=user_data,
-        current_user=user_data,
-        username=user_data['username'],
-        points=user_data['points'],
-        balance=balance_val,
-        money=user_data['money'],
-        vip=user_data['vip'],
-        vip_level=user_data['vip_level']
-    )
+    return dict(user=user_data, balance=balance_val)
 
-def safe_render(template_name):
-    try:
-        return render_template(template_name)
-    except Exception:
-        return render_template('index.html')
+def generate_memo():
+    """Tạo mã nội dung chuyển khoản dạng: chuyen tien DMCNA + 7 số/chữ"""
+    random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+    return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. CÁC TRANG CHÍNH & THÀNH VIÊN
+# 1. TRANG THANH TOÁN QR & BỘ ĐỒNG BỘ TỰ ĐỘNG CỘNG TIỀN
+# -------------------------------------------------------------
+@app.route('/payment')
+def payment():
+    amount_vnd = request.args.get('amount', 50000, type=int)
+    formatted_amount = "{:,}".format(amount_vnd).replace(",", ".")
+    
+    # Tạo nội dung chuyển khoản mới
+    memo_code = generate_memo()
+    
+    # Tính số điểm/tiền ví ảo sẽ cộng (Ví dụ 1,000 VND = 1 điểm ví)
+    points_to_add = amount_vnd / 1000  
+    
+    # Lưu thông tin đơn nạp chờ thanh toán
+    payment_orders[memo_code] = {
+        "username": session.get('username', 'GUEST'),
+        "amount_vnd": amount_vnd,
+        "points": points_to_add,
+        "status": "PENDING"
+    }
+    
+    bank_info = {
+        "bank_id": "TCB",
+        "bank_name": "Ngân hàng Techcombank",
+        "account_no": "8992362013",
+        "account_name": "LỶ KIM HẰNG",
+        "amount": amount_vnd,
+        "amount_str": f"{formatted_amount} VND",
+        "memo": memo_code
+    }
+    
+    # Mã QR tự điền sẵn nội dung chuyển khoản
+    qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
+    
+    return render_template('payment.html', bank=bank_info, qr_url=qr_url)
+
+# API để giao diện kiểm tra xem đơn đã được cộng tiền chưa
+@app.route('/api/check_payment/<path:memo>')
+def check_payment(memo):
+    order = payment_orders.get(memo)
+    if order and order['status'] == 'SUCCESS':
+        return jsonify({"status": "SUCCESS", "message": "Thanh toán thành công! Tiền đã cộng vào ví."})
+    return jsonify({"status": "PENDING"})
+
+# API Webhook (Cổng nhận thông báo tự động từ Ngân hàng / Casso / SePay / Hoặc giả lập)
+@app.route('/api/bank_webhook', methods=['POST', 'GET'])
+def bank_webhook():
+    # Nhận dữ liệu memo và số tiền
+    memo = request.args.get('memo') or (request.json.get('content') if request.is_json else None)
+    
+    if memo and memo in payment_orders:
+        order = payment_orders[memo]
+        if order['status'] != 'SUCCESS':
+            # Cập nhật trạng thái thành công
+            order['status'] = 'SUCCESS'
+            
+            # Cộng tiền trực tiếp vào Ví ảo của người dùng
+            current_balance = session.get('balance', 0)
+            session['balance'] = current_balance + order['points']
+            
+            return jsonify({"status": "ok", "message": f"Đã cộng {order['points']} điểm vào tài khoản!"})
+            
+    return jsonify({"status": "failed", "message": "Mã giao dịch không hợp lệ hoặc đã xử lý"}), 400
+
+# Route để test nhanh cộng tiền thủ công (Gõ link này trên trình duyệt để giả lập ngân hàng chuyển khoản)
+@app.route('/test_pay/<path:memo>')
+def test_pay(memo):
+    if memo in payment_orders:
+        payment_orders[memo]['status'] = 'SUCCESS'
+        session['balance'] = session.get('balance', 0) + payment_orders[memo]['points']
+        return f"<h3>Thành công! Đã giả lập ngân hàng chuyển khoản cho đơn: {memo}. Số dư hiện tại: {session['balance']}</h3><a href='/'>Quay lại trang chủ</a>"
+    return "Không tìm thấy mã đơn!"
+
+# -------------------------------------------------------------
+# CÁC ROUTE KHÁC
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -70,114 +116,18 @@ def index():
 def profile():
     return render_template('profile.html')
 
-@app.route('/vip')
-def vip():
-    return safe_render('vip.html')
-
-@app.route('/vip_details')
-def vip_details():
-    return safe_render('vip_details.html')
-
-@app.route('/cskh')
-def cskh():
-    return safe_render('cskh.html')
-
-@app.route('/promotions')
-def promotions():
-    return safe_render('promotions.html')
-
-@app.route('/withdraw')
-def withdraw():
-    return safe_render('withdraw.html')
-
-@app.route('/activity')
-def activity():
-    return safe_render('activity.html')
-
-# -------------------------------------------------------------
-# 2. BỔ SUNG CÁC ROUTE PHỤ TRÁNH LỖI TRONG PROFILE.HTML
-# -------------------------------------------------------------
-@app.route('/transaction_center')
-def transaction_center():
-    return safe_render('transaction_center.html')
-
-@app.route('/history')
-def history():
-    return safe_render('history.html')
-
-@app.route('/bank_card')
-def bank_card():
-    return safe_render('bank_card.html')
-
-@app.route('/security')
-def security():
-    return safe_render('security.html')
-
-@app.route('/messages')
-def messages():
-    return safe_render('messages.html')
-
-# -------------------------------------------------------------
-# 3. ĐĂNG NHẬP & ĐĂNG KÝ
-# -------------------------------------------------------------
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        session['username'] = request.form.get('username', 'User')
-        session['points'] = 0
-        session['balance'] = 0
-        return redirect(url_for('index'))
-    return safe_render('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        return redirect(url_for('login'))
-    return safe_render('register.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
-# -------------------------------------------------------------
-# 4. TRANG NẠP TIỀN & THANH TOÁN QR TECHCOMBANK
-# -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
     if request.method == 'POST':
-        amount_points = request.form.get('amount', 0)
+        amount_points = request.form.get('amount', 50)
         try:
             amount_points = float(amount_points)
         except ValueError:
-            amount_points = 0
-            
+            amount_points = 50
         amount_vnd = int(amount_points * 1000)
         return redirect(url_for('payment', amount=amount_vnd))
-        
-    return safe_render('deposit.html')
+    return render_template('deposit.html')
 
-@app.route('/payment')
-def payment():
-    amount_vnd = request.args.get('amount', 0, type=int)
-    formatted_amount = "{:,}".format(amount_vnd).replace(",", ".")
-    
-    bank_info = {
-        "bank_id": "TCB",
-        "bank_name": "Ngân hàng Techcombank",
-        "account_no": "8992362013",
-        "account_name": "LỶ KIM HẰNG",
-        "amount": amount_vnd,
-        "amount_str": f"{formatted_amount} VND"
-    }
-    
-    qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-compact2.png?amount={amount_vnd}&addInfo=NAP%20TIEN&accountName={bank_info['account_name']}"
-    
-    return render_template('payment.html', bank=bank_info, qr_url=qr_url)
-
-# -------------------------------------------------------------
-# KHỞI CHẠY SERVER
-# -------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
     

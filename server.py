@@ -1,14 +1,14 @@
 import os
 import sqlite3
 import traceback
-from flask import Flask, render_template, request, redirect, url_for, session, g, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, session, g
 
 app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI CHẨN ĐOÁN
+# BỘ BẪY LỖI: Hiện nguyên nhân chính xác để fix
 # -------------------------------------------------------------
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -16,13 +16,13 @@ def handle_exception(e):
     tb = traceback.format_exc()
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
-        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE:</h2>
+        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE (DEBUG MODE):</h2>
         <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
     </div>
     """, 500
 
 # -------------------------------------------------------------
-# CUNG CẤP ĐẦY ĐỦ BIẾN CHO PROFILE / TRANG THÀNH VIÊN
+# CUNG CẤP TẤT CẢ BIẾN CẦN THIẾT CHO PROFILE & GAME
 # -------------------------------------------------------------
 @app.context_processor
 def inject_defaults():
@@ -38,7 +38,8 @@ def inject_defaults():
         'balance': balance_val,
         'phone': session.get('phone', '09******88'),
         'bank_name': 'TECHCOMBANK',
-        'bank_account': '8992362013'
+        'bank_account': '8992362013',
+        'account_name': 'LỶ KIM HẰNG'
     }
     return dict(
         user=user_data,
@@ -51,30 +52,8 @@ def inject_defaults():
         vip_level=user_data['vip_level']
     )
 
-def render_or_fallback(template_name, fallback_title="Thông báo"):
-    """Nếu tìm thấy file html thì render, nếu thiếu file html thì hiện thông báo thay vì tự nhảy về lobby"""
-    try:
-        return render_template(template_name)
-    except Exception as e:
-        return render_template_string(f"""
-        <!DOCTYPE html>
-        <html>
-        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{fallback_title}</title>
-        <style>body{{font-family:sans-serif;background:#172d56;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}}
-        .card{{background:#1e3a70;padding:30px;border-radius:15px;box-shadow:0 4px 10px rgba(0,0,0,0.3);}}
-        a{{color:#e2f835;text-decoration:none;font-weight:bold;margin-top:15px;display:inline-block;}}</style></head>
-        <body>
-            <div class="card">
-                <h2>Chức năng đang cập nhật</h2>
-                <p>Trang <b>{template_name}</b> chưa có trong thư mục <code>templates/</code>.</p>
-                <a href="/">‹ Quay lại Trang Chủ</a>
-            </div>
-        </body>
-        </html>
-        """)
-
 # -------------------------------------------------------------
-# 1. CÁC TRANG CHÍNH & TÍNH NĂNG
+# 1. CÁC TRANG CHÍNH & THÀNH VIÊN
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -83,31 +62,31 @@ def index():
 
 @app.route('/profile')
 def profile():
-    return render_or_fallback('profile.html', 'Trang Thành Viên')
+    return render_template('profile.html')
 
 @app.route('/vip')
 def vip():
-    return render_or_fallback('vip.html', 'Trang VIP')
+    return render_template('vip.html')
 
 @app.route('/vip_details')
 def vip_details():
-    return render_or_fallback('vip_details.html', 'Chi Tiết VIP')
+    return render_template('vip_details.html')
 
 @app.route('/cskh')
 def cskh():
-    return render_or_fallback('cskh.html', 'CSKH')
+    return render_template('cskh.html')
 
 @app.route('/promotions')
 def promotions():
-    return render_or_fallback('promotions.html', 'Khuyến Mãi')
+    return render_template('promotions.html')
 
 @app.route('/withdraw')
 def withdraw():
-    return render_or_fallback('withdraw.html', 'Rút Tiền')
+    return render_template('withdraw.html')
 
 @app.route('/activity')
 def activity():
-    return render_or_fallback('activity.html', 'Hoạt Động')
+    return render_template('activity.html')
 
 # -------------------------------------------------------------
 # 2. ĐĂNG NHẬP & ĐĂNG KÝ
@@ -119,13 +98,13 @@ def login():
         session['points'] = 0
         session['balance'] = 0
         return redirect(url_for('index'))
-    return render_or_fallback('login.html', 'Đăng Nhập')
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return redirect(url_for('login'))
-    return render_or_fallback('register.html', 'Đăng Ký')
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
@@ -147,7 +126,7 @@ def deposit():
         amount_vnd = int(amount_points * 1000)
         return redirect(url_for('payment', amount=amount_vnd))
         
-    return render_or_fallback('deposit.html', 'Nạp Tiền')
+    return render_template('deposit.html')
 
 @app.route('/payment')
 def payment():

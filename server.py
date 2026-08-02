@@ -13,7 +13,7 @@ app.config['DEBUG'] = True
 payment_orders = {}
 
 # -------------------------------------------------------------
-# HỆ THỐNG AN TOÀN: TỰ ĐỘNG HIỂN THỊ GIAO DIỆN DỰ PHÒNG NẾU THIẾU FILE HTML
+# HỆ THỐNG AN TOÀN: GIAO DIỆN DỰ PHÒNG KHI CHƯA CÓ FILE HTML
 # -------------------------------------------------------------
 def render_safe(template_name, **kwargs):
     try:
@@ -39,7 +39,7 @@ def render_safe(template_name, **kwargs):
         <body>
             <div class="container">
                 <h2>✨ {title}</h2>
-                <p>Tính năng này đang hoạt động. Giao diện chi tiết sẽ hiển thị ngay khi bạn cập nhật file mẫu lên hệ thống.</p>
+                <p>Khu vực này đang hoạt động và sẵn sàng hiển thị dữ liệu.</p>
                 <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
             </div>
         </body>
@@ -99,7 +99,7 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. ĐỊNH TUYẾN TẤT CẢ CÁC TRANG
+# 1. ĐỊNH TUYẾN TẤT CẢ CÁC TRANG & ĐƯỜNG DẪN ALIAS
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -110,12 +110,20 @@ def index():
 def profile():
     return render_safe('profile.html')
 
+# Bổ sung toàn bộ các biến thể đường dẫn cho Khuyến mãi
 @app.route('/promotions')
+@app.route('/khuyen_mai')
+@app.route('/khuyenmai')
 def promotions():
     return render_safe('promotions.html')
 
+# Bổ sung toàn bộ các biến thể đường dẫn cho Thành viên / VIP
 @app.route('/vip')
 @app.route('/vip_details')
+@app.route('/member')
+@app.route('/members')
+@app.route('/thanh_vien')
+@app.route('/thanhvien')
 def vip():
     return render_safe('vip.html')
 
@@ -259,3 +267,4 @@ def catch_all(subpath):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+    

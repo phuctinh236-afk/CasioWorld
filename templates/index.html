@@ -78,7 +78,7 @@
             font-weight: 600;
         }
         
-        /* Sidebar Menu Drawer (Giống ảnh 1) */
+        /* Sidebar Menu Drawer */
         .drawer-overlay {
             position: fixed;
             top: 0;
@@ -154,9 +154,17 @@
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
+            overflow: hidden;
+        }
+        .wallet-info-content {
+            overflow: hidden;
+            max-width: 210px;
         }
         .wallet-box-mini .balance-val {
-            font-size: 16px;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .drawer-close-btn {
             position: absolute;
@@ -370,7 +378,7 @@
     </style>
 </head>
 <body>
-    <div class="app-container">
+        <div class="app-container">
         <div class="header">
             <div class="header-left">
                 <button type="button" class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
@@ -381,7 +389,7 @@
             </a>
         </div>
 
-        <!-- Sidebar Menu Drawer (Giống mẫu Ảnh 1) -->
+        <!-- Sidebar Menu Drawer -->
         <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
         <div class="drawer-menu" id="drawerMenu">
             <div class="drawer-header">
@@ -396,9 +404,11 @@
                     </div>
                 </div>
                 <div class="wallet-box-mini">
-                    <div>
+                    <div class="wallet-info-content">
                         <div style="font-size: 10px; font-weight: normal;">Ví chính (VND)</div>
-                        <div class="balance-val">đ{{ "{:,.2f}".format(balance) }}</div>
+                        <div class="balance-val">
+                            đ{% if balance > 1e9 %}{{ "{:.2e}".format(balance) }}{% else %}{{ "{:,.2f}".format(balance) }}{% endif %}
+                        </div>
                     </div>
                     <div>💳</div>
                 </div>
@@ -466,8 +476,9 @@
                     <span>Tải xuống</span>
                 </a>
             </div>
-            </div>
-            <div class="banner">
+        </div>
+
+        <div class="banner">
             <div class="banner-box">
                 <span>Banner</span>
                 <div class="banner-dots">
@@ -592,8 +603,7 @@
             </a>
         </nav>
     </div>
-
-    <script>
+        <script>
         function toggleDrawer(isOpen) {
             const menu = document.getElementById('drawerMenu');
             const overlay = document.getElementById('drawerOverlay');
@@ -607,5 +617,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>

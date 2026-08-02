@@ -1,74 +1,100 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
+app.secret_key = 'casio_world_secret_key'
 
+# -------------------------------------------------------------
+# 1. Trang Chủ
+# -------------------------------------------------------------
 @app.route('/')
+@app.route('/index')
 def index():
-    balance = 50100000.0
-    return render_template('index.html', balance=balance)
+    return render_template('index.html')
 
+# -------------------------------------------------------------
+# 2. Trang Đăng Nhập & Đăng Ký
+# -------------------------------------------------------------
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+# -------------------------------------------------------------
+# 3. Trang Cá Nhân & Chăm Sóc Khách Hàng
+# -------------------------------------------------------------
 @app.route('/profile')
 def profile():
-    balance = 50100000.0
-    username = "pphuc8386"
-    return render_template('profile.html', balance=balance, username=username)
-
-@app.route('/deposit')
-def deposit():
-    return render_template('deposit.html')
-
-@app.route('/withdraw')
-def withdraw():
-    return "Trang Rút Tiền"
-
-@app.route('/transaction-center')
-def transaction_center():
-    return "Trang Trung Tâm Giao Dịch"
+    return render_template('profile.html')
 
 @app.route('/cskh')
 def cskh():
     return render_template('cskh.html')
 
+# -------------------------------------------------------------
+# 4. Trang VIP & Chi Tiết VIP
+# -------------------------------------------------------------
 @app.route('/vip')
 def vip():
     return render_template('vip.html')
 
-@app.route('/vip-details')
+@app.route('/vip_details')
 def vip_details():
     return render_template('vip_details.html')
 
-@app.route('/promotions')
-def promotions():
-    return "Trang Khuyến Mãi"
+# -------------------------------------------------------------
+# 5. Trang Nạp Tiền (Nhận điểm/tiền người dùng chọn)
+# -------------------------------------------------------------
+@app.route('/deposit', methods=['GET', 'POST'])
+def deposit():
+    if request.method == 'POST':
+        amount_points = request.form.get('amount', 0)
+        try:
+            amount_points = float(amount_points)
+        except ValueError:
+            amount_points = 0
+            
+        # Quy đổi: 1 Điểm = 1.000 VNĐ
+        amount_vnd = int(amount_points * 1000)
+        
+        # Chuyển hướng sang trang hiển thị mã QR (/payment)
+        return redirect(url_for('payment', amount=amount_vnd))
+        
+    return render_template('deposit.html')
 
-@app.route('/referral')
-def referral():
-    return "Trang Giới Thiệu Bạn Bè"
+# -------------------------------------------------------------
+# 6. Trang Hiển Thị Mã QR Thanh Toán Techcombank
+# -------------------------------------------------------------
+@app.route('/payment')
+def payment():
+    # Lấy số tiền được chuyển tới
+    amount_vnd = request.args.get('amount', 0, type=int)
+    formatted_amount = "{:,}".format(amount_vnd).replace(",", ".")
+    
+    # Thông tin tài khoản Techcombank
+    bank_info = {
+        "bank_id": "TCB",
+        "bank_name": "Ngân hàng Techcombank",
+        "account_no": "8992362013",
+        "account_name": "LỶ KIM HẰNG",
+        "amount": amount_vnd,
+        "amount_str": f"{formatted_amount} VND"
+    }
+    
+    # Tự động tạo link mã QR VietQR khớp số tiền
+    qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-compact2.png?amount={amount_vnd}&addInfo=NAP%20TIEN&accountName={bank_info['account_name']}"
+    
+    return render_template('payment.html', bank=bank_info, qr_url=qr_url)
 
-@app.route('/mailbox')
-def mailbox():
-    return "Trang Hộp Thư"
-
-@app.route('/bet-history')
-def bet_history():
-    return "Trang Chi Tiết Đặt Cược"
-
-@app.route('/security')
-def security():
-    return "Trang Bảo Mật"
-
-@app.route('/notifications')
-def notifications():
-    return "Trang Thông Báo"
-
-@app.route('/rebate')
-def rebate():
-    return "Trang Hoàn Trả"
-
-@app.route('/logout')
-def logout():
-    return redirect(url_for('index'))
-
+# -------------------------------------------------------------
+# Khởi Chạy Server
+# -------------------------------------------------------------
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
     

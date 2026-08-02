@@ -6,6 +6,10 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+@app.route('/promotions')
+def promotions():
+    return render_template('promotions.html')
+
 @app.route('/vip')
 def vip():
     return render_template('vip.html')
@@ -17,14 +21,6 @@ def deposit():
 @app.route('/profile')
 def profile():
     return render_template('profile.html')
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-@app.route('/register')
-def register():
-    return render_template('register.html')
 
 @app.route('/cskh')
 def cskh():

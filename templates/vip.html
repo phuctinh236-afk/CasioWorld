@@ -10,7 +10,8 @@
         .app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow-y: auto; }
         
         .header { padding: 12px 15px; background-color: #171a29; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; }
-        .back-btn { color: #cca352; text-decoration: none; font-size: 14px; }
+        /* Nút Chi tiết VIP ở góc trái thay cho Trở về */
+        .detail-link { color: #cca352; text-decoration: none; font-size: 12px; font-weight: bold; background: #212537; padding: 5px 10px; border-radius: 6px; border: 1px solid #303650; }
         .header-title { font-size: 16px; font-weight: bold; color: #cca352; }
 
         .vip-banner { padding: 20px 15px; text-align: center; background: linear-gradient(135deg, #2b2f45, #171a29); border-bottom: 1px solid #24293f; }
@@ -34,9 +35,10 @@
 <body>
     <div class="app-container">
         <div class="header">
-            <a href="{{ url_for('profile') }}" class="back-btn">❮ Trở về</a>
+            <!-- Thay nút Trở về thành Chi tiết VIP -->
+            <a href="{{ url_for('vip_details') }}" class="detail-link">📋 Chi tiết VIP</a>
             <div class="header-title">ĐẶC QUYỀN VIP</div>
-            <div style="width: 40px;"></div>
+            <div style="width: 75px;"></div>
         </div>
 
         <div class="vip-banner">
@@ -82,7 +84,7 @@
                 <div class="nav-icon">💳</div>
                 <span>Nạp tiền</span>
             </a>
-            <a href="{{ url_for('profile') }}" class="nav-item active">
+            <a href="{{ url_for('profile') }}" class="nav-item">
                 <div class="nav-icon">👤</div>
                 <span>Tài khoản</span>
             </a>

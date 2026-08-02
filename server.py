@@ -8,7 +8,7 @@ app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI
+# BỘ BẪY LỖI TRÁNH TRANG TRẮNG / LỖI 500
 # -------------------------------------------------------------
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -22,7 +22,7 @@ def handle_exception(e):
     """, 500
 
 # -------------------------------------------------------------
-# BỘ TỰ ĐỘNG CUNG CẤP BIẾN CHO HTML (Sửa triệt để lỗi 'balance')
+# BỘ CUNG CẤP BIẾN TOÀN CỤC CHO HTML
 # -------------------------------------------------------------
 @app.context_processor
 def inject_defaults():
@@ -44,8 +44,15 @@ def inject_defaults():
         vip=user_data['vip']
     )
 
+# Helper render an toàn (nếu thiếu file html phụ sẽ không sập web)
+def safe_render(template_name):
+    try:
+        return render_template(template_name)
+    except Exception:
+        return render_template('index.html')
+
 # -------------------------------------------------------------
-# 1. CÁC TRANG CHÍNH
+# 1. CÁC TRANG CHÍNH & KHUYẾN MÃI (SỬA LỖI BUILDERROR)
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -54,19 +61,31 @@ def index():
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    return safe_render('profile.html')
 
 @app.route('/cskh')
 def cskh():
-    return render_template('cskh.html')
+    return safe_render('cskh.html')
 
 @app.route('/vip')
 def vip():
-    return render_template('vip.html')
+    return safe_render('vip.html')
 
 @app.route('/vip_details')
 def vip_details():
-    return render_template('vip_details.html')
+    return safe_render('vip_details.html')
+
+@app.route('/promotions')
+def promotions():
+    return safe_render('promotions.html')
+
+@app.route('/withdraw')
+def withdraw():
+    return safe_render('withdraw.html')
+
+@app.route('/activity')
+def activity():
+    return safe_render('activity.html')
 
 # -------------------------------------------------------------
 # 2. ĐĂNG NHẬP & ĐĂNG KÝ
@@ -78,13 +97,13 @@ def login():
         session['points'] = 0
         session['balance'] = 0
         return redirect(url_for('index'))
-    return render_template('login.html')
+    return safe_render('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return redirect(url_for('login'))
-    return render_template('register.html')
+    return safe_render('register.html')
 
 @app.route('/logout')
 def logout():
@@ -92,7 +111,7 @@ def logout():
     return redirect(url_for('index'))
 
 # -------------------------------------------------------------
-# 3. TRANG NẠP TIỀN & THANH TOÁN TECHCOMBANK
+# 3. TRANG NẠP TIỀN & THANH TOÁN QR TECHCOMBANK
 # -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
@@ -106,7 +125,7 @@ def deposit():
         amount_vnd = int(amount_points * 1000)
         return redirect(url_for('payment', amount=amount_vnd))
         
-    return render_template('deposit.html')
+    return safe_render('deposit.html')
 
 @app.route('/payment')
 def payment():
@@ -127,8 +146,7 @@ def payment():
     return render_template('payment.html', bank=bank_info, qr_url=qr_url)
 
 # -------------------------------------------------------------
-# KHỞI CHẠY
+# KHỞI CHẠY SERVER
 # -------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    

@@ -4,111 +4,267 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Cá Nhân - Ab666</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #131521; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow-y: auto; }
-        
-        .header { padding: 12px 15px; background-color: #171a29; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; }
-        .header-title { font-size: 16px; font-weight: bold; color: #cca352; }
-        .cskh-btn { background: #212537; padding: 4px 10px; border-radius: 15px; font-size: 11px; color: #cca352; border: 1px solid #303650; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-
-        .profile-top { padding: 15px; background: linear-gradient(135deg, #1b1e2e, #131521); border-bottom: 1px solid #24293f; }
-        .profile-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .username-text { font-size: 12px; color: #9fa5b9; }
-        .username-text span { color: #fff; font-weight: bold; }
-        .logout-link { font-size: 11px; color: #e06c75; text-decoration: none; }
-
-        .balance-box { font-size: 24px; font-weight: bold; color: #cca352; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
-        .balance-box span { font-size: 16px; }
-
-        .action-buttons { display: flex; gap: 10px; }
-        .btn-action { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: bold; text-align: center; text-decoration: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-deposit { background: linear-gradient(135deg, #cca352, #e6c679); color: #131521; }
-        .btn-withdraw { background: #212537; color: #fff; border: 1px solid #303650; }
-
-        .menu-grid { padding: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .menu-card { background-color: #171a29; border: 1px solid #24293f; border-radius: 10px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-decoration: none; color: #fff; cursor: pointer; transition: 0.2s; height: 95px; }
-        .menu-card:hover { border-color: #cca352; }
-        .menu-icon { font-size: 24px; }
-        .menu-label { font-size: 11px; color: #cfd3dc; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background-color: #171a29; border-top: 1px solid #24293f; display: flex; justify-content: space-around; padding: 8px 0; z-index: 900; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #7a83a0; font-size: 10px; gap: 3px; }
-        .nav-item.active { color: #cca352; }
-        .nav-icon { font-size: 20px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #131521;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: #131521;
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        .header {
+            padding: 12px 15px;
+            background-color: #171a29;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #cca352;
+        }
+        .cskh-btn {
+            background: #212537;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #cca352;
+            border: 1px solid #303650;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .profile-header-card {
+            background: linear-gradient(135deg, #1d2136, #131521);
+            padding: 20px 15px;
+            border-bottom: 1px solid #24293f;
+        }
+        .user-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .welcome-text {
+            font-size: 13px;
+            color: #9fa5b9;
+        }
+        .username-highlight {
+            color: #fff;
+            font-weight: bold;
+        }
+        .logout-link {
+            font-size: 12px;
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .balance-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .balance-amount {
+            font-size: 26px;
+            font-weight: bold;
+            color: #cca352;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 320px;
+        }
+        .refresh-balance-btn {
+            background: #212537;
+            border: 1px solid #303650;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #cca352;
+            font-size: 16px;
+        }
+        .action-buttons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .btn-deposit, .btn-withdraw {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-deposit {
+            background: linear-gradient(135deg, #cca352, #b8860b);
+            color: #131521;
+        }
+        .btn-withdraw {
+            background-color: #212537;
+            color: #e74c3c;
+            border: 1px solid #303650;
+        }
+        .menu-grid {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .menu-card {
+            background-color: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 10px;
+            padding: 18px 10px;
+            text-align: center;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .menu-card:hover {
+            border-color: #cca352;
+            background-color: #1d2133;
+        }
+        .menu-icon {
+            font-size: 24px;
+        }
+        .menu-label {
+            font-size: 11px;
+            color: #cfd3df;
+            font-weight: 500;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #7a83a0;
+            font-size: 10px;
+            gap: 3px;
+        }
+        .nav-item.active {
+            color: #cca352;
+        }
+        .nav-icon {
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
         <div class="header">
             <div class="header-title">Trang Cá Nhân</div>
-            <a href="{{ url_for('cskh') }}" class="cskh-btn">🎧 CSKH</a>
+            <a href="{{ url_for('cskh') }}" class="cskh-btn">
+                🎧 CSKH
+            </a>
         </div>
 
-        <!-- Thông tin số dư & Nạp rút -->
-        <div class="profile-top">
-            <div class="profile-info-row">
-                <div class="username-text">Xin chào, <span>pphuc8386</span></div>
-                <a href="#" class="logout-link" onclick="alert('Đã đăng xuất'); return false;">đăng xuất 🚪</a>
+        <div class="profile-header-card">
+            <div class="user-meta">
+                <div class="welcome-text">Xin chào, <span class="username-highlight">{{ username | default('pphuc8386') }}</span></div>
+                <a href="{{ url_for('logout') }}" class="logout-link">đăng xuất 🚪</a>
             </div>
-            <div class="balance-box">
-                <span>đ</span> 50.100.000 🔄
+            <div class="balance-section">
+                <div class="balance-amount" title="{{ balance }}">
+                    đ{% if balance > 1e9 %}{{ "{:.2e}".format(balance) }}{% else %}{{ "{:,.2f}".format(balance) }}{% endif %}
+                </div>
+                <button type="button" class="refresh-balance-btn" onclick="location.reload()" title="Làm mới số dư">🔄</button>
             </div>
-            <div class="action-buttons">
-                <a href="{{ url_for('deposit') }}" class="btn-action btn-deposit">💳 Nạp Tiền</a>
-                <a href="#" class="btn-action btn-withdraw" onclick="alert('Chức năng Rút Tiền'); return false;">👛 Rút Tiền</a>
+            <div class="action-buttons-row">
+                <a href="{{ url_for('deposit') }}" class="btn-deposit">💳 Nạp Tiền</a>
+                <a href="{{ url_for('withdraw') }}" class="btn-withdraw">📥 Rút Tiền</a>
             </div>
         </div>
 
-        <!-- Lưới chức năng (Đúng theo ảnh 3) -->
         <div class="menu-grid">
-            <a href="#" class="menu-card" onclick="alert('Giới thiệu bạn bè'); return false;">
+            <a href="{{ url_for('transaction_center') }}" class="menu-card">
+                <div class="menu-icon">📊</div>
+                <div class="menu-label">Trung tâm giao dịch</div>
+            </a>
+            <a href="{{ url_for('referral') }}" class="menu-card">
                 <div class="menu-icon">👥</div>
                 <div class="menu-label">Giới thiệu bạn bè</div>
             </a>
-            <a href="#" class="menu-card" onclick="alert('Hộp thư'); return false;">
+            <a href="{{ url_for('mailbox') }}" class="menu-card">
                 <div class="menu-icon">✉️</div>
                 <div class="menu-label">Hộp Thư</div>
             </a>
-            <a href="#" class="menu-card" onclick="alert('Chi tiết đặt cược'); return false;">
+            <a href="{{ url_for('bet_history') }}" class="menu-card">
                 <div class="menu-icon">📋</div>
                 <div class="menu-label">Chi tiết đặt cược</div>
             </a>
-            <a href="#" class="menu-card" onclick="alert('Trung tâm giao dịch'); return false;">
-                <div class="menu-icon">📄</div>
-                <div class="menu-label">Trung tâm giao dịch</div>
-            </a>
-            <a href="#" class="menu-card" onclick="alert('Khu sự kiện'); return false;">
-                <div class="menu-icon">🎁</div>
-                <div class="menu-label">Khu sự kiện</div>
-            </a>
-            <a href="#" class="menu-card" onclick="alert('Yêu thích'); return false;">
-                <div class="menu-icon">❤️</div>
-                <div class="menu-label">Yêu Thích</div>
-            </a>
-            <a href="#" class="menu-card" onclick="alert('Bảo mật'); return false;">
+            <a href="{{ url_for('security') }}" class="menu-card">
                 <div class="menu-icon">🔒</div>
                 <div class="menu-label">Bảo Mật</div>
             </a>
-            <a href="#" class="menu-card" onclick="alert('Thông báo'); return false;">
+            <a href="{{ url_for('notifications') }}" class="menu-card">
                 <div class="menu-icon">🔔</div>
                 <div class="menu-label">Thông Báo</div>
             </a>
-            <a href="#" class="menu-card" onclick="alert('Hoàn trả'); return false;">
+            <a href="{{ url_for('rebate') }}" class="menu-card">
                 <div class="menu-icon">🔄</div>
                 <div class="menu-label">Hoàn Trả</div>
             </a>
-            <!-- Nút VIP trỏ thẳng tới trang VIP -->
             <a href="{{ url_for('vip') }}" class="menu-card">
                 <div class="menu-icon">💎</div>
                 <div class="menu-label">VIP</div>
             </a>
         </div>
 
-        <!-- Bottom Nav -->
+        <!-- Thanh điều hướng dưới -->
         <nav class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item">
                 <div class="nav-icon">🏠</div>
@@ -129,4 +285,5 @@
         </nav>
     </div>
 </body>
-</html>
+    </html>
+    

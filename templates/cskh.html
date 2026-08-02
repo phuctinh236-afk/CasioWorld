@@ -22,7 +22,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            padding-bottom: 125px; /* Tránh bị che bởi input bar và bottom nav */
+            padding-bottom: 125px;
         }
 
         /* Chat Header */
@@ -115,6 +115,7 @@
             border-radius: 8px;
             font-size: 13px;
             line-height: 1.4;
+            white-space: pre-wrap;
         }
         .incoming .msg-bubble {
             background-color: #1e2235;
@@ -131,7 +132,7 @@
         /* Chat Input Bar */
         .chat-input-container {
             position: fixed;
-            bottom: 55px; /* Nằm ngay trên bottom nav */
+            bottom: 55px;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -259,14 +260,25 @@
     </div>
 
     <script>
-        function sendMessage() {
+        // ================= CẤU HÌNH KẾT NỐI SERVER RENDER =================
+        const RENDER_SERVER_URL = "https://tx68-bot.onrender.com";
+
+        // Tạo hoặc lấy ID cố định lưu trong trình duyệt của người dùng
+        let CURRENT_USER_ID = localStorage.getItem('tx68_user_id');
+        if (!CURRENT_USER_ID) {
+            CURRENT_USER_ID = 'user_' + Math.floor(Math.random() * 1000000);
+            localStorage.setItem('tx68_user_id', CURRENT_USER_ID);
+        }
+
+        // ================= GỬI TIN NHẮN TỪ GAME SANG BOT 2 =================
+        async function sendMessage() {
             const inputField = document.getElementById('messageInput');
             const messageText = inputField.value.trim();
             if (messageText === "") return;
 
             const chatMessages = document.getElementById('chatMessages');
 
-            // Thêm tin nhắn của người dùng
+            // 1. Thêm tin nhắn người dùng lên khung chat
             const userRow = document.createElement('div');
             userRow.className = 'message-row outgoing';
             userRow.innerHTML = `<div class="msg-bubble">${escapeHtml(messageText)}</div>`;
@@ -275,15 +287,41 @@
             inputField.value = "";
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Giả lập phản hồi tự động từ CSKH sau 1 giây
-            setTimeout(() => {
-                const replyRow = document.createElement('div');
-                replyRow.className = 'message-row incoming';
-                replyRow.innerHTML = `<div class="msg-bubble">Cảm ơn bạn đã liên hệ. Hệ thống đã ghi nhận thông tin và sẽ hỗ trợ bạn ngay lập tức!</div>`;
-                chatMessages.appendChild(replyRow);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1000);
+            // 2. Gửi tin nhắn lên Server Render
+            try {
+                await fetch(`${RENDER_SERVER_URL}/api/send_from_game`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: CURRENT_USER_ID,
+                        message: messageText
+                    })
+                });
+            } catch (error) {
+                console.error("Lỗi gửi tin nhắn sang CSKH:", error);
+            }
         }
+
+        // ================= TỰ ĐỘNG NHẬN CÂU TRẢ LỜI DÁN LẠI GAME =================
+        setInterval(async () => {
+            try {
+                let response = await fetch(`${RENDER_SERVER_URL}/api/get_reply_for_game?user_id=${CURRENT_USER_ID}`);
+                let data = await response.json();
+
+                if (data.replies && data.replies.length > 0) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    data.replies.forEach(replyText => {
+                        const replyRow = document.createElement('div');
+                        replyRow.className = 'message-row incoming';
+                        replyRow.innerHTML = `<div class="msg-bubble">${escapeHtml(replyText)}</div>`;
+                        chatMessages.appendChild(replyRow);
+                    });
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            } catch (error) {
+                console.error("Lỗi lấy tin nhắn phản hồi:", error);
+            }
+        }, 3000); // 3 giây kiểm tra tin nhắn mới 1 lần
 
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
@@ -303,4 +341,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    

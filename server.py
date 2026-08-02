@@ -10,14 +10,14 @@ app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
-# Bộ lưu trữ đơn nạp tiền và danh sách ghi nhớ lỗi hệ thống
+# Bộ lưu trữ đơn nạp tiền và lịch sử lỗi hệ thống
 payment_orders = {}
 error_logs = []
 
 def log_error(err_msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     error_logs.insert(0, {"time": timestamp, "detail": err_msg})
-    if len(error_logs) > 50:  # Giữ tối đa 50 lỗi gần nhất
+    if len(error_logs) > 50:
         error_logs.pop()
 
 # -------------------------------------------------------------
@@ -26,7 +26,7 @@ def log_error(err_msg):
 def render_safe(template_name, **kwargs):
     try:
         return render_template(template_name, **kwargs)
-    except TemplateNotFound as e:
+    except TemplateNotFound:
         log_error(f"Thiếu file giao diện (TemplateNotFound): {template_name}")
         title = template_name.replace('.html', '').replace('_', ' ').upper()
         return f"""
@@ -37,18 +37,17 @@ def render_safe(template_name, **kwargs):
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>{title}</title>
             <style>
-                body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; text-align: center; }}
+                body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }}
                 .container {{ max-width: 450px; margin: 60px auto; background: #1e293b; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #334155; }}
                 h2 {{ color: #38bdf8; margin-bottom: 15px; font-size: 22px; }}
                 p {{ color: #94a3b8; font-size: 14px; line-height: 1.6; }}
-                .btn {{ display: inline-block; margin-top: 25px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }}
-                .btn:hover {{ opacity: 0.9; transform: translateY(-2px); }}
+                .btn {{ display: inline-block; margin-top: 25px; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <h2>✨ {title}</h2>
-                <p>Trang này đang hoạt động. Giao diện chi tiết sẽ hiển thị khi bạn cập nhật file mẫu.</p>
+                <p>Khu vực này đang hoạt động. Giao diện chi tiết sẽ hiển thị khi cập nhật file mẫu.</p>
                 <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
             </div>
         </body>
@@ -80,8 +79,8 @@ def ktraloibug():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Bảng Kiểm Tra Lỗi Hệ Thống</title>
         <style>
-            body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; text-align: center; }}
-            .wrapper {{ max-width: 800px; margin: 30px auto; background: #090d16; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
+            body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }}
+            .wrapper {{ max-width: 800px; margin: 30px auto; background: #090d16; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; }}
             h2 {{ color: #f87171; margin-bottom: 5px; }}
             p.sub {{ color: #94a3b8; font-size: 13px; margin-bottom: 25px; }}
             .btn-group {{ margin-top: 25px; display: flex; justify-content: center; gap: 15px; }}
@@ -96,7 +95,7 @@ def ktraloibug():
             {logs_html}
             <div class="btn-group">
                 <a href="/" class="btn">⬅ Về Trang Chủ</a>
-                <a href="/ktraloibug/clear" class="btn btn-clear">🧹 Xóa Sạch Lịch Sử Lỗi</a>
+                <a href="/ktraloibug/clear" class="btn btn-clear">🧹 Xóa Sạch Lịch Sử</a>
             </div>
         </div>
     </body>
@@ -111,7 +110,7 @@ def clear_bugs():
 
 @app.errorhandler(404)
 def not_found_error(error):
-    log_error(f"Lỗi 404 - Không tìm thấy đường dẫn: {request.path}")
+    log_error(f"Lỗi 404 - Đường dẫn không tồn tại: {request.path}")
     return redirect(url_for('index'))
 
 @app.errorhandler(500)
@@ -124,9 +123,9 @@ def handle_exception(e):
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #1e1e1e; color: #ff5555;">
         <h2>⚠️ LỖI HỆ THỐNG (500):</h2>
-        <pre style="background: #2d2d2d; color: #55ff55; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
-        <br><a href="/ktraloibug" style="color: #38bdf8; font-size: 16px;">🔍 Xem chi tiết tại /ktraloibug</a> | 
-        <a href="/" style="color: #38bdf8; font-size: 16px;">⬅ Quay lại Trang chủ</a>
+        <pre style="background: #2d2d2d; color: #55ff55; padding: 15px; border-radius: 8px; overflow-x: auto;">{tb}</pre>
+        <br><a href="/ktraloibug" style="color: #38bdf8;">🔍 Xem chi tiết tại /ktraloibug</a> | 
+        <a href="/" style="color: #38bdf8;">⬅ Quay lại Trang chủ</a>
     </div>
     """, 500
 
@@ -166,7 +165,7 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# ĐỊNH TUYẾN CÁC TRANG CHÍNH
+# ĐỊNH TUYẾN TOÀN BỘ CÁC TRANG
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -318,7 +317,7 @@ def payment():
         "memo": memo_code
     }
     
-    qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-{qr_only}.png?amount={amount_vnd}&addInfo={memo_code}" if False else f"https://img.vietqr.io/image/TCB-8992362013-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
+    qr_url = f"https://img.vietqr.io/image/TCB-8992362013-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
     
     return render_safe('payment.html', bank=bank_info, qr_url=qr_url)
 
@@ -326,7 +325,7 @@ def payment():
 def check_payment(memo):
     order = payment_orders.get(memo)
     if order and order['status'] == 'SUCCESS':
-        return jsonify({"status": "SUCCESS", "message": "Thanh toán thành công! Tiền đã cộng vào ví."})
+        return jsonify({"status": "SUCCESS", "message": "Thanh toán thành công!"})
     return jsonify({"status": "PENDING"})
 
 @app.route('/api/bank_webhook', methods=['POST', 'GET'])
@@ -337,17 +336,16 @@ def bank_webhook():
         if order['status'] != 'SUCCESS':
             order['status'] = 'SUCCESS'
             session['balance'] = session.get('balance', 0) + order['points']
-            return jsonify({"status": "ok", "message": f"Đã cộng {order['points']} điểm vào tài khoản!"})
-    return jsonify({"status": "failed", "message": "Mã giao dịch không hợp lệ"}), 400
+            return jsonify({"status": "ok", "message": f"Đã cộng {order['points']} điểm!"})
+    return jsonify({"status": "failed"}), 400
 
 @app.route('/test_pay/<path:memo>')
 def test_pay(memo):
     if memo in payment_orders:
         payment_orders[memo]['status'] = 'SUCCESS'
         session['balance'] = session.get('balance', 0) + payment_orders[memo]['points']
-        return f"<h3>Thành công! Đã giả lập nạp tiền cho đơn: {memo}. Số dư hiện tại: {session['balance']}</h3><a href='/'>Quay lại trang chủ</a>"
+        return f"<h3>Thành công! Số dư: {session['balance']}</h3><a href='/'>Quay lại</a>"
     return "Không tìm thấy mã đơn!"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    

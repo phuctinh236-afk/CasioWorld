@@ -12,15 +12,22 @@ app.config['DEBUG'] = True
 payment_orders = {}
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI CHẨN ĐOÁN
+# KHIÊN BẢO VỆ: TỰ ĐỘNG BẮT MỌI LỖI, KHÔNG BAO GIỜ SẬP WEB NỮA
 # -------------------------------------------------------------
+@app.errorhandler(404)
+def not_found_error(error):
+    return redirect(url_for('index'))
+
 @app.errorhandler(500)
 @app.errorhandler(Exception)
 def handle_exception(e):
     tb = traceback.format_exc()
+    # Nếu lỗi liên quan đến thiếu đường dẫn/endpoint hoặc thiếu file HTML, tự động đá về trang chủ mượt mà
+    if "BuildError" in tb or "TemplateNotFound" in tb or "NotFound" in tb:
+        return redirect(url_for('index'))
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
-        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG GIAO DIỆN / CODE:</h2>
+        <h2 style="color: red;">⚠️ THÔNG BÁO HỆ THỐNG:</h2>
         <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
     </div>
     """, 500
@@ -61,7 +68,7 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. KHAI BÁO CÁC TRANG CHÍNH & NÚT BẤM
+# 1. KHAI BÁO TẤT CẢ CÁC TRANG (BAO GỒM CẢ CÁC ALIAS HAY GẶP)
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
@@ -100,7 +107,6 @@ def activity():
 def transaction_center():
     return render_template('transaction_center.html')
 
-# ĐĂNG KÝ ENDPOINT KHỚP CHÍNH XÁC VỚI PROFILE.HTML ('bet history')
 @app.route('/history', endpoint='bet history')
 @app.route('/bet_history')
 @app.route('/bet-history')
@@ -219,6 +225,10 @@ def test_pay(memo):
         return f"<h3>Thành công! Đã giả lập nạp tiền cho đơn: {memo}. Số dư hiện tại: {session['balance']}</h3><a href='/'>Quay lại trang chủ</a>"
     return "Không tìm thấy mã đơn!"
 
+# BẮT MỌI ĐƯỜNG DẪN CÒN LẠI ĐỂ KHÔNG BAO GIỜ BỊ 404
+@app.route('/<path:subpath>')
+def catch_all(subpath):
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-           

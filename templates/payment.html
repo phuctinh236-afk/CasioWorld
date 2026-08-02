@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán đơn hàng - B168 PAY</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #d8f3f3;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .pay-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: #d8f3f3;
+            min-height: 100vh;
+            padding: 12px 15px 30px 15px;
+        }
+
+        /* Header logo */
+        .pay-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+        .back-btn {
+            font-size: 24px;
+            color: #11a89d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .logo-box {
+            font-size: 22px;
+            font-weight: 900;
+            color: #172d56;
+            display: flex;
+            align-items: center;
+        }
+        .logo-box span {
+            color: #11a89d;
+            font-size: 13px;
+            margin-left: 3px;
+        }
+
+        /* Đồng hồ đếm ngược */
+        .timer-box {
+            background-color: #11a89d;
+            color: #fff;
+            border-radius: 10px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .timer-text {
+            line-height: 1.4;
+            max-width: 75%;
+        }
+        .timer-countdown {
+            color: #e2f835;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Thẻ chứa QR */
+        .qr-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 12px;
+        }
+        .qr-code-img {
+            width: 230px;
+            height: 230px;
+            object-fit: contain;
+            margin: 10px 0;
+        }
+        .qr-amount {
+            color: #e53935;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        /* Các hàng thông tin chi tiết */
+        .info-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .info-card-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-title {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #111;
+        }
+        .info-value-highlight {
+            color: #e53935;
+        }
+
+        /* Nút copy */
+        .copy-btn {
+            background-color: #11a89d;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .copy-btn:active {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="pay-container">
+        <!-- Header -->
+        <div class="pay-header">
+            <a href="javascript:history.back()" class="back-btn">‹</a>
+            <div class="logo-box">
+                <span style="font-size: 24px; color: #172d56; font-weight: bold; font-style: italic;">B</span>
+                <span style="font-size: 18px; color: #172d56; font-weight: bold;">168</span>
+                <span style="background: #172d56; color: #fff; padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 4px;">PAY</span>
+            </div>
+            <div style="width: 24px;"></div>
+        </div>
+
+        <!-- Timer Banner -->
+        <div class="timer-box">
+            <div class="timer-text">
+                🕒 Hãy hoàn thành chuyển khoản trong thời gian quy định
+            </div>
+            <div class="timer-countdown" id="countdownTimer">15:00</div>
+        </div>
+
+        <!-- Khung Mã QR -->
+        <div class="qr-card">
+            <img src="{{ qr_url }}" alt="Mã QR Chuyển khoản" class="qr-code-img">
+            <div class="qr-amount">{{ bank.amount_str }}</div>
+        </div>
+
+        <!-- Chi tiết tài khoản -->
+        <div class="info-card">
+            <div class="info-title">Tên ngân hàng:</div>
+            <div class="info-value">{{ bank.bank_name }}</div>
+        </div>
+
+        <div class="info-card info-card-flex">
+            <div>
+                <div class="info-title">Số tài khoản ngân hàng:</div>
+                <div class="info-value" id="accountNo">{{ bank.account_no }}</div>
+            </div>
+            <button type="button" class="copy-btn" onclick="copyAccountNo()">Copy</button>
+        </div>
+
+        <div class="info-card">
+            <div class="info-title">Người nhận tiền:</div>
+            <div class="info-value">{{ bank.account_name }}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-title">Số tiền đơn hàng:</div>
+            <div class="info-value info-value-highlight">{{ bank.amount_str }}</div>
+        </div>
+    </div>
+
+    <!-- Script đếm ngược & Copy -->
+    <script>
+        // Đồng hồ đếm ngược 15 phút
+        let timeRemaining = 15 * 60;
+        const timerElement = document.getElementById('countdownTimer');
+
+        const timerInterval = setInterval(() => {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            
+            timerElement.textContent = 
+                `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert('Đơn hàng đã hết thời gian thanh toán!');
+            }
+            timeRemaining--;
+        }, 1000);
+
+        // Nút copy số tài khoản
+        function copyAccountNo() {
+            const accountNo = document.getElementById('accountNo').innerText;
+            navigator.clipboard.writeText(accountNo).then(() => {
+                alert('Đã sao chép số tài khoản!');
+            }).catch(err => {
+                console.error('Lỗi khi sao chép: ', err);
+            });
+        }
+    </script>
+</body>
+                  </html>
+                  

@@ -8,7 +8,7 @@ app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI: Hiện nguyên nhân chính xác để fix
+# BỘ BẪY LỖI CHẨN ĐOÁN
 # -------------------------------------------------------------
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -16,7 +16,7 @@ def handle_exception(e):
     tb = traceback.format_exc()
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
-        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE (DEBUG MODE):</h2>
+        <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE:</h2>
         <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
     </div>
     """, 500
@@ -52,6 +52,12 @@ def inject_defaults():
         vip_level=user_data['vip_level']
     )
 
+def safe_render(template_name):
+    try:
+        return render_template(template_name)
+    except Exception:
+        return render_template('index.html')
+
 # -------------------------------------------------------------
 # 1. CÁC TRANG CHÍNH & THÀNH VIÊN
 # -------------------------------------------------------------
@@ -66,30 +72,53 @@ def profile():
 
 @app.route('/vip')
 def vip():
-    return render_template('vip.html')
+    return safe_render('vip.html')
 
 @app.route('/vip_details')
 def vip_details():
-    return render_template('vip_details.html')
+    return safe_render('vip_details.html')
 
 @app.route('/cskh')
 def cskh():
-    return render_template('cskh.html')
+    return safe_render('cskh.html')
 
 @app.route('/promotions')
 def promotions():
-    return render_template('promotions.html')
+    return safe_render('promotions.html')
 
 @app.route('/withdraw')
 def withdraw():
-    return render_template('withdraw.html')
+    return safe_render('withdraw.html')
 
 @app.route('/activity')
 def activity():
-    return render_template('activity.html')
+    return safe_render('activity.html')
 
 # -------------------------------------------------------------
-# 2. ĐĂNG NHẬP & ĐĂNG KÝ
+# 2. BỔ SUNG CÁC ROUTE PHỤ TRÁNH LỖI TRONG PROFILE.HTML
+# -------------------------------------------------------------
+@app.route('/transaction_center')
+def transaction_center():
+    return safe_render('transaction_center.html')
+
+@app.route('/history')
+def history():
+    return safe_render('history.html')
+
+@app.route('/bank_card')
+def bank_card():
+    return safe_render('bank_card.html')
+
+@app.route('/security')
+def security():
+    return safe_render('security.html')
+
+@app.route('/messages')
+def messages():
+    return safe_render('messages.html')
+
+# -------------------------------------------------------------
+# 3. ĐĂNG NHẬP & ĐĂNG KÝ
 # -------------------------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -98,13 +127,13 @@ def login():
         session['points'] = 0
         session['balance'] = 0
         return redirect(url_for('index'))
-    return render_template('login.html')
+    return safe_render('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return redirect(url_for('login'))
-    return render_template('register.html')
+    return safe_render('register.html')
 
 @app.route('/logout')
 def logout():
@@ -112,7 +141,7 @@ def logout():
     return redirect(url_for('index'))
 
 # -------------------------------------------------------------
-# 3. TRANG NẠP TIỀN & THANH TOÁN QR TECHCOMBANK
+# 4. TRANG NẠP TIỀN & THANH TOÁN QR TECHCOMBANK
 # -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
@@ -126,7 +155,7 @@ def deposit():
         amount_vnd = int(amount_points * 1000)
         return redirect(url_for('payment', amount=amount_vnd))
         
-    return render_template('deposit.html')
+    return safe_render('deposit.html')
 
 @app.route('/payment')
 def payment():

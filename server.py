@@ -19,64 +19,6 @@ def log_error(err_msg):
     if len(error_logs) > 50:
         error_logs.pop()
 
-# -------------------------------------------------------------
-# TỰ ĐỘNG ÉP GIAO DIỆN BẰNG JAVASCRIPT ĐỂ KHÔNG BAO GIỜ LỖI NÚT
-# -------------------------------------------------------------
-@app.after_request
-def auto_fix_navigation(response):
-    if response.headers.get('Content-Type', '').startswith('text/html'):
-        html = response.get_data(as_text=True)
-        # Đoạn script tự động bắt sự kiện bấm vào các nút menu dưới đáy
-        js_injector = """
-        <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Tự động tìm tất cả các thẻ có khả năng là nút bấm menu
-            const allElements = document.querySelectorAll('a, div, span, button');
-            allElements.forEach(el => {
-                let text = el.innerText ? el.innerText.trim().toLowerCase() : '';
-                
-                // Nếu bấm vào nút Khuyến mãi
-                if (text === 'khuyến mãi' || text === 'khuyen mai' || text.includes('khuyến mãi')) {
-                    el.style.cursor = 'pointer';
-                    el.onclick = function(e) {
-                        e.preventDefault();
-                        window.location.href = '/promotions';
-                    };
-                }
-                // Nếu bấm vào nút Thành viên / Tài khoản / VIP
-                if (text === 'thành viên' || text === 'thanh vien' || text === 'tài khoản' || text === 'tai khoan' || text === 'vip') {
-                    el.style.cursor = 'pointer';
-                    el.onclick = function(e) {
-                        e.preventDefault();
-                        window.location.href = '/vip';
-                    };
-                }
-                // Nếu bấm vào nút Trang chủ
-                if (text === 'trang chủ' || text === 'trang chu') {
-                    el.style.cursor = 'pointer';
-                    el.onclick = function(e) {
-                        e.preventDefault();
-                        window.location.href = '/';
-                    };
-                }
-                // Nếu bấm vào nút Nạp tiền
-                if (text === 'nạp tiền' || text === 'nap tien') {
-                    el.style.cursor = 'pointer';
-                    el.onclick = function(e) {
-                        e.preventDefault();
-                        window.location.href = '/deposit';
-                    };
-                }
-            });
-        });
-        </script>
-        </body>
-        """
-        if '</body>' in html:
-            html = html.replace('</body>', js_injector)
-            response.set_data(html)
-    return response
-
 def render_safe(template_name, **kwargs):
     try:
         return render_template(template_name, **kwargs)
@@ -108,9 +50,6 @@ def render_safe(template_name, **kwargs):
         </html>
         """
 
-# -------------------------------------------------------------
-# TRANG KIỂM TRA LỖI: /ktraloibug
-# -------------------------------------------------------------
 @app.route('/ktraloibug')
 def ktraloibug():
     logs_html = ""
@@ -175,7 +114,6 @@ def inject_defaults():
 def generate_memo():
     return f"chuyen tien DMCNA{''.join(random.choices(string.ascii_uppercase + string.digits, k=7))}"
 
-# Định tuyến đầy đủ các trang
 @app.route('/')
 @app.route('/index')
 def index():
@@ -256,4 +194,3 @@ def catch_all(subpath):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-        

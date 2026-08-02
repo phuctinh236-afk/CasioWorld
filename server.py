@@ -49,7 +49,7 @@ def vip_details():
     return render_template('vip_details.html')
 
 # -------------------------------------------------------------
-# 5. Trang Nạp Tiền (Nhận điểm/tiền người dùng chọn)
+# 5. Trang Nạp Tiền
 # -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
@@ -63,17 +63,16 @@ def deposit():
         # Quy đổi: 1 Điểm = 1.000 VNĐ
         amount_vnd = int(amount_points * 1000)
         
-        # Chuyển hướng sang trang hiển thị mã QR (/payment)
+        # Chuyển hướng sang trang tạo mã QR (/payment)
         return redirect(url_for('payment', amount=amount_vnd))
         
     return render_template('deposit.html')
 
 # -------------------------------------------------------------
-# 6. Trang Hiển Thị Mã QR Thanh Toán Techcombank
+# 6. Trang Thanh Toán QR VietQR Techcombank
 # -------------------------------------------------------------
 @app.route('/payment')
 def payment():
-    # Lấy số tiền được chuyển tới
     amount_vnd = request.args.get('amount', 0, type=int)
     formatted_amount = "{:,}".format(amount_vnd).replace(",", ".")
     
@@ -87,7 +86,7 @@ def payment():
         "amount_str": f"{formatted_amount} VND"
     }
     
-    # Tự động tạo link mã QR VietQR khớp số tiền
+    # Tự động tạo link mã QR VietQR khớp chuẩn số tiền
     qr_url = f"https://img.vietqr.io/image/{bank_info['bank_id']}-{bank_info['account_no']}-compact2.png?amount={amount_vnd}&addInfo=NAP%20TIEN&accountName={bank_info['account_name']}"
     
     return render_template('payment.html', bank=bank_info, qr_url=qr_url)

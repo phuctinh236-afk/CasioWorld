@@ -146,6 +146,54 @@ body {
     text-align: center;
 }
 
+/* ==========================================
+   LƯỚI HIỂN THỊ GAME (4 CỘT FULL ẢNH)
+   ========================================== */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Chuẩn 4 cột như thiết kế */
+    gap: 8px;
+    padding: 12px;
+}
+
+.game-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Giữ khung luôn vuông vắn */
+    background: #171a29;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #24293f;
+    cursor: pointer;
+    padding: 0 !important;
+    display: block;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.game-card:active {
+    transform: scale(0.95);
+}
+
+.game-card:hover {
+    border-color: #cca352;
+}
+
+/* Cho ảnh phủ tràn kín 100% ô thẻ game */
+.game-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Đảm bảo không bị chừa viền hay móp ảnh */
+    display: block;
+    border-radius: 10px;
+}
+
+/* Ẩn chữ thừa bên ngoài vì ảnh cắt đã có chữ */
+.game-card span,
+.game-card p,
+.game-title {
+    display: none !important;
+}
+
 /* Thanh Điều Hướng Dưới Cùng (Bottom Nav) */
 .bottom-nav {
     position: fixed;
@@ -271,4 +319,4 @@ body {
     text-align: center;
     font-size: 12px;
     color: #9fa5b9;
-}
+    }

@@ -39,7 +39,7 @@ def render_safe(template_name, **kwargs):
         <body>
             <div class="container">
                 <h2>✨ {title}</h2>
-                <p>Khu vực này đang hoạt động và sẵn sàng hiển thị dữ liệu.</p>
+                <p>Trang này đang hoạt động bình thường. Giao diện chi tiết sẽ hiển thị khi bạn nạp file mẫu tương ứng.</p>
                 <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
             </div>
         </body>
@@ -48,18 +48,23 @@ def render_safe(template_name, **kwargs):
 
 @app.errorhandler(404)
 def not_found_error(error):
-    return redirect(url_for('index'))
+    return f"""
+    <div style="padding: 40px; font-family: sans-serif; background: #0f172a; color: #f8fafc; text-align: center;">
+        <h2 style="color: #ef4444;">⚠️ Không tìm thấy đường dẫn (404)</h2>
+        <p style="color: #94a3b8; margin: 15px 0;">Đường dẫn bạn vừa bấm không khớp với cấu hình server.</p>
+        <a href="/" style="display: inline-block; background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">⬅ Quay lại Trang chủ</a>
+    </div>
+    """, 404
 
 @app.errorhandler(500)
 @app.errorhandler(Exception)
 def handle_exception(e):
     tb = traceback.format_exc()
-    if "BuildError" in tb or "NotFound" in tb:
-        return redirect(url_for('index'))
     return f"""
-    <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
-        <h2 style="color: red;">⚠️ THÔNG BÁO HỆ THỐNG:</h2>
-        <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
+    <div style="padding: 20px; font-family: monospace; background: #1e1e1e; color: #ff5555;">
+        <h2>⚠️ LỖI HỆ THỐNG (500):</h2>
+        <pre style="background: #2d2d2d; color: #55ff55; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
+        <br><a href="/" style="color: #38bdf8; font-size: 16px;">⬅ Quay lại Trang chủ</a>
     </div>
     """, 500
 
@@ -99,73 +104,97 @@ def generate_memo():
     return f"chuyen tien DMCNA{random_str}"
 
 # -------------------------------------------------------------
-# 1. ĐỊNH TUYẾN TẤT CẢ CÁC TRANG & ĐƯỜNG DẪN ALIAS
+# 1. ĐỊNH TUYẾN TOÀN BỘ CÁC TRANG & BIẾN THỂ ĐƯỜNG DẪN
 # -------------------------------------------------------------
 @app.route('/')
 @app.route('/index')
+@app.route('/index.html')
 def index():
     return render_safe('index.html')
 
 @app.route('/profile')
+@app.route('/profile.html')
 def profile():
     return render_safe('profile.html')
 
-# Bổ sung toàn bộ các biến thể đường dẫn cho Khuyến mãi
+# Phủ sóng mọi biến thể của Khuyến Mãi
 @app.route('/promotions')
+@app.route('/promotion')
 @app.route('/khuyen_mai')
 @app.route('/khuyenmai')
+@app.route('/promo')
+@app.route('/khuyen-mai')
+@app.route('/promotions.html')
+@app.route('/khuyen_mai.html')
 def promotions():
     return render_safe('promotions.html')
 
-# Bổ sung toàn bộ các biến thể đường dẫn cho Thành viên / VIP
+# Phủ sóng mọi biến thể của Thành Viên / VIP / Tài Khoản
 @app.route('/vip')
 @app.route('/vip_details')
 @app.route('/member')
 @app.route('/members')
 @app.route('/thanh_vien')
 @app.route('/thanhvien')
+@app.route('/tai_khoan')
+@app.route('/taikhoan')
+@app.route('/account')
+@app.route('/user')
+@app.route('/vip.html')
+@app.route('/member.html')
+@app.route('/thanh_vien.html')
 def vip():
     return render_safe('vip.html')
 
 @app.route('/cskh')
+@app.route('/cskh.html')
 def cskh():
     return render_safe('cskh.html')
 
 @app.route('/withdraw')
+@app.route('/withdraw.html')
 def withdraw():
     return render_safe('withdraw.html')
 
 @app.route('/activity')
+@app.route('/activity.html')
 def activity():
     return render_safe('activity.html')
 
 @app.route('/transaction_center')
+@app.route('/transaction_center.html')
 def transaction_center():
     return render_safe('transaction_center.html')
 
 @app.route('/history', endpoint='bet history')
 @app.route('/bet_history')
 @app.route('/bet-history')
+@app.route('/history.html')
 def history():
     return render_safe('history.html')
 
 @app.route('/bank_card')
+@app.route('/bank_card.html')
 def bank_card():
     return render_safe('bank_card.html')
 
 @app.route('/security')
+@app.route('/security.html')
 def security():
     return render_safe('security.html')
 
 @app.route('/messages')
+@app.route('/messages.html')
 def messages():
     return render_safe('messages.html')
 
 @app.route('/referral')
+@app.route('/referral.html')
 def referral():
     return render_safe('referral.html')
 
 @app.route('/mailbox')
+@app.route('/mailbox.html')
 def mailbox():
     return render_safe('mailbox.html')
 
@@ -173,6 +202,7 @@ def mailbox():
 # 2. ĐĂNG NHẬP & ĐĂNG KÝ
 # -------------------------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
+@app.route('/login.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         session['username'] = request.form.get('username', 'User')
@@ -181,6 +211,7 @@ def login():
     return render_safe('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
+@app.route('/register.html', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         return redirect(url_for('login'))
@@ -195,6 +226,7 @@ def logout():
 # 3. TRANG NẠP TIỀN & XỬ LÝ THANH TOÁN
 # -------------------------------------------------------------
 @app.route('/deposit', methods=['GET', 'POST'])
+@app.route('/deposit.html', methods=['GET', 'POST'])
 def deposit():
     if request.method == 'POST':
         amount_points = request.form.get('amount', 50)
@@ -207,6 +239,7 @@ def deposit():
     return render_safe('deposit.html')
 
 @app.route('/payment')
+@app.route('/payment.html')
 def payment():
     amount_vnd = request.args.get('amount', 50000, type=int)
     formatted_amount = "{:,}".format(amount_vnd).replace(",", ".")
@@ -261,10 +294,5 @@ def test_pay(memo):
         return f"<h3>Thành công! Đã giả lập nạp tiền cho đơn: {memo}. Số dư hiện tại: {session['balance']}</h3><a href='/'>Quay lại trang chủ</a>"
     return "Không tìm thấy mã đơn!"
 
-@app.route('/<path:subpath>')
-def catch_all(subpath):
-    return redirect(url_for('index'))
-
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    

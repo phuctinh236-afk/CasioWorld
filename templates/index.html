@@ -223,12 +223,6 @@
             position: relative;
             overflow: hidden;
         }
-        .banner-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
         .banner-dots {
             position: absolute;
             bottom: 8px;
@@ -284,6 +278,8 @@
         .g-tab-icon {
             font-size: 16px;
         }
+
+        /* ===== CẤU HÌNH Ô GAME FULL 1 ẢNH ===== */
         .game-section {
             padding: 10px 10px 80px 10px;
         }
@@ -295,54 +291,28 @@
         .game-item-card {
             background-color: #171a29;
             border: 1px solid #24293f;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            text-align: center;
             cursor: pointer;
-            transition: 0.2s;
-            padding-bottom: 5px;
+            transition: transform 0.15s, border-color 0.15s;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            display: block;
         }
         .game-item-card:hover {
             border-color: #cca352;
         }
-        .game-thumb-box {
-            width: 44px;
-            height: 44px;
-            margin: 8px auto 3px auto;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #2b2f45, #1d2133);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #303650;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            overflow: hidden;
+        .game-item-card:active {
+            transform: scale(0.95);
         }
-        .game-thumb-box img {
+        .game-item-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
-        .game-thumb-box::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 10px;
-            height: 10px;
-            background: linear-gradient(135deg, transparent 50%, #cca352 50%);
-            border-top-right-radius: 8px;
-            z-index: 2;
-        }
-        .game-name {
-            padding: 2px 2px;
-            font-size: 9.5px;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+
+        /* Thanh Điều Hướng Dưới Cùng */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -378,7 +348,7 @@
     </style>
 </head>
 <body>
-        <div class="app-container">
+    <div class="app-container">
         <div class="header">
             <div class="header-left">
                 <button type="button" class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
@@ -415,66 +385,21 @@
             </div>
 
             <div class="drawer-grid">
-                <a href="{{ url_for('deposit') }}" class="drawer-item">
-                    <span class="drawer-item-icon">💳</span>
-                    <span>Nạp tiền</span>
-                </a>
-                <a href="{{ url_for('deposit') }}" class="drawer-item">
-                    <span class="drawer-item-icon">📥</span>
-                    <span>Rút tiền</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🔥</span>
-                    <span>HOT</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🐓</span>
-                    <span>ĐÁ GÀ</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🎰</span>
-                    <span>Slots</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">♠️</span>
-                    <span>Casino</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🎴</span>
-                    <span>Game bài</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🐟</span>
-                    <span>Bắn Cá</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🎱</span>
-                    <span>Xổ Số</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">⚽</span>
-                    <span>Thể Thao</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🚀</span>
-                    <span>Crash</span>
-                </a>
-                <a href="{{ url_for('index') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🕹️</span>
-                    <span>Arcade</span>
-                </a>
-                <a href="{{ url_for('promotions') }}" class="drawer-item">
-                    <span class="drawer-item-icon">🎁</span>
-                    <span>Khuyến mãi</span>
-                </a>
-                <a href="{{ url_for('vip') }}" class="drawer-item">
-                    <span class="drawer-item-icon">⭐</span>
-                    <span>VIP</span>
-                </a>
-                <a href="{{ url_for('profile') }}" class="drawer-item">
-                    <span class="drawer-item-icon">📥</span>
-                    <span>Tải xuống</span>
-                </a>
+                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💳</span><span>Nạp tiền</span></a>
+                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">📥</span><span>Rút tiền</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🔥</span><span>HOT</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🐓</span><span>ĐÁ GÀ</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">♠️</span><span>Casino</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎴</span><span>Game bài</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🐟</span><span>Bắn Cá</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎱</span><span>Xổ Số</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">⚽</span><span>Thể Thao</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🚀</span><span>Crash</span></a>
+                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🕹️</span><span>Arcade</span></a>
+                <a href="{{ url_for('promotions') }}" class="drawer-item"><span class="drawer-item-icon">🎁</span><span>Khuyến mãi</span></a>
+                <a href="{{ url_for('vip') }}" class="drawer-item"><span class="drawer-item-icon">⭐</span><span>VIP</span></a>
+                <a href="{{ url_for('profile') }}" class="drawer-item"><span class="drawer-item-icon">📥</span><span>Tải xuống</span></a>
             </div>
         </div>
 
@@ -497,121 +422,67 @@
             <div class="g-tab"><span class="g-tab-icon">♠️</span><span>Casino</span></div>
             <div class="g-tab"><span class="g-tab-icon">🃏</span><span>Game Bài</span></div>
         </div>
-
+                <!-- DANH SÁCH GAME HIỂN THỊ FULL 1 Ô ÁNH -->
         <div class="game-section">
             <div class="game-grid-detailed">
-                <div class="game-item-card" onclick="alert('Vào game Dragon Gems')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}"></div>
-                    <div class="game-name">Dragon Gems</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Mithai Madness')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}"></div>
-                    <div class="game-name">Mithai Madness</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Fortune Garuda')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}"></div>
-                    <div class="game-name">Fortune Garuda</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game NCVIP Super Elements')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}"></div>
-                    <div class="game-name">NCVIP Super...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Ultra Ace')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}"></div>
-                    <div class="game-name">Ultra Ace</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game NCVIP Gates')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}"></div>
-                    <div class="game-name">NCVIP Gates</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game NC Bountiful Birds')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}"></div>
-                    <div class="game-name">NC Bountif...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Treasures of Aztec')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}"></div>
-                    <div class="game-name">Treasures o...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Wild Bounty')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}"></div>
-                    <div class="game-name">Wild Bount...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Dragon Gems 2')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}"></div>
-                    <div class="game-name">Dragon Ge...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Mahjong')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/mahjong.jpg') }}"></div>
-                    <div class="game-name">Mahjong ...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Mahjong 2')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/mahjong.jpg') }}"></div>
-                    <div class="game-name">Mahjong ...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Pinata Wins')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}"></div>
-                    <div class="game-name">Pinata Wins</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Super Ace')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}"></div>
-                    <div class="game-name">Super Ace</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Tongits Go')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}"></div>
-                    <div class="game-name">Tongits Go</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Jackpot Fishing')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}"></div>
-                    <div class="game-name">Jackpot Fis...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Super Niuchi')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/super_niuchi.jpg') }}"></div>
-                    <div class="game-name">Super Niuc...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Lucky Neko')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}"></div>
-                    <div class="game-name">Lucky Neko</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Chinese New')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/chinese_new.jpg') }}"></div>
-                    <div class="game-name">CHINESE...</div>
-                </div>
-                <div class="game-item-card" onclick="alert('Vào game Chicken Dash')">
-                    <div class="game-thumb-box"><img src="{{ url_for('static', filename='assets/chicken_dash.jpg') }}"></div>
-                    <div class="game-name">Chicken D...</div>
-                </div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt="Dragon Gems"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt="Mithai Madness"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt="Fortune Garuda"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt="NCVIP Super"></div>
+                
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt="Ultra Ace"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt="NCVIP Gates"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}" alt="NC Bountiful Birds"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt="Treasures of Aztec"></div>
+
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt="Wild Bounty"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt="Dragon Gems"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2"></div>
+
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt="Pinata Wins"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt="Super Ace"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt="Tongits Go"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt="Jackpot Fishing"></div>
+
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_niubi.jpg') }}" alt="Super Niubi"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt="Lucky Neko"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt="Chinese New Year"></div>
+                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chicken_dash.jpg') }}" alt="Chicken Dash"></div>
             </div>
         </div>
 
-        <!-- Thanh điều hướng dưới -->
-        <nav class="bottom-nav">
+        <!-- Thanh Điều Hướng Dưới Cùng (Bottom Nav) -->
+        <div class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item active">
-                <div class="nav-icon">🏠</div>
+                <span class="nav-icon">🏠</span>
                 <span>Trang chủ</span>
             </a>
             <a href="{{ url_for('promotions') }}" class="nav-item">
-                <div class="nav-icon">🎁</div>
+                <span class="nav-icon">🎁</span>
                 <span>Khuyến mãi</span>
             </a>
             <a href="{{ url_for('deposit') }}" class="nav-item">
-                <div class="nav-icon">💳</div>
+                <span class="nav-icon">💳</span>
                 <span>Nạp tiền</span>
             </a>
             <a href="{{ url_for('profile') }}" class="nav-item">
-                <div class="nav-icon">👤</div>
+                <span class="nav-icon">👤</span>
                 <span>Tài khoản</span>
             </a>
-        </nav>
+        </div>
     </div>
-        <script>
-        function toggleDrawer(isOpen) {
-            const menu = document.getElementById('drawerMenu');
+
+    <!-- Script điều khiển Sidebar Menu Drawer -->
+    <script>
+        function toggleDrawer(show) {
+            const drawer = document.getElementById('drawerMenu');
             const overlay = document.getElementById('drawerOverlay');
-            if (isOpen) {
-                menu.classList.add('open');
+            if (show) {
+                drawer.classList.add('open');
                 overlay.style.display = 'block';
             } else {
-                menu.classList.remove('open');
+                drawer.classList.remove('open');
                 overlay.style.display = 'none';
             }
         }

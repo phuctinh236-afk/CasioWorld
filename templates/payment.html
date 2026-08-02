@@ -26,8 +26,6 @@
             min-height: 100vh;
             padding: 12px 15px 30px 15px;
         }
-
-        /* Header logo */
         .pay-header {
             display: flex;
             align-items: center;
@@ -48,13 +46,6 @@
             display: flex;
             align-items: center;
         }
-        .logo-box span {
-            color: #11a89d;
-            font-size: 13px;
-            margin-left: 3px;
-        }
-
-        /* Đồng hồ đếm ngược */
         .timer-box {
             background-color: #11a89d;
             color: #fff;
@@ -66,17 +57,11 @@
             font-size: 12px;
             margin-bottom: 15px;
         }
-        .timer-text {
-            line-height: 1.4;
-            max-width: 75%;
-        }
         .timer-countdown {
             color: #e2f835;
             font-size: 18px;
             font-weight: bold;
         }
-
-        /* Thẻ chứa QR */
         .qr-card {
             background: #ffffff;
             border-radius: 16px;
@@ -96,8 +81,6 @@
             font-size: 22px;
             font-weight: 800;
         }
-
-        /* Các hàng thông tin chi tiết */
         .info-card {
             background: #ffffff;
             border-radius: 12px;
@@ -123,8 +106,6 @@
         .info-value-highlight {
             color: #e53935;
         }
-
-        /* Nút copy */
         .copy-btn {
             background-color: #11a89d;
             color: #fff;
@@ -135,14 +116,10 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .copy-btn:active {
-            opacity: 0.8;
-        }
     </style>
 </head>
 <body>
     <div class="pay-container">
-        <!-- Header -->
         <div class="pay-header">
             <a href="javascript:history.back()" class="back-btn">‹</a>
             <div class="logo-box">
@@ -153,21 +130,16 @@
             <div style="width: 24px;"></div>
         </div>
 
-        <!-- Timer Banner -->
         <div class="timer-box">
-            <div class="timer-text">
-                🕒 Hãy hoàn thành chuyển khoản trong thời gian quy định
-            </div>
+            <div>🕒 Hãy hoàn thành chuyển khoản trong thời gian quy định</div>
             <div class="timer-countdown" id="countdownTimer">15:00</div>
         </div>
 
-        <!-- Khung Mã QR -->
         <div class="qr-card">
             <img src="{{ qr_url }}" alt="Mã QR Chuyển khoản" class="qr-code-img">
             <div class="qr-amount">{{ bank.amount_str }}</div>
         </div>
 
-        <!-- Chi tiết tài khoản -->
         <div class="info-card">
             <div class="info-title">Tên ngân hàng:</div>
             <div class="info-value">{{ bank.bank_name }}</div>
@@ -192,19 +164,13 @@
         </div>
     </div>
 
-    <!-- Script đếm ngược & Copy -->
     <script>
-        // Đồng hồ đếm ngược 15 phút
         let timeRemaining = 15 * 60;
         const timerElement = document.getElementById('countdownTimer');
-
         const timerInterval = setInterval(() => {
             const minutes = Math.floor(timeRemaining / 60);
             const seconds = timeRemaining % 60;
-            
-            timerElement.textContent = 
-                `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
+            timerElement.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
                 alert('Đơn hàng đã hết thời gian thanh toán!');
@@ -212,16 +178,12 @@
             timeRemaining--;
         }, 1000);
 
-        // Nút copy số tài khoản
         function copyAccountNo() {
             const accountNo = document.getElementById('accountNo').innerText;
             navigator.clipboard.writeText(accountNo).then(() => {
                 alert('Đã sao chép số tài khoản!');
-            }).catch(err => {
-                console.error('Lỗi khi sao chép: ', err);
             });
         }
     </script>
 </body>
-                  </html>
-                  
+</html>

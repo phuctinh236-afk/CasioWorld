@@ -8,7 +8,7 @@ app.secret_key = 'casio_world_secret_key_123'
 app.config['DEBUG'] = True
 
 # -------------------------------------------------------------
-# BỘ BẪY LỖI: Hiện nguyên nhân gây lỗi lên màn hình thay vì màn hình 500
+# BỘ BẪY LỖI
 # -------------------------------------------------------------
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -17,27 +17,31 @@ def handle_exception(e):
     return f"""
     <div style="padding: 20px; font-family: monospace; background: #ffffff; color: #cc0000;">
         <h2 style="color: red;">⚠️ PHÁT HIỆN LỖI TRONG CODE (DEBUG MODE):</h2>
-        <p style="color: #333;">Vui lòng chụp lại đoạn văn bản màu xanh bên dưới gửi cho tôi để fix ngay:</p>
         <pre style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">{tb}</pre>
     </div>
     """, 500
 
 # -------------------------------------------------------------
-# BỘ TỰ ĐỘNG CUNG CẤP BIẾN CHO HTML (Tránh lỗi thiếu biến)
+# BỘ TỰ ĐỘNG CUNG CẤP BIẾN CHO HTML (Sửa triệt để lỗi 'balance')
 # -------------------------------------------------------------
 @app.context_processor
 def inject_defaults():
+    balance_val = session.get('balance', session.get('points', 0))
     user_data = {
         'username': session.get('username', 'GUEST'),
         'points': session.get('points', 0),
         'money': session.get('money', 0),
-        'vip': session.get('vip', 0)
+        'vip': session.get('vip', 0),
+        'balance': balance_val
     }
     return dict(
         user=user_data,
         current_user=user_data,
         username=user_data['username'],
-        points=user_data['points']
+        points=user_data['points'],
+        balance=balance_val,
+        money=user_data['money'],
+        vip=user_data['vip']
     )
 
 # -------------------------------------------------------------
@@ -72,6 +76,7 @@ def login():
     if request.method == 'POST':
         session['username'] = request.form.get('username', 'User')
         session['points'] = 0
+        session['balance'] = 0
         return redirect(url_for('index'))
     return render_template('login.html')
 

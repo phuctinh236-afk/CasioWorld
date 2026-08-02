@@ -3,33 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống VIP - Lobbygame_1</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Đặc Quyền VIP - Ab666</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #131521; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow-y: auto; }
         
         .header { padding: 12px 15px; background-color: #171a29; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; }
-        .back-btn { color: #fff; text-decoration: none; font-size: 18px; }
+        .back-btn { color: #cca352; text-decoration: none; font-size: 14px; }
         .header-title { font-size: 16px; font-weight: bold; color: #cca352; }
 
-        .vip-card-box { margin: 15px; background: linear-gradient(135deg, #222639, #171a29); border: 1px solid #303650; border-radius: 12px; padding: 15px; }
-        .vip-level-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .vip-current { font-size: 22px; font-weight: bold; color: #cca352; }
-        .vip-badge { background: #303650; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #fff; }
+        .vip-banner { padding: 20px 15px; text-align: center; background: linear-gradient(135deg, #2b2f45, #171a29); border-bottom: 1px solid #24293f; }
+        .vip-icon { font-size: 40px; margin-bottom: 8px; }
+        .vip-level-text { font-size: 18px; font-weight: bold; color: #cca352; }
+        .vip-desc { font-size: 12px; color: #9fa5b9; margin-top: 5px; }
 
-        .progress-group { margin-bottom: 10px; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: #9fa5b9; margin-bottom: 4px; }
-        .progress-bar { width: 100%; height: 8px; background: #131521; border-radius: 4px; overflow: hidden; border: 1px solid #303650; }
-        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #cca352, #ffdf85); border-radius: 4px; }
-
-        .vip-menu-list { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
-        .vip-menu-item { background: #171a29; border: 1px solid #24293f; border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; text-decoration: none; font-size: 14px; font-weight: 550; }
-        .vip-menu-item:hover { border-color: #cca352; }
-
-        .vip-rules { padding: 15px; font-size: 12px; color: #9fa5b9; line-height: 1.6; background: #171a29; margin: 15px; border-radius: 8px; border: 1px solid #24293f; }
-        .vip-rules h3 { color: #cca352; margin-bottom: 8px; font-size: 14px; }
+        .vip-benefits { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .benefit-card { background: #171a29; border: 1px solid #24293f; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px; }
+        .benefit-icon { font-size: 24px; }
+        .benefit-info { flex: 1; }
+        .benefit-title { font-size: 13px; font-weight: bold; color: #fff; }
+        .benefit-sub { font-size: 11px; color: #9fa5b9; margin-top: 2px; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background-color: #171a29; border-top: 1px solid #24293f; display: flex; justify-content: space-around; padding: 8px 0; z-index: 900; }
         .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #7a83a0; font-size: 10px; gap: 3px; }
@@ -39,84 +33,60 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
         <div class="header">
-            <a href="{{ url_for('index') }}" class="back-btn">❮</a>
+            <a href="{{ url_for('profile') }}" class="back-btn">❮ Trở về</a>
             <div class="header-title">ĐẶC QUYỀN VIP</div>
-            <div style="width: 18px;"></div>
+            <div style="width: 40px;"></div>
         </div>
 
-        <!-- Thẻ thông tin VIP hiện tại -->
-        <div class="vip-card-box">
-            <div class="vip-level-top">
-                <div>
-                    <div style="font-size: 11px; color: #9fa5b9;">Cấp độ hiện tại</div>
-                    <div class="vip-current">VIP 0</div>
+        <div class="vip-banner">
+            <div class="vip-icon">💎</div>
+            <div class="vip-level-text">VIP 1 - Thành Viên Thân Thiết</div>
+            <div class="vip-desc">Cược tích lũy để thăng hạng và nhận nhiều phần thưởng giá trị.</div>
+        </div>
+
+        <div class="vip-benefits">
+            <div class="benefit-card">
+                <div class="benefit-icon">🎁</div>
+                <div class="benefit-info">
+                    <div class="benefit-title">Thưởng Thăng Hạng</div>
+                    <div class="benefit-sub">Nhận ngay 188.000đ khi lên cấp VIP mới.</div>
                 </div>
-                <div class="vip-badge">LOBBYGAME VIP</div>
             </div>
-
-            <div class="progress-group">
-                <div class="progress-label">
-                    <span>Điểm cược tích lũy lên VIP 1</span>
-                    <span>0 / 30.000</span>
+            <div class="benefit-card">
+                <div class="benefit-icon">💰</div>
+                <div class="benefit-info">
+                    <div class="benefit-title">Lương Tuần VIP</div>
+                    <div class="benefit-sub">Phát thưởng vào thứ Hai hàng tuần.</div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
             </div>
-
-            <div class="progress-group" style="margin-bottom: 0;">
-                <div class="progress-label">
-                    <span>Tích lũy tiền gửi</span>
-                    <span>0 / 1</span>
+            <div class="benefit-card">
+                <div class="benefit-icon">🔄</div>
+                <div class="benefit-info">
+                    <div class="benefit-title">Hoàn Trả Cao Hơn</div>
+                    <div class="benefit-sub">Tỷ lệ hoàn trả tức thì lên đến 3.0%.</div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
             </div>
         </div>
 
-        <!-- Menu chức năng VIP -->
-        <div class="vip-menu-list">
-            <a href="#" class="vip-menu-item" onclick="alert('Bảng chi tiết 60 cấp VIP đang hiển thị'); return false;">
-                <span>📊 Chi tiết bảng cấp độ VIP</span>
-                <span>❯</span>
-            </a>
-            <a href="#" class="vip-menu-item" onclick="alert('Chưa có phần thưởng nào khả dụng'); return false;">
-                <span>🎁 Yêu cầu nhận thưởng</span>
-                <span>❯</span>
-            </a>
-            <a href="#" class="vip-menu-item" onclick="alert('Chưa có lịch sử nâng cấp'); return false;">
-                <span>📜 Lịch sử nâng cấp</span>
-                <span>❯</span>
-            </a>
-        </div>
-
-        <!-- Quy tắc VIP -->
-        <div class="vip-rules">
-            <h3>I - CHI TIẾT CẤP & QUY ĐỊNH</h3>
-            <p><strong>1. Điều kiện thăng cấp:</strong> 1 điểm cược hợp lệ = 1 điểm tích lũy cấp VIP. Hệ thống tự động cập nhật mỗi giờ.</p>
-            <p style="margin-top: 6px;"><strong>2. Bảo lưu cấp:</strong> Không cần điều kiện bảo lưu, điểm tích lũy được giữ vĩnh viễn.</p>
-            <p style="margin-top: 6px;"><strong>3. Nhận thưởng:</strong> Tiền thưởng thăng cấp và thưởng tháng tự động phát vào ngày 01 hằng tháng.</p>
-        </div>
-
-        <!-- Bottom Nav -->
         <nav class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item">
                 <div class="nav-icon">🏠</div>
                 <span>Trang chủ</span>
             </a>
-            <a href="{{ url_for('vip') }}" class="nav-item active">
-                <div class="nav-icon">⭐</div>
-                <span>VIP</span>
+            <a href="{{ url_for('promotions') }}" class="nav-item">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Tính năng nạp tiền'); return false;">
+            <a href="{{ url_for('deposit') }}" class="nav-item">
                 <div class="nav-icon">💳</div>
                 <span>Nạp tiền</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Khu vực tài khoản'); return false;">
+            <a href="{{ url_for('profile') }}" class="nav-item active">
                 <div class="nav-icon">👤</div>
                 <span>Tài khoản</span>
             </a>
         </nav>
     </div>
 </body>
-              </html>
-              
+</html>

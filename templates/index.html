@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lobbygame_1</title>
+    <title>TX68 - Trang Chủ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         * {
@@ -61,7 +61,7 @@
         .header-title {
             font-size: 15px;
             font-weight: bold;
-            color: #fff;
+            color: #cca352;
         }
         .cskh-btn {
             background: #212537;
@@ -191,7 +191,7 @@
         .drawer-item-icon {
             font-size: 20px;
         }
-                .banner {
+        .banner {
             padding: 10px 15px;
         }
         .banner-box {
@@ -334,7 +334,7 @@
         <div class="header">
             <div class="header-left">
                 <button type="button" class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
-                <div class="header-title">Lobbygame_1</div>
+                <div class="header-title">TX68 OFFICIAL</div>
             </div>
             <a href="{{ url_for('cskh') }}" class="cskh-btn">💬 CSKH</a>
         </div>
@@ -347,7 +347,7 @@
                 <div class="user-info-box">
                     <div class="user-avatar">💎</div>
                     <div>
-                        <div class="user-name-text">Phun Cam Kiu</div>
+                        <div class="user-name-text">{{ username }}</div>
                         <a href="{{ url_for('profile') }}" class="user-profile-link">Hồ Sơ</a>
                     </div>
                 </div>
@@ -356,7 +356,7 @@
                 <div class="wallet-info-content">
                     <div style="font-size: 10px; font-weight: normal;">Ví chính (VND)</div>
                     <div class="balance-val">
-                        {% if balance > 1e9 %}{{ "%.2e"|format(balance) }}{% else %}{{ "%.2f"|format(balance) }}{% endif %}
+                        {{ "{:,.0f}".format(balance).replace(",", ".") }} đ
                     </div>
                 </div>
                 <div>💳</div>
@@ -364,25 +364,22 @@
             <div class="drawer-grid">
                 <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💰</span><span>Nạp tiền</span></a>
                 <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💳</span><span>Rút tiền</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🔥</span><span>HOT</span></a>
+                <a href="{{ url_for('mahjong') }}" class="drawer-item"><span class="drawer-item-icon">🀄</span><span>Mahjong</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🐓</span><span>ĐÁ GÀ</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
+                <a href="{{ url_for('mahjong') }}" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎲</span><span>Casino</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎮</span><span>Game Bài</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎣</span><span>Bắn Cá</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎟️</span><span>Xổ Số</span></a>
                 <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">⚽</span><span>Thể Thao</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🚀</span><span>Crash</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🕹️</span><span>Arcade</span></a>
                 <a href="{{ url_for('promotions') }}" class="drawer-item"><span class="drawer-item-icon">🎁</span><span>Khuyến mãi</span></a>
                 <a href="{{ url_for('vip') }}" class="drawer-item"><span class="drawer-item-icon">⭐</span><span>VIP</span></a>
-                <a href="{{ url_for('profile') }}" class="drawer-item"><span class="drawer-item-icon">👤</span><span>Tài khoản</span></a>
             </div>
         </div>
 
         <div class="banner">
             <div class="banner-box">
-                <span>Banner</span>
+                <span>TX68 - SẢNH GIẢI TRÍ ĐỈNH CAO</span>
                 <div class="banner-dots">
                     <div class="dot active"></div>
                     <div class="dot"></div>
@@ -395,12 +392,11 @@
         <div class="game-tabs">
             <div class="g-tab active"><span class="g-tab-icon">🔥</span><span>HOT</span></div>
             <div class="g-tab"><span class="g-tab-icon">🐓</span><span>ĐÁ GÀ</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🎰</span><span>Slots</span></div>
+            <div class="g-tab" onclick="location.href='{{ url_for('mahjong') }}'"><span class="g-tab-icon">🎰</span><span>Slots</span></div>
             <div class="g-tab"><span class="g-tab-icon">🎲</span><span>Casino</span></div>
             <div class="g-tab"><span class="g-tab-icon">🎮</span><span>Game Bài</span></div>
-        </div>
-
-        <div class="game-section">
+    </div>
+                                                                                                                                      <div class="game-section">
             <div class="game-grid-detailed">
                 <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt=""></div>
                 <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt=""></div>
@@ -414,8 +410,15 @@
 
                 <div class="game-item-card"><img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt=""></div>
                 <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt=""></div>
+                
+                <!-- 🀄 Ô game Mahjong Ways được liên kết trực tiếp tới sảnh game Python Flask -->
+                <a href="{{ url_for('mahjong') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways">
+                </a>
+
+                <a href="{{ url_for('mahjong') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2">
+                </a>
 
                 <div class="game-item-card"><img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt=""></div>
                 <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt=""></div>

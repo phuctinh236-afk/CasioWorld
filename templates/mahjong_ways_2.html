@@ -12,13 +12,11 @@
         .balance-box span { display: block; font-size: 18px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 18px; font-weight: bold; color: #34d399; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        /* Khung quay slot đặc trưng phần 2 (Tông xanh ngọc) */
         .slot-machine { width: 100%; max-width: 500px; background: linear-gradient(135deg, #065f46, #022c22); border: 4px solid #10b981; border-radius: 16px; padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 15px 0; }
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
         .reel-cell { background: #ecfdf5; border-radius: 8px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
         .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Bảng điều khiển */
         .control-panel { width: 100%; max-width: 500px; background: #022c22; padding: 15px; border-radius: 12px; border: 1px solid #059669; display: flex; flex-direction: column; gap: 10px; }
         .win-display { text-align: center; font-size: 16px; color: #fbbf24; font-weight: bold; min-height: 24px; }
         .actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -34,7 +32,7 @@
 
     <div class="header">
         <div class="game-title">🀄 Mahjong Ways 2</div>
-        <div class="balance-box">Số dư: <span id="balance">1,000,000</span> VNĐ</div>
+        <div class="balance-box">Số dư: <span id="balance">{{ "{:,.0f}".format(balance).replace(",", ".") }}</span> VNĐ</div>
     </div>
 
     <div class="slot-machine">
@@ -55,19 +53,21 @@
             </div>
             <button class="spin-btn" id="spin-btn" onclick="startSpin()">QUAY V2</button>
         </div>
-        <a href="/" class="back-link">← Quay lại trang chủ CasioWorld</a>
+        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
     </div>
 
     <script>
+        // Lấy số dư từ Flask truyền vào JS
+        let balance = {{ balance }};
+
         const tiles = [
-            "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man5-Dora.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
-            "Pin1.svg", "Pin2.svg", "Pin3.svg", "Pin4.svg", "Pin5.svg", "Pin5-Dora.svg", "Pin6.svg", "Pin7.svg", "Pin8.svg", "Pin9.svg",
-            "Sou1.svg", "Sou2.svg", "Sou3.svg", "Sou4.svg", "Sou5.svg", "Sou5-Dora.svg", "Sou6.svg", "Sou7.svg", "Sou8.svg", "Sou9.svg",
+            "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
+            "Pin1.svg", "Pin2.svg", "Pin3.svg", "Pin4.svg", "Pin5.svg", "Pin6.svg", "Pin7.svg", "Pin8.svg", "Pin9.svg",
+            "Sou1.svg", "Sou2.svg", "Sou3.svg", "Sou4.svg", "Sou5.svg", "Sou6.svg", "Sou7.svg", "Sou8.svg", "Sou9.svg",
             "Ton.svg", "Nan.svg", "Shaa.svg", "Pei.svg",
             "Haku.svg", "Hatsu.svg", "Chun.svg"
         ];
 
-        let balance = 1000000;
         const rows = 4;
         const cols = 5;
         const totalCells = rows * cols;
@@ -116,8 +116,8 @@
 
                 let winChance = Math.random();
                 let winAmount = 0;
-                if (winChance < 0.45) { // 45% tỉ lệ thắng ở bản 2
-                    winAmount = betInput * (Math.floor(Math.random() * 8) + 2); // Thưởng đậm hơn x2 đến x9
+                if (winChance < 0.45) {
+                    winAmount = betInput * (Math.floor(Math.random() * 8) + 2);
                     balance += winAmount;
                     document.getElementById('win-text').innerHTML = `🌟 NỔ HŨ V2: +${winAmount.toLocaleString()} VNĐ!`;
                 } else {
@@ -130,7 +130,7 @@
         }
 
         function updateBalance() {
-            document.getElementById('balance').innerText = balance.toLocaleString();
+            document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
         }
 
         window.onload = initGrid;

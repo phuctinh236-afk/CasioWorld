@@ -23,20 +23,23 @@
         .balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
 
-        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); margin: 10px 0; }
+        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); margin: 10px 0; position: relative; }
         
+        .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 10; }
+
         .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #b45309; }
         .mult-item { font-size: 14px; font-weight: bold; color: #94a3b8; padding: 2px 10px; border-radius: 6px; transition: 0.3s; }
         .mult-item.active { background: #fbbf24; color: #450a0a; text-shadow: none; box-shadow: 0 0 10px #fbbf24; transform: scale(1.1); }
 
-        /* Khung hiển thị theo từng Cột (Reel) chuẩn Slot */
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
         .slot-reel { display: flex; flex-direction: column; gap: 5px; transition: opacity 0.3s ease; }
         .slot-reel.dimmed { opacity: 0.25; filter: grayscale(50%); }
-        .slot-reel.anticipation { transform: scale(1.02); z-index: 2; }
+        .slot-reel.anticipation { transform: scale(1.02); z-index: 2; border: 2px dashed #ef4444; border-radius: 6px; }
 
         .reel-cell { background: #f8fafc; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
         .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
+        .reel-cell.scatter-glow { border: 3px solid #ef4444; background: #fee2e2; box-shadow: 0 0 12px #ef4444; animation: pulseScatter 0.8s infinite alternate; }
+        @anticipationPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
         .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
@@ -51,7 +54,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Nút quay chuẩn mẫu ảnh 2 (Vòng tròn vàng + Ô vuông bo góc chứa icon mũi tên xoay) */
         .spin-btn { 
             width: 72px; 
             height: 72px; 
@@ -100,6 +102,7 @@
     </div>
 
     <div class="slot-machine">
+        <div class="freespin-badge" id="freespin-badge">MIỄN PHÍ: 10</div>
         <div class="multiplier-bar">
             <div class="mult-item" id="mult-1">x1</div>
             <div class="mult-item" id="mult-2">x2</div>
@@ -128,7 +131,6 @@
                 </select>
             </div>
             
-            <!-- Nút quay chuẩn mẫu ảnh 2 -->
             <button class="spin-btn" id="spin-btn" onclick="startSpin()">
                 <div class="spin-inner-box">
                     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -147,6 +149,7 @@
         let isSpinning = false;
         let isAutoPlaying = false;
         let autoTimer = null;
+        let freeSpinsLeft = 0;
         
         const tiles = [
             "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
@@ -156,6 +159,7 @@
             "Haku.svg", "Hatsu.svg", "Chun.svg"
         ];
 
+        const scatterTile = "Chun.svg"; // Biểu tượng đặc biệt kích hoạt nổ hũ / free spins
         const rows = 4;
         const cols = 5;
         let currentMultiplierIndex = 0; 
@@ -202,15 +206,23 @@
             const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
             const betInput = betMultiplier * 5000; 
 
-            if (balance < betInput) {
-                alert("Số dư tài khoản không đủ để đặt cược!");
-                stopAutoPlay();
-                return;
+            if (freeSpinsLeft > 0) {
+                freeSpinsLeft--;
+                document.getElementById('freespin-badge').innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
+                if (freeSpinsLeft === 0) {
+                    document.getElementById('freespin-badge').style.display = 'none';
+                }
+            } else {
+                if (balance < betInput) {
+                    alert("Số dư tài khoản không đủ để đặt cược!");
+                    stopAutoPlay();
+                    return;
+                }
+                balance -= betInput;
+                updateBalance();
             }
 
             isSpinning = true;
-            balance -= betInput;
-            updateBalance();
             document.getElementById('win-text').innerText = "";
             
             const spinBtn = document.getElementById('spin-btn');
@@ -222,8 +234,38 @@
 
             const reels = document.querySelectorAll('.slot-reel');
             reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
+            document.querySelectorAll('.reel-cell').forEach(c => c.classList.remove('scatter-glow'));
 
-            // Tốc độ quay vòng cuộn từng cột từ trên xuống (0.6s - 0.75s mỗi vòng)
+            // Quyết định trước xem vòng này có kích hoạt sắp nổ / đủ scatter hay không (ví dụ xác suất 20%)
+            let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
+            
+            // Tạo kết quả cho từng ô
+            let finalGridData = [];
+            let scatterCount = 0;
+
+            for (let c = 0; c < cols; c++) {
+                let colTiles = [];
+                for (let r = 0; r < rows; r++) {
+                    let chosen = tiles[Math.floor(Math.random() * tiles.length)];
+                    // Nếu kích hoạt, ép xuất hiện Scatter ở các cột đầu
+                    if (willTriggerFreeSpins && c < 3 && r === 0 && Math.random() < 0.8) {
+                        chosen = scatterTile;
+                    }
+                    if (chosen === scatterTile) scatterCount++;
+                    colTiles.push(chosen);
+                }
+                finalGridData.push(colTiles);
+            }
+
+            // Kiểm tra xem 2 cột đầu có xuất hiện Scatter hay không để bật hiệu ứng hồi hộp cột 3, 4, 5
+            let firstTwoScatters = 0;
+            for(let c=0; c<2; c++) {
+                for(let r=0; r<rows; r++) {
+                    if(finalGridData[c][r] === scatterTile) firstTwoScatters++;
+                }
+            }
+
+            // Bắt đầu quay tất cả các cột
             let spinIntervals = [];
             reels.forEach((reel, colIdx) => {
                 let interval = setInterval(() => {
@@ -237,50 +279,73 @@
                 spinIntervals.push(interval);
             });
 
-            // Dừng lần lượt từng cột từ trái sang phải với khoảng thời gian mượt mà
+            // Logic dừng từng cột (Cột 1 & 2 dừng nhanh, nếu có dấu hiệu nổ thì cột 3, 4, 5 quay chậm 0.5s - 0.75s)
             reels.forEach((reel, colIdx) => {
+                let stopDelay = 350 + colIdx * 150;
+                
+                // Nếu cột 3, 4, 5 và đang ở trạng thái chờ (sắp nổ) thì cho quay chậm lại
+                if (colIdx >= 2 && firstTwoScatters > 0) {
+                    stopDelay = 500 + colIdx * 450; // Quay chậm tầm 0.5s - 0.75s mỗi cột
+                }
+
                 setTimeout(() => {
                     clearInterval(spinIntervals[colIdx]);
 
                     const cells = reel.querySelectorAll('.reel-cell');
-                    cells.forEach(cell => {
-                        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                        cell.querySelector('img').src = `/static/assets/${randomTile}`;
-                        cell.dataset.tile = randomTile;
+                    cells.forEach((cell, rIdx) => {
+                        let tileName = finalGridData[colIdx][rIdx];
+                        cell.querySelector('img').src = `/static/assets/${tileName}`;
+                        cell.dataset.tile = tileName;
+                        if (tileName === scatterTile) {
+                            cell.classList.add('scatter-glow');
+                        }
                         if (Math.random() < 0.2) cell.classList.add('gold-border');
                         else cell.classList.remove('gold-border');
                     });
 
-                    // Nếu là cột cuối hoặc có khung vàng, tạo hiệu ứng chờ (anticipation)
-                    if (colIdx === cols - 1 && Math.random() < 0.6) {
-                        reels.forEach((r, idx) => { if(idx < cols - 1) r.classList.add('dimmed'); });
+                    // Hiệu ứng làm mờ các cột trước nếu cột sau đang quay chậm chờ kết quả
+                    if (colIdx >= 2 && firstTwoScatters > 0 && colIdx < cols - 1) {
+                        for(let i=0; i<=colIdx; i++) reels[i].classList.remove('dimmed');
+                        for(let i=colIdx+1; i<cols; i++) reels[i].classList.add('dimmed');
                         reel.classList.add('anticipation');
-                        
-                        setTimeout(() => {
-                            reel.classList.remove('anticipation');
-                            reels.forEach(r => r.classList.remove('dimmed'));
-                            if (colIdx === cols - 1) finishSpinProcess(spinBtn);
-                        }, 500);
-                    } else if (colIdx === cols - 1) {
-                        finishSpinProcess(spinBtn);
                     }
-                }, 400 + colIdx * 120);
+
+                    // Khi đến cột cuối cùng, hoàn tất quá trình quay
+                    if (colIdx === cols - 1) {
+                        setTimeout(() => {
+                            reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
+                            finishSpinProcess(spinBtn, betInput);
+                        }, 500);
+                    }
+                }, stopDelay);
             });
         }
 
-        function finishSpinProcess(spinBtn) {
-            const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
-            const betInput = betMultiplier * 5000;
-            
+        function finishSpinProcess(spinBtn, betInput) {
+            let totalScatters = 0;
+            const cells = document.querySelectorAll('.reel-cell');
+            cells.forEach(cell => {
+                if (cell.dataset.tile === scatterTile) totalScatters++;
+            });
+
+            // Nếu đạt từ 3 Scatter trở lên -> Kích hoạt 10 lượt quay miễn phí
+            if (totalScatters >= 3 && freeSpinsLeft === 0) {
+                freeSpinsLeft = 10;
+                const badge = document.getElementById('freespin-badge');
+                badge.style.display = 'block';
+                badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
+                document.getElementById('win-text').innerHTML = `🎊 TRÚNG 10 LƯỢT QUAY MIỄN PHÍ (x2 TỈ LỆ)!`;
+            }
+
             evaluateWin(betInput);
 
             isSpinning = false;
             spinBtn.disabled = false;
             spinBtn.classList.remove('rotating');
 
-            if (isAutoPlaying) {
+            if (isAutoPlaying || freeSpinsLeft > 0) {
                 autoTimer = setTimeout(() => {
-                    if (isAutoPlaying) startSpin();
+                    if (isAutoPlaying || freeSpinsLeft > 0) startSpin();
                 }, 800);
             }
         }
@@ -328,18 +393,22 @@
                 }
             }
 
-            if (hasWon) {
+            // Nếu đang trong chế độ Free Spins, nhân đôi (x2) tỉ lệ may mắn / tiền thưởng
+            let luckFactor = (freeSpinsLeft > 0) ? 2 : 1;
+
+            if (hasWon || luckFactor > 1 && totalWin > 0) {
                 let multValue = multipliers[currentMultiplierIndex];
-                totalWin = Math.floor(totalWin * multValue);
+                totalWin = Math.floor(totalWin * multValue * luckFactor);
                 balance += totalWin;
 
-                document.getElementById('win-text').innerHTML = `🎉 NỔ HŨ (x${multValue}): +${totalWin.toLocaleString()} VNĐ!`;
+                let freeText = freeSpinsLeft > 0 ? " (FREE SPIN x2)" : "";
+                document.getElementById('win-text').innerHTML = `🎉 THẮNG LỚN${freeText}: +${totalWin.toLocaleString()} VNĐ!`;
                 
                 if (currentMultiplierIndex < multipliers.length - 1) {
                     currentMultiplierIndex++;
                 }
                 updateMultiplierDisplay();
-            } else {
+            } else if (totalWin === 0 && freeSpinsLeft === 0) {
                 document.getElementById('win-text').innerHTML = `Chúc bạn may mắn lần sau!`;
             }
 

@@ -31,19 +31,19 @@ def render_safe(template_name, **kwargs):
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{title}</title>
+            <title>TX68 - {title}</title>
             <style>
                 body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }}
                 .container {{ max-width: 450px; margin: 60px auto; background: #1e293b; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #334155; }}
-                h2 {{ color: #38bdf8; margin-bottom: 15px; font-size: 22px; }}
+                h2 {{ color: #cca352; margin-bottom: 15px; font-size: 22px; }}
                 p {{ color: #94a3b8; font-size: 14px; line-height: 1.6; }}
-                .btn {{ display: inline-block; margin-top: 25px; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; }}
+                .btn {{ display: inline-block; margin-top: 25px; background: #cca352; color: #131521; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <h2>✨ {title}</h2>
-                <p>Khu vực này đang hoạt động bình thường.</p>
+                <p>Khu vực này đang hoạt động bình thường trên hệ thống TX68.</p>
                 <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
             </div>
         </body>
@@ -70,17 +70,17 @@ def ktraloibug():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Kiểm Tra Lỗi</title>
+        <title>TX68 - Kiểm Tra Lỗi</title>
         <style>
             body {{ background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }}
             .wrapper {{ max-width: 800px; margin: 30px auto; background: #090d16; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; }}
             h2 {{ color: #f87171; margin-bottom: 5px; }}
-            .btn {{ background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 20px; }}
+            .btn {{ background: #cca352; color: #131521; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 20px; }}
         </style>
     </head>
     <body>
         <div class="wrapper">
-            <h2>🛠️ HỆ THỐNG GIÁM SÁT LỖI (/ktraloibug)</h2>
+            <h2>🛠️ HỆ THỐNG GIÁM SÁT LỖI TX68 (/ktraloibug)</h2>
             {logs_html}
             <a href="/" class="btn">⬅ Về Trang Chủ</a>
         </div>
@@ -102,9 +102,9 @@ def handle_exception(e):
 
 @app.context_processor
 def inject_defaults():
-    balance_val = session.get('balance', 0)
+    balance_val = session.get('balance', 500000)
     user_data = {
-        'id': 888888, 'user_id': 888888, 'username': session.get('username', 'GUEST'),
+        'id': 8386888, 'user_id': 8386888, 'username': session.get('username', 'GUEST'),
         'points': balance_val, 'money': balance_val, 'vip': 1, 'vip_level': 1,
         'balance': balance_val, 'phone': '09******88', 'bank_name': 'TECHCOMBANK',
         'bank_account': '8992362013', 'account_name': 'LỶ KIM HẰNG'
@@ -112,7 +112,7 @@ def inject_defaults():
     return dict(user=user_data, current_user=user_data, username=user_data['username'], points=balance_val, balance=balance_val, money=balance_val, vip=1, vip_level=1)
 
 def generate_memo():
-    return f"chuyen tien DMCNA{''.join(random.choices(string.ascii_uppercase + string.digits, k=7))}"
+    return f"chuyen tien TX68{''.join(random.choices(string.ascii_uppercase + string.digits, k=7))}"
 
 @app.route('/')
 @app.route('/index')
@@ -147,6 +147,11 @@ def withdraw():
 @app.route('/activity')
 def activity():
     return render_safe('activity.html')
+
+@app.route('/mahjong')
+def mahjong():
+    balance_val = session.get('balance', 500000)
+    return render_safe('mahjong.html', balance=balance_val)
 
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
@@ -194,3 +199,4 @@ def catch_all(subpath):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+           

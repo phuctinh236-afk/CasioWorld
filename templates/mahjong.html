@@ -31,15 +31,17 @@
         .mult-item { font-size: 14px; font-weight: bold; color: #94a3b8; padding: 2px 10px; border-radius: 6px; transition: 0.3s; }
         .mult-item.active { background: #fbbf24; color: #450a0a; text-shadow: none; box-shadow: 0 0 10px #fbbf24; transform: scale(1.1); }
 
+        /* Khung chứa các cột slot */
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
-        .slot-reel { display: flex; flex-direction: column; gap: 5px; transition: opacity 0.3s ease; }
-        .slot-reel.dimmed { opacity: 0.25; filter: grayscale(50%); }
-        .slot-reel.anticipation { transform: scale(1.02); z-index: 2; border: 2px dashed #ef4444; border-radius: 6px; }
+        
+        /* Cửa sổ cuộn thật cho từng cột */
+        .reel-window { height: 280px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
+        .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; transition: transform 0.6s cubic-bezier(0.15, 0.85, 0.35, 1.2); }
 
-        .reel-cell { background: #f8fafc; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .reel-cell { background: #f8fafc; border-radius: 6px; height: 65px; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); flex-shrink: 0; }
         .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
         .reel-cell.scatter-glow { border: 3px solid #ef4444; background: #fee2e2; box-shadow: 0 0 12px #ef4444; }
-        .reel-cell img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.1s ease; }
+        .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
         .win-display { text-align: center; font-size: 15px; color: #34d399; font-weight: bold; min-height: 22px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
@@ -163,9 +165,6 @@
         const cols = 5;
         let currentMultiplierIndex = 0; 
         const multipliers = [1, 2, 3, 5];
-        
-        // Lưu trữ mảng quân bài cho từng cột để thực hiện hiệu ứng cuộn dọc từ trên xuống
-        let reelData = [];
 
         function updateMultiplierDisplay() {
             document.querySelectorAll('.mult-item').forEach((el, idx) => {
@@ -180,14 +179,16 @@
         function initGrid() {
             const grid = document.getElementById('slot-grid');
             grid.innerHTML = '';
-            reelData = [];
-
+            
             for (let c = 0; c < cols; c++) {
-                let colTiles = [];
-                const reelDiv = document.createElement('div');
-                reelDiv.className = 'slot-reel';
-                reelDiv.dataset.col = c;
+                const windowDiv = document.createElement('div');
+                windowDiv.className = 'reel-window';
 
+                const trackDiv = document.createElement('div');
+                trackDiv.className = 'reel-track';
+                trackDiv.id = `reel-track-${c}`;
+
+                // Tạo sẵn 4 ô hiển thị ban đầu
                 for (let r = 0; r < rows; r++) {
                     const cell = document.createElement('div');
                     cell.className = 'reel-cell';
@@ -198,30 +199,14 @@
                     img.src = `/static/assets/${randomTile}`;
                     cell.dataset.tile = randomTile;
                     cell.appendChild(img);
-                    reelDiv.appendChild(cell);
-
-                    colTiles.push(randomTile);
+                    trackDiv.appendChild(cell);
                 }
-                grid.appendChild(reelDiv);
-                reelData.push(colTiles);
+
+                windowDiv.appendChild(trackDiv);
+                grid.appendChild(windowDiv);
             }
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
-        }
-
-        function updateReelDOM(colIdx) {
-            const reels = document.querySelectorAll('.slot-reel');
-            const cells = reels[colIdx].querySelectorAll('.reel-cell');
-            for (let r = 0; r < rows; r++) {
-                let tileName = reelData[colIdx][r];
-                cells[r].querySelector('img').src = `/static/assets/${tileName}`;
-                cells[r].dataset.tile = tileName;
-                if (tileName === scatterTile) {
-                    cells[r].classList.add('scatter-glow');
-                } else {
-                    cells[r].classList.remove('scatter-glow');
-                }
-            }
         }
 
         function startSpin() {
@@ -256,10 +241,7 @@
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
 
-            const reels = document.querySelectorAll('.slot-reel');
-            reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
-
-            // Tạo trước kết quả mục tiêu cho vòng quay
+            // Tạo kết quả chuẩn cho 5 cột
             let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
             let finalGridData = [];
 
@@ -275,61 +257,43 @@
                 finalGridData.push(colTiles);
             }
 
-            let firstTwoScatters = 0;
-            for(let c=0; c<2; c++) {
-                for(let r=0; r<rows; r++) {
-                    if(finalGridData[c][r] === scatterTile) firstTwoScatters++;
+            // Cho cả 5 cột chạy cuộn thật đồng loạt cùng lúc
+            for (let c = 0; c < cols; c++) {
+                const track = document.getElementById(`reel-track-${c}`);
+                
+                // Tạo một dãy danh sách quân bài cuộn dài giả lập chuyển động vật lý
+                let htmlContent = '';
+                // Thêm các item ngẫu nhiên chạy trước
+                for (let i = 0; i < 10; i++) {
+                    let randT = tiles[Math.floor(Math.random() * tiles.length)];
+                    htmlContent += `<div class="reel-cell"><img src="/static/assets/${randT}"></div>`;
                 }
+                // Thêm 4 kết quả chính thức ở cuối track
+                for (let r = 0; r < rows; r++) {
+                    let finalT = finalGridData[c][r];
+                    let isGold = Math.random() < 0.2 ? 'gold-border' : '';
+                    let isScatter = finalT === scatterTile ? 'scatter-glow' : '';
+                    htmlContent += `<div class="reel-cell ${isGold} ${isScatter}" data-tile="${finalT}"><img src="/static/assets/${finalT}"></div>`;
+                }
+                track.innerHTML = htmlContent;
+
+                // Đặt vị trí track ban đầu lên trên để chuẩn bị trượt xuống đáy
+                track.style.transition = 'none';
+                track.style.transform = 'translateY(0px)';
+                
+                // Kích hoạt trượt mượt mà xuống phần kết quả cuối cùng cùng một lúc
+                setTimeout(() => {
+                    track.style.transition = 'transform 0.8s cubic-bezier(0.15, 0.85, 0.35, 1)';
+                    // Dịch chuyển khoảng cách tương ứng với số item phụ chạy qua
+                    let targetY = -10 * 70; // 10 item * chiều cao mỗi ô (65px + 5px gap)
+                    track.style.transform = `translateY(${targetY}px)`;
+                }, 50);
             }
 
-            // Hiệu ứng cuộn dọc từng cột (Hàng 1 xuống hàng 2, 2 xuống 3, 3 xuống 4, nạp quân mới vào hàng 1)
-            let spinIntervals = [];
-            reels.forEach((reel, colIdx) => {
-                let interval = setInterval(() => {
-                    let newTopTile = tiles[Math.floor(Math.random() * tiles.length)];
-                    // Cuộn dọc: dịch chuyển các phần tử xuống, nạp mới lên đầu
-                    reelData[colIdx].pop();
-                    reelData[colIdx].unshift(newTopTile);
-                    updateReelDOM(colIdx);
-                }, 60);
-                spinIntervals.push(interval);
-            });
-
-            // Dừng lần lượt các cột (Nếu gần nổ scatter, cột 3, 4, 5 sẽ quay chậm hồi hộp tầm 0.5s)
-            reels.forEach((reel, colIdx) => {
-                let stopDelay = 350 + colIdx * 150;
-                
-                if (colIdx >= 2 && firstTwoScatters > 0) {
-                    stopDelay = 500 + colIdx * 500; // Quay chậm hơn tạo cảm giác cấn
-                }
-
-                setTimeout(() => {
-                    clearInterval(spinIntervals[colIdx]);
-
-                    // Đắp kết quả chuẩn xác vào cột
-                    reelData[colIdx] = finalGridData[colIdx];
-                    updateReelDOM(colIdx);
-
-                    const cells = reel.querySelectorAll('.reel-cell');
-                    cells.forEach(cell => {
-                        if (Math.random() < 0.2) cell.classList.add('gold-border');
-                        else cell.classList.remove('gold-border');
-                    });
-
-                    if (colIdx >= 2 && firstTwoScatters > 0 && colIdx < cols - 1) {
-                        for(let i=0; i<=colIdx; i++) reels[i].classList.remove('dimmed');
-                        for(let i=colIdx+1; i<cols; i++) reels[i].classList.add('dimmed');
-                        reel.classList.add('anticipation');
-                    }
-
-                    if (colIdx === cols - 1) {
-                        setTimeout(() => {
-                            reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
-                            finishSpinProcess(spinBtn, betInput);
-                        }, 500);
-                    }
-                }, stopDelay);
-            });
+            // Sau khi hiệu ứng chạy xong đồng loạt, kiểm tra kết quả
+            setTimeout(() => {
+                finishSpinProcess(spinBtn, betInput);
+            }, 900);
         }
 
         function finishSpinProcess(spinBtn, betInput) {
@@ -385,12 +349,18 @@
 
         function evaluateWin(betInput) {
             let matchedSymbols = {};
-            const cells = document.querySelectorAll('.reel-cell');
-            
-            cells.forEach(cell => {
-                let t = cell.dataset.tile;
-                matchedSymbols[t] = (matchedSymbols[t] || 0) + 1;
-            });
+            // Chỉ tính điểm các ô hiển thị ở hàng cuối cùng của track (4 ô kết quả mỗi cột)
+            for (let c = 0; c < cols; c++) {
+                const track = document.getElementById(`reel-track-${c}`);
+                const allCellsInTrack = track.querySelectorAll('.reel-cell');
+                // Lấy 4 ô cuối cùng hiển thị trong khung
+                for (let i = allCellsInTrack.length - rows; i < allCellsInTrack.length; i++) {
+                    if(allCellsInTrack[i]) {
+                        let t = allCellsInTrack[i].dataset.tile;
+                        if(t) matchedSymbols[t] = (matchedSymbols[t] || 0) + 1;
+                    }
+                }
+            }
 
             let totalWin = 0;
             let hasWon = false;

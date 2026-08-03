@@ -14,8 +14,10 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: space-between; 
+            justify-content: flex-start; 
+            gap: 10px;
             padding: 10px; 
+            overflow-y: auto;
             overflow-x: hidden;
         }
         
@@ -24,7 +26,7 @@
         .balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
 
-        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); margin: 10px 0; position: relative; }
+        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); margin: 5px 0; position: relative; }
         
         .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 10; }
 
@@ -78,8 +80,134 @@
         .spin-btn:active { transform: scale(0.92); }
         .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px
-            <script>
+        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+
+        .back-link { color: #cbd5e1; text-decoration: none; font-size: 12px; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .back-link:hover { color: #fff; }
+
+        .win-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .win-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .win-popup-wrapper {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            text-align: center;
+            transform: scale(0.4);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .win-overlay.show .win-popup-wrapper {
+            transform: scale(1);
+        }
+        .win-popup-img {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.8));
+        }
+        .win-popup-number {
+            position: absolute;
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffeb3b;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px #ff9800;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+
+        .freespin-popup-box {
+            background: linear-gradient(135deg, #064e3b, #022c22);
+            border: 4px solid #34d399;
+            padding: 30px 45px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px #059669;
+            text-align: center;
+        }
+        .freespin-popup-title {
+            font-size: 24px;
+            color: #fef08a;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .freespin-popup-desc {
+            font-size: 34px;
+            color: #34d399;
+            font-weight: 900;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="game-title">🀄 Mahjong Ways</div>
+        <div class="balance-box">Số dư: <span id="balance">{{ "{:,.0f}".format(balance).replace(",", ".") }}</span> VNĐ</div>
+    </div>
+
+    <div class="slot-machine">
+        <div class="freespin-badge" id="freespin-badge">MIỄN PHÍ: 10</div>
+        <div class="multiplier-bar">
+            <div class="mult-item" id="mult-1">x1</div>
+            <div class="mult-item" id="mult-2">x2</div>
+            <div class="mult-item" id="mult-3">x3</div>
+            <div class="mult-item" id="mult-5">x5</div>
+        </div>
+        <div class="grid-container" id="slot-grid"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="win-display" id="win-text">Sẵn sàng chinh phục Mạt Chượt!</div>
+        <div class="actions">
+            <div class="bet-control">
+                <span>Mức cược:</span>
+                <select id="bet-amount">
+                    <option value="0.2">0.2</option>
+                    <option value="0.5">0.5</option>
+                    <option value="1" selected>1.0</option>
+                    <option value="2">2.0</option>
+                    <option value="3">3.0</option>
+                    <option value="5">5.0</option>
+                    <option value="10">10.0</option>
+                    <option value="20">20.0</option>
+                    <option value="50">50.0</option>
+                    <option value="100">100.0</option>
+                </select>
+            </div>
+            
+            <button class="spin-btn" id="spin-btn" onclick="startSpin()">
+                <img src="{{ url_for('static', filename='assets/nutquay.svg') }}" onerror="this.src='{{ url_for('static', filename='assets/2098.svg') }}'" alt="Quay ngay">
+            </button>
+            
+            <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
+        </div>
+        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
+    </div>
+
+    <div class="win-overlay" id="win-overlay" onclick="closeWinPopupEarly()">
+        <div class="win-popup-wrapper" id="popup-content-box"></div>
+                    </div>
+        <script>
         let balance = {{ balance }};
         let isSpinning = false;
         let isAutoPlaying = false;
@@ -328,7 +456,6 @@
             updateBalance();
         }
 
-        // Thuật toán tự động quét và xóa sạch nền caro trắng/xám của ảnh
         function processImageWithoutCheckerboard(imgSrc, callback) {
             const img = new Image();
             img.crossOrigin = "anonymous";
@@ -444,4 +571,3 @@
     </script>
 </body>
 </html>
-        

@@ -31,12 +31,14 @@
         .mult-item { font-size: 14px; font-weight: bold; color: #94a3b8; padding: 2px 10px; border-radius: 6px; transition: 0.3s; }
         .mult-item.active { background: #fbbf24; color: #450a0a; text-shadow: none; box-shadow: 0 0 10px #fbbf24; transform: scale(1.1); }
 
-        /* Khung chứa các cột slot */
+        /* Khung chứa 5 cột */
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
         
-        /* Cửa sổ cuộn thật cho từng cột */
-        .reel-window { height: 280px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
-        .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; transition: transform 0.6s cubic-bezier(0.15, 0.85, 0.35, 1.2); }
+        /* Cửa sổ từng cột: Cố định chiều cao và CẮT TUYỆT ĐỐI không cho tràn ra ngoài */
+        .reel-window { height: 275px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
+        
+        /* Dải băng chứa các quân bài chạy từ trên xuống bên trong khung */
+        .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; left: 0; }
 
         .reel-cell { background: #f8fafc; border-radius: 6px; height: 65px; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); flex-shrink: 0; }
         .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
@@ -188,7 +190,6 @@
                 trackDiv.className = 'reel-track';
                 trackDiv.id = `reel-track-${c}`;
 
-                // Tạo sẵn 4 ô hiển thị ban đầu
                 for (let r = 0; r < rows; r++) {
                     const cell = document.createElement('div');
                     cell.className = 'reel-cell';
@@ -241,7 +242,7 @@
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
 
-            // Tạo kết quả chuẩn cho 5 cột
+            // Tạo kết quả cho 5 cột
             let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
             let finalGridData = [];
 
@@ -257,18 +258,17 @@
                 finalGridData.push(colTiles);
             }
 
-            // Cho cả 5 cột chạy cuộn thật đồng loạt cùng lúc
+            // Kích hoạt 5 cột chạy từ trên xuống đồng loạt, tốc độ chậm rãi ~1.0 giây
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
                 
-                // Tạo một dãy danh sách quân bài cuộn dài giả lập chuyển động vật lý
                 let htmlContent = '';
-                // Thêm các item ngẫu nhiên chạy trước
-                for (let i = 0; i < 10; i++) {
+                // Thêm các item ngẫu nhiên chạy phía trên
+                for (let i = 0; i < 8; i++) {
                     let randT = tiles[Math.floor(Math.random() * tiles.length)];
                     htmlContent += `<div class="reel-cell"><img src="/static/assets/${randT}"></div>`;
                 }
-                // Thêm 4 kết quả chính thức ở cuối track
+                // Thêm 4 kết quả chuẩn ở đáy track
                 for (let r = 0; r < rows; r++) {
                     let finalT = finalGridData[c][r];
                     let isGold = Math.random() < 0.2 ? 'gold-border' : '';
@@ -277,23 +277,21 @@
                 }
                 track.innerHTML = htmlContent;
 
-                // Đặt vị trí track ban đầu lên trên để chuẩn bị trượt xuống đáy
                 track.style.transition = 'none';
                 track.style.transform = 'translateY(0px)';
                 
-                // Kích hoạt trượt mượt mà xuống phần kết quả cuối cùng cùng một lúc
                 setTimeout(() => {
-                    track.style.transition = 'transform 0.8s cubic-bezier(0.15, 0.85, 0.35, 1)';
-                    // Dịch chuyển khoảng cách tương ứng với số item phụ chạy qua
-                    let targetY = -10 * 70; // 10 item * chiều cao mỗi ô (65px + 5px gap)
+                    // Thời gian chạy chậm lại tầm 1.0 giây (1s)
+                    track.style.transition = 'transform 1.0s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                    let targetY = -8 * 70; // 8 item dịch chuyển qua khung hiển thị
                     track.style.transform = `translateY(${targetY}px)`;
                 }, 50);
             }
 
-            // Sau khi hiệu ứng chạy xong đồng loạt, kiểm tra kết quả
+            // Hoàn tất lượt quay sau 1.05 giây
             setTimeout(() => {
                 finishSpinProcess(spinBtn, betInput);
-            }, 900);
+            }, 1050);
         }
 
         function finishSpinProcess(spinBtn, betInput) {
@@ -349,11 +347,9 @@
 
         function evaluateWin(betInput) {
             let matchedSymbols = {};
-            // Chỉ tính điểm các ô hiển thị ở hàng cuối cùng của track (4 ô kết quả mỗi cột)
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
                 const allCellsInTrack = track.querySelectorAll('.reel-cell');
-                // Lấy 4 ô cuối cùng hiển thị trong khung
                 for (let i = allCellsInTrack.length - rows; i < allCellsInTrack.length; i++) {
                     if(allCellsInTrack[i]) {
                         let t = allCellsInTrack[i].dataset.tile;

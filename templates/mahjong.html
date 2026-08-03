@@ -57,38 +57,31 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Nút quay mới sử dụng nutquay.svg */
         .spin-btn { 
-            width: 72px; 
-            height: 72px; 
-            background: radial-gradient(circle, #fde047 0%, #ca8a04 60%, #854d0e 100%); 
-            border: 3px solid #fef08a; 
-            border-radius: 50%; 
+            width: 76px; 
+            height: 76px; 
+            background: transparent; 
+            border: none; 
             cursor: pointer; 
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.7); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            transition: 0.1s; 
+            transition: transform 0.1s; 
             flex-shrink: 0; 
+            padding: 0;
         }
-        .spin-inner-box {
-            width: 42px;
-            height: 42px;
-            background: #1e293b;
-            border: 2px solid #475569;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-            transition: 0.2s;
+        .spin-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
         }
-        .spin-btn.rotating .spin-inner-box {
-            animation: spinRotate 0.6s linear infinite;
+        .spin-btn.rotating img {
+            animation: spinRotate 0.8s linear infinite;
         }
         .spin-btn:active { transform: scale(0.92); }
-        .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+        .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
@@ -135,11 +128,7 @@
             </div>
             
             <button class="spin-btn" id="spin-btn" onclick="startSpin()">
-                <div class="spin-inner-box">
-                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.73-5.73"/>
-                    </svg>
-                </div>
+                <img src="/static/assets/nutquay.svg" alt="Quay ngay">
             </button>
             
             <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
@@ -257,7 +246,6 @@
                 finalGridData.push(colTiles);
             }
 
-            // Cập nhật DOM các track trước
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
                 let htmlContent = '';
@@ -276,7 +264,6 @@
                 track.style.transform = 'translate3d(0, 0px, 0)';
             }
 
-            // Sử dụng requestAnimationFrame để kích hoạt chuyển động mượt mà bằng phần cứng mà không bị giật/lag
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     for (let c = 0; c < cols; c++) {

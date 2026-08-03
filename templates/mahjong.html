@@ -6,14 +6,25 @@
     <title>Mahjong Ways - TX68</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0f172a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px; }
         
-        .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
+        /* Hiệu ứng nền phong cách Mạt Chượt (vàng cam ấm & xanh ngọc bích) */
+        body { 
+            background: radial-gradient(circle, #fef08a 0%, #ea580c 45%, #7c2d12 75%, #064e3b 100%); 
+            color: #fff; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 10px; 
+        }
+        
+        .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
         .balance-box { font-size: 13px; color: #94a3b8; text-align: right; }
         .balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
 
-        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); margin: 10px 0; }
+        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); margin: 10px 0; }
         
         .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #b45309; }
         .mult-item { font-size: 14px; font-weight: bold; color: #94a3b8; padding: 2px 10px; border-radius: 6px; transition: 0.3s; }
@@ -26,8 +37,8 @@
         .reel-cell.highlight-slow { opacity: 1; transform: scale(1.05); z-index: 2; box-shadow: 0 0 15px #ef4444; border: 3px solid #ef4444; }
         .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
 
-        .control-panel { width: 100%; max-width: 480px; background: #1e293b; padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
-        .win-display { text-align: center; font-size: 15px; color: #34d399; font-weight: bold; min-height: 22px; }
+        .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
+        .win-display { text-align: center; font-size: 15px; color: #34d399; font-weight: bold; min-height: 22px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
         
         .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
         .bet-control { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #94a3b8; }
@@ -45,7 +56,7 @@
         .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
-        .back-link { color: #94a3b8; text-decoration: none; font-size: 12px; text-align: center; }
+        .back-link { color: #cbd5e1; text-decoration: none; font-size: 12px; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
         .back-link:hover { color: #fff; }
     </style>
 </head>
@@ -85,7 +96,6 @@
                 </select>
             </div>
             
-            <!-- Nút biểu tượng mũi tên cong giống ảnh 2 -->
             <button class="spin-btn" id="spin-btn" onclick="startSpin()">🔄</button>
             
             <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
@@ -167,13 +177,11 @@
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
 
-            // Xóa hiệu ứng cũ
             const cells = document.querySelectorAll('.reel-cell');
             cells.forEach(c => {
                 c.classList.remove('dimmed', 'highlight-slow');
             });
 
-            // Giai đoạn 1: Chạy quay liên tục từ trên xuống
             let spinInterval = setInterval(() => {
                 cells.forEach(cell => {
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
@@ -185,7 +193,6 @@
             setTimeout(() => {
                 clearInterval(spinInterval);
                 
-                // Đặt kết quả ngẫu nhiên cho các ô
                 cells.forEach(cell => {
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
                     cell.querySelector('img').src = `/static/assets/${randomTile}`;
@@ -194,13 +201,11 @@
                     else cell.classList.remove('gold-border');
                 });
 
-                // Giai đoạn 2: Hiệu ứng đặc biệt Mạt Chượt (Làm mờ phần lớn, chừa ô chờ khung vàng chạy chậm)
                 let goldCells = Array.from(cells).filter(c => c.classList.contains('gold-border') || Math.random() < 0.15);
                 
                 if (goldCells.length > 0) {
                     cells.forEach(c => c.classList.add('dimmed'));
                     
-                    // Chọn ngẫu nhiên 1 đến 2 ô đặc biệt để chạy chậm hồi hộp
                     let targetCell = goldCells[Math.floor(Math.random() * goldCells.length)];
                     targetCell.classList.remove('dimmed');
                     targetCell.classList.add('highlight-slow');

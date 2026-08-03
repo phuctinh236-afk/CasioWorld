@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TX68 - Mahjong Ways Slot</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+        }
+        body {
+            background-color: #0d0f17;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #131521 0%, #090a0f 100%);
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.8);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Header */
+        .header {
+            padding: 12px 15px;
+            background-color: #171a29;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #cca352;
+            font-size: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #cca352;
+            letter-spacing: 1px;
+        }
+        .balance-pill {
+            background: #212537;
+            border: 1px solid #cca352;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #cca352;
+        }
+
+        /* Game Screen Container */
+        .slot-game-wrapper {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Thắng lớn thông báo */
+        .win-display-box {
+            text-align: center;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        .win-text {
+            font-size: 18px;
+            font-weight: 900;
+            color: #f1c40f;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
+            animation: bounce 0.5s infinite alternate;
+            display: none;
+        }
+        @keyframes bounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        /* Bảng Slot (Reels Grid) */
+        .slot-machine-board {
+            background: radial-gradient(circle, #2b2f4a 0%, #11131d 100%);
+            border: 3px solid #cca352;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 15px rgba(204, 163, 82, 0.4);
+            margin-bottom: 15px;
+        }
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .slot-cell {
+            background: #1a1d2e;
+            border: 2px solid #303650;
+            border-radius: 10px;
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.5);
+            transition: 0.1s;
+        }
+        .slot-cell.win-highlight {
+            border-color: #f1c40f;
+            background: #36392b;
+            box-shadow: 0 0 15px #f1c40f;
+        }
+
+        /* Bảng thông tin cược & Thắng */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .stat-box {
+            background: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #9fa5b9;
+            margin-bottom: 2px;
+        }
+        .stat-value {
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .stat-value.gold {
+            color: #cca352;
+        }
+
+        /* Bảng điều khiển (Controls) */
+        .control-panel {
+            background: #171a29;
+            border: 1px solid #24293f;
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bet-adjuster {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-bet-ctrl {
+            background: #212537;
+            border: 1px solid #303650;
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-bet-ctrl:active {
+            background: #cca352;
+            color: #131521;
+        }
+        .current-bet-display {
+            font-size: 13px;
+            color: #9fa5b9;
+            text-align: center;
+        }
+        .current-bet-display span {
+            color: #cca352;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Nút Quay (Spin Button) lớn chính giữa */
+        .spin-action-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-auto {
+            background: #212537;
+            border: 1px solid #303650;
+            color: #9fa5b9;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-spin {
+            flex-grow: 1;
+            background: linear-gradient(135deg, #f1c40f, #d4ac0d);
+            border: none;
+            border-radius: 12px;
+            color: #131521;
+            font-size: 20px;
+            font-weight: 900;
+            padding: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.1s;
+        }
+        .btn-spin:active {
+            transform: scale(0.96);
+        }
+        .btn-spin:disabled {
+            background: #555;
+            color: #888;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Thanh điều hướng dưới */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #7a83a0;
+            font-size: 10px;
+            gap: 3px;
+        }
+        .nav-item.active {
+            color: #cca352;
+        }
+        .nav-icon {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <a href="{{ url_for('index') }}" class="back-btn">‹</a>
+            <div class="header-title">🀄 MAHJONG WAYS TX68</div>
+            <div class="balance-pill" id="userBalanceDisplay">{{ balance if balance is defined else 500000 }} đ</div>
+        </div>
+
+        <div class="slot-game-wrapper">
+            <!-- Khu vực thông báo thắng -->
+            <div class="win-display-box">
+                <div class="win-text" id="winNotification">🎉 THẮNG LỚN: +0 đ</div>
+            </div>
+
+            <!-- Bảng Quay Hũ (4 cột x 3 hàng = 12 ô quân bài Mạt Chược) -->
+            <div class="slot-machine-board">
+                <div class="slot-grid" id="slotGrid">
+                    <!-- 12 ô ban đầu -->
+                    <div class="slot-cell">🀄</div>
+                    <div class="slot-cell">🀇</div>
+                    <div class="slot-cell">🀐</div>
+                    <div class="slot-cell">🀙</div>
+                    <div class="slot-cell">🀫</div>
+                    <div class="slot-cell">🀄</div>
+                    <div class="slot-cell">🀈</div>
+                    <div class="slot-cell">🀑</div>
+                    <div class="slot-cell">🀙</div>
+                    <div class="slot-cell">🀋</div>
+                    <div class="slot-cell">🀐</div>
+                    <div class="slot-cell">🀄</div>
+                </div>
+            </div>
+
+            <!-- Bảng thống kê Thắng phiên & Cược -->
+            <div class="stats-panel">
+                <div class="stat-box">
+                    <div class="stat-label">THẮNG VÁN NÀY</div>
+                    <div class="stat-value gold" id="sessionWin">0 đ</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">TỔNG THƯỞNG TÍCH LŨY</div>
+                    <div class="stat-value" id="totalWon">0 đ</div>
+                </div>
+            </div>
+
+            <!-- Bảng điều khiển cược & nút quay -->
+            <div class="control-panel">
+                <div class="bet-adjuster">
+                    <button class="btn-bet-ctrl" onclick="changeBet(-1000)">-</button>
+                    <div class="current-bet-display">MỨC CƯỢC: <span id="currentBetText">2,000 đ</span></div>
+                    <button class="btn-bet-ctrl" onclick="changeBet(1000)">+</button>
+                </div>
+
+                <div class="spin-action-row">
+                    <button class="btn-auto" id="autoBtn" onclick="toggleAutoSpin()">TỰ QUAY</button>
+                    <button class="btn-spin" id="spinBtn" onclick="startSpin()">QUAY NGAY</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh điều hướng dưới -->
+        <nav class="bottom-nav">
+            <a href="{{ url_for('index') }}" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Trang chủ</span>
+            </a>
+            <a href="{{ url_for('promotions') }}" class="nav-item">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
+            </a>
+            <a href="{{ url_for('deposit') }}" class="nav-item">
+                <div class="nav-icon">💳</div>
+                <span>Nạp tiền</span>
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Tài khoản</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Danh sách các quân bài Mạt Chược chuẩn xác trong slot Mahjong Ways
+        const symbols = ['🀄', '🀇', '🀈', '🀉', '🀊', '🀋', '🀌', '🀍', '🀎', '🀏', '🀐', '🀑', '🀒', '🀓', '🀔', '🀕', '🀖', '🀗', '🀘', '🀙', '🀚', '🀛', '🀜', '🀝', '🀞', '🀟', '🀠', '🀡', '🀢', '🀣', '💎'];
+        
+        let currentBalance = parseInt(document.getElementById('userBalanceDisplay').innerText.replace(/\D/g, '')) || 500000;
+        let currentBet = 2000;
+        let totalWinAccumulated = 0;
+        let isSpinning = false;
+        let autoSpinActive = false;
+        let autoSpinInterval = null;
+
+        function formatMoney(num) {
+            return num.toLocaleString('vi-VN') + ' đ';
+        }
+
+        function changeBet(amount) {
+            if (isSpinning) return;
+            currentBet += amount;
+            if (currentBet < 1000) currentBet = 1000;
+            if (currentBet > 500000) currentBet = 500000;
+            document.getElementById('currentBetText').innerText = formatMoney(currentBet);
+        }
+
+        function startSpin() {
+            if (isSpinning) return;
+
+            if (currentBalance < currentBet) {
+                alert("Số dư của bạn không đủ để quay! Vui lòng nạp thêm tiền.");
+                stopAutoSpin();
+                return;
+            }
+
+            // Trừ tiền cược
+            currentBalance -= currentBet;
+            document.getElementById('userBalanceDisplay').innerText = formatMoney(currentBalance);
+            
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('winNotification').style.display = 'none';
+            document.getElementById('sessionWin').innerText = '0 đ';
+
+            const cells = document.querySelectorAll('.slot-cell');
+            cells.forEach(c => c.classList.remove('win-highlight'));
+
+            // Hiệu ứng quay số ngẫu nhiên liên tục trong 1 giây
+            let spinTimer = setInterval(() => {
+                cells.forEach(cell => {
+                    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    cell.innerText = randomSymbol;
+                });
+            }, 80);
+
+            // Dừng quay sau 1200ms và tính kết quả
+            setTimeout(() => {
+                clearInterval(spinTimer);
+                
+                // Tạo kết quả cuối cùng (có tỉ lệ trúng thưởng hấp dẫn ~ 40%)
+                let finalSymbols = [];
+                cells.forEach((cell, index) => {
+                    const sym = symbols[Math.floor(Math.random() * symbols.length)];
+                    cell.innerText = sym;
+                    finalSymbols.push({ element: cell, symbol: sym });
+                });
+
+                // Kiểm tra xem có trúng thưởng không (ví dụ có từ 3 ô giống nhau liên tiếp hoặc xuất hiện quân Rồng đỏ 🀄)
+                let winAmount = evaluateWin(finalSymbols);
+
+                if (winAmount > 0) {
+                    currentBalance += winAmount;
+                    totalWinAccumulated += winAmount;
+                    document.getElementById('userBalanceDisplay').innerText = formatMoney(currentBalance);
+                    document.getElementById('sessionWin').innerText = formatMoney(winAmount);
+                    document.getElementById('totalWon').innerText = formatMoney(totalWinAccumulated);
+                    
+                    const winNotif = document.getElementById('winNotification');
+                    winNotif.innerText = `🎉 THẮNG LỚN: +${formatMoney(winAmount)}`;
+                    winNotif.style.display = 'block';
+                }
+
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+
+                if (autoSpinActive && !autoSpinActive) {
+                    stopAutoSpin();
+                }
+            }, 1200);
+        }
+
+        function evaluateWin(grid) {
+            // Đếm tần suất các quân bài xuất hiện
+            let counts = {};
+            grid.forEach(item => {
+                counts[item.symbol] = (counts[item.symbol] || 0) + 1;
+            });
+
+            let winMultiplier = 0;
+            let winningSymbol = null;
+
+            for (let sym in counts) {
+                if (counts[sym] >= 3) {
+                    winningSymbol = sym;
+                    if (sym === '🀄') winMultiplier = 15; // Rồng Đỏ ăn đậm nhất
+                    else if (sym === '💎') winMultiplier = 10;
+                    else winMultiplier = 5;
+                    break;
+                }
+            }
+
+            if (winMultiplier > 0) {
+                // Highlight các ô trúng thưởng
+                grid.forEach(item => {
+                    if (item.symbol === winningSymbol) {
+                        item.element.classList.add('win-highlight');
+                    }
+                });
+                return currentBet * winMultiplier;
+            }
+            return 0;
+        }
+
+        function toggleAutoSpin() {
+            const autoBtn = document.getElementById('autoBtn');
+            if (!autoSpinActive) {
+                autoSpinActive = true;
+                autoBtn.innerText = 'DỪNG TỰ QUAY';
+                autoBtn.style.color = '#f1c40f';
+                autoBtn.style.borderColor = '#f1c40f';
+                autoSpinInterval = setInterval(() => {
+                    if (!isSpinning) {
+                        startSpin();
+                    }
+                }, 2000);
+            } else {
+                stopAutoSpin();
+            }
+        }
+
+        function stopAutoSpin() {
+            autoSpinActive = false;
+            clearInterval(autoSpinInterval);
+            const autoBtn = document.getElementById('autoBtn');
+            autoBtn.innerText = 'TỰ QUAY';
+            autoBtn.style.color = '#9fa5b9';
+            autoBtn.style.borderColor = '#303650';
+        }
+    </script>
+</body>
+  </html>
+  

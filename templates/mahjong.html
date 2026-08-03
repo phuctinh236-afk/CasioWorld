@@ -34,11 +34,11 @@
         /* Khung chứa 5 cột */
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
         
-        /* Cửa sổ từng cột: Cố định chiều cao và CẮT TUYỆT ĐỐI không cho tràn ra ngoài */
+        /* Cửa sổ từng cột: Cố định chiều cao và cắt tuyệt đối không cho tràn ra ngoài */
         .reel-window { height: 275px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
         
-        /* Dải băng chứa các quân bài chạy từ trên xuống bên trong khung */
-        .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; left: 0; }
+        /* Dải băng chứa các quân bài, tối ưu hóa phần cứng bằng will-change */
+        .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; left: 0; will-change: transform; }
 
         .reel-cell { background: #f8fafc; border-radius: 6px; height: 65px; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); flex-shrink: 0; }
         .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
@@ -242,7 +242,6 @@
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
 
-            // Tạo kết quả cho 5 cột
             let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
             let finalGridData = [];
 
@@ -258,17 +257,14 @@
                 finalGridData.push(colTiles);
             }
 
-            // Kích hoạt 5 cột chạy từ trên xuống đồng loạt, tốc độ chậm rãi ~1.0 giây
+            // Cập nhật DOM các track trước
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
-                
                 let htmlContent = '';
-                // Thêm các item ngẫu nhiên chạy phía trên
                 for (let i = 0; i < 8; i++) {
                     let randT = tiles[Math.floor(Math.random() * tiles.length)];
                     htmlContent += `<div class="reel-cell"><img src="/static/assets/${randT}"></div>`;
                 }
-                // Thêm 4 kết quả chuẩn ở đáy track
                 for (let r = 0; r < rows; r++) {
                     let finalT = finalGridData[c][r];
                     let isGold = Math.random() < 0.2 ? 'gold-border' : '';
@@ -276,19 +272,22 @@
                     htmlContent += `<div class="reel-cell ${isGold} ${isScatter}" data-tile="${finalT}"><img src="/static/assets/${finalT}"></div>`;
                 }
                 track.innerHTML = htmlContent;
-
                 track.style.transition = 'none';
-                track.style.transform = 'translateY(0px)';
-                
-                setTimeout(() => {
-                    // Thời gian chạy chậm lại tầm 1.0 giây (1s)
-                    track.style.transition = 'transform 1.0s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                    let targetY = -8 * 70; // 8 item dịch chuyển qua khung hiển thị
-                    track.style.transform = `translateY(${targetY}px)`;
-                }, 50);
+                track.style.transform = 'translate3d(0, 0px, 0)';
             }
 
-            // Hoàn tất lượt quay sau 1.05 giây
+            // Sử dụng requestAnimationFrame để kích hoạt chuyển động mượt mà bằng phần cứng mà không bị giật/lag
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    for (let c = 0; c < cols; c++) {
+                        const track = document.getElementById(`reel-track-${c}`);
+                        track.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
+                        let targetY = -8 * 70;
+                        track.style.transform = `translate3d(0, ${targetY}px, 0)`;
+                    }
+                });
+            });
+
             setTimeout(() => {
                 finishSpinProcess(spinBtn, betInput);
             }, 1050);

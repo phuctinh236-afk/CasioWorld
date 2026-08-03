@@ -38,9 +38,8 @@
 
         .reel-cell { background: #f8fafc; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
         .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
-        .reel-cell.scatter-glow { border: 3px solid #ef4444; background: #fee2e2; box-shadow: 0 0 12px #ef4444; animation: pulseScatter 0.8s infinite alternate; }
-        @anticipationPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
-        .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
+        .reel-cell.scatter-glow { border: 3px solid #ef4444; background: #fee2e2; box-shadow: 0 0 12px #ef4444; }
+        .reel-cell img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.1s ease; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
         .win-display { text-align: center; font-size: 15px; color: #34d399; font-weight: bold; min-height: 22px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
@@ -159,11 +158,14 @@
             "Haku.svg", "Hatsu.svg", "Chun.svg"
         ];
 
-        const scatterTile = "Chun.svg"; // Biểu tượng đặc biệt kích hoạt nổ hũ / free spins
+        const scatterTile = "Chun.svg";
         const rows = 4;
         const cols = 5;
         let currentMultiplierIndex = 0; 
         const multipliers = [1, 2, 3, 5];
+        
+        // Lưu trữ mảng quân bài cho từng cột để thực hiện hiệu ứng cuộn dọc từ trên xuống
+        let reelData = [];
 
         function updateMultiplierDisplay() {
             document.querySelectorAll('.mult-item').forEach((el, idx) => {
@@ -178,10 +180,14 @@
         function initGrid() {
             const grid = document.getElementById('slot-grid');
             grid.innerHTML = '';
+            reelData = [];
+
             for (let c = 0; c < cols; c++) {
+                let colTiles = [];
                 const reelDiv = document.createElement('div');
                 reelDiv.className = 'slot-reel';
                 reelDiv.dataset.col = c;
+
                 for (let r = 0; r < rows; r++) {
                     const cell = document.createElement('div');
                     cell.className = 'reel-cell';
@@ -193,11 +199,29 @@
                     cell.dataset.tile = randomTile;
                     cell.appendChild(img);
                     reelDiv.appendChild(cell);
+
+                    colTiles.push(randomTile);
                 }
                 grid.appendChild(reelDiv);
+                reelData.push(colTiles);
             }
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
+        }
+
+        function updateReelDOM(colIdx) {
+            const reels = document.querySelectorAll('.slot-reel');
+            const cells = reels[colIdx].querySelectorAll('.reel-cell');
+            for (let r = 0; r < rows; r++) {
+                let tileName = reelData[colIdx][r];
+                cells[r].querySelector('img').src = `/static/assets/${tileName}`;
+                cells[r].dataset.tile = tileName;
+                if (tileName === scatterTile) {
+                    cells[r].classList.add('scatter-glow');
+                } else {
+                    cells[r].classList.remove('scatter-glow');
+                }
+            }
         }
 
         function startSpin() {
@@ -234,30 +258,23 @@
 
             const reels = document.querySelectorAll('.slot-reel');
             reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
-            document.querySelectorAll('.reel-cell').forEach(c => c.classList.remove('scatter-glow'));
 
-            // Quyết định trước xem vòng này có kích hoạt sắp nổ / đủ scatter hay không (ví dụ xác suất 20%)
+            // Tạo trước kết quả mục tiêu cho vòng quay
             let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
-            
-            // Tạo kết quả cho từng ô
             let finalGridData = [];
-            let scatterCount = 0;
 
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
                 for (let r = 0; r < rows; r++) {
                     let chosen = tiles[Math.floor(Math.random() * tiles.length)];
-                    // Nếu kích hoạt, ép xuất hiện Scatter ở các cột đầu
                     if (willTriggerFreeSpins && c < 3 && r === 0 && Math.random() < 0.8) {
                         chosen = scatterTile;
                     }
-                    if (chosen === scatterTile) scatterCount++;
                     colTiles.push(chosen);
                 }
                 finalGridData.push(colTiles);
             }
 
-            // Kiểm tra xem 2 cột đầu có xuất hiện Scatter hay không để bật hiệu ứng hồi hộp cột 3, 4, 5
             let firstTwoScatters = 0;
             for(let c=0; c<2; c++) {
                 for(let r=0; r<rows; r++) {
@@ -265,52 +282,46 @@
                 }
             }
 
-            // Bắt đầu quay tất cả các cột
+            // Hiệu ứng cuộn dọc từng cột (Hàng 1 xuống hàng 2, 2 xuống 3, 3 xuống 4, nạp quân mới vào hàng 1)
             let spinIntervals = [];
             reels.forEach((reel, colIdx) => {
                 let interval = setInterval(() => {
-                    const cells = reel.querySelectorAll('.reel-cell');
-                    cells.forEach(cell => {
-                        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                        cell.querySelector('img').src = `/static/assets/${randomTile}`;
-                        cell.dataset.tile = randomTile;
-                    });
-                }, 50);
+                    let newTopTile = tiles[Math.floor(Math.random() * tiles.length)];
+                    // Cuộn dọc: dịch chuyển các phần tử xuống, nạp mới lên đầu
+                    reelData[colIdx].pop();
+                    reelData[colIdx].unshift(newTopTile);
+                    updateReelDOM(colIdx);
+                }, 60);
                 spinIntervals.push(interval);
             });
 
-            // Logic dừng từng cột (Cột 1 & 2 dừng nhanh, nếu có dấu hiệu nổ thì cột 3, 4, 5 quay chậm 0.5s - 0.75s)
+            // Dừng lần lượt các cột (Nếu gần nổ scatter, cột 3, 4, 5 sẽ quay chậm hồi hộp tầm 0.5s)
             reels.forEach((reel, colIdx) => {
                 let stopDelay = 350 + colIdx * 150;
                 
-                // Nếu cột 3, 4, 5 và đang ở trạng thái chờ (sắp nổ) thì cho quay chậm lại
                 if (colIdx >= 2 && firstTwoScatters > 0) {
-                    stopDelay = 500 + colIdx * 450; // Quay chậm tầm 0.5s - 0.75s mỗi cột
+                    stopDelay = 500 + colIdx * 500; // Quay chậm hơn tạo cảm giác cấn
                 }
 
                 setTimeout(() => {
                     clearInterval(spinIntervals[colIdx]);
 
+                    // Đắp kết quả chuẩn xác vào cột
+                    reelData[colIdx] = finalGridData[colIdx];
+                    updateReelDOM(colIdx);
+
                     const cells = reel.querySelectorAll('.reel-cell');
-                    cells.forEach((cell, rIdx) => {
-                        let tileName = finalGridData[colIdx][rIdx];
-                        cell.querySelector('img').src = `/static/assets/${tileName}`;
-                        cell.dataset.tile = tileName;
-                        if (tileName === scatterTile) {
-                            cell.classList.add('scatter-glow');
-                        }
+                    cells.forEach(cell => {
                         if (Math.random() < 0.2) cell.classList.add('gold-border');
                         else cell.classList.remove('gold-border');
                     });
 
-                    // Hiệu ứng làm mờ các cột trước nếu cột sau đang quay chậm chờ kết quả
                     if (colIdx >= 2 && firstTwoScatters > 0 && colIdx < cols - 1) {
                         for(let i=0; i<=colIdx; i++) reels[i].classList.remove('dimmed');
                         for(let i=colIdx+1; i<cols; i++) reels[i].classList.add('dimmed');
                         reel.classList.add('anticipation');
                     }
 
-                    // Khi đến cột cuối cùng, hoàn tất quá trình quay
                     if (colIdx === cols - 1) {
                         setTimeout(() => {
                             reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
@@ -328,7 +339,6 @@
                 if (cell.dataset.tile === scatterTile) totalScatters++;
             });
 
-            // Nếu đạt từ 3 Scatter trở lên -> Kích hoạt 10 lượt quay miễn phí
             if (totalScatters >= 3 && freeSpinsLeft === 0) {
                 freeSpinsLeft = 10;
                 const badge = document.getElementById('freespin-badge');
@@ -393,7 +403,6 @@
                 }
             }
 
-            // Nếu đang trong chế độ Free Spins, nhân đôi (x2) tỉ lệ may mắn / tiền thưởng
             let luckFactor = (freeSpinsLeft > 0) ? 2 : 1;
 
             if (hasWon || luckFactor > 1 && totalWin > 0) {

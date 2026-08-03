@@ -21,7 +21,7 @@
             overflow-x: hidden;
         }
         
-        .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
+        .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
         .balance-box { font-size: 13px; color: #94a3b8; text-align: right; }
         .balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
@@ -35,15 +35,14 @@
         .mult-item.active { background: #fbbf24; color: #450a0a; text-shadow: none; box-shadow: 0 0 10px #fbbf24; transform: scale(1.1); }
 
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
-        .reel-window { height: 275px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
+        .reel-window { height: 260px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
         .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; left: 0; will-change: transform; }
 
-        .reel-cell { background: #f8fafc; border-radius: 6px; height: 65px; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); flex-shrink: 0; }
-        .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
-        .reel-cell.scatter-glow { border: 3px solid #ef4444; background: #fee2e2; box-shadow: 0 0 12px #ef4444; }
-        .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
+        .reel-cell { background: #f8fafc; color: #1e293b; border-radius: 6px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); flex-shrink: 0; font-weight: bold; }
+        .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; color: #b45309; }
+        .reel-cell.scatter-glow { border: 3px solid #ef4444; background: #fee2e2; box-shadow: 0 0 12px #ef4444; color: #dc2626; }
 
-        .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
+        .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
         .win-display { text-align: center; font-size: 15px; color: #34d399; font-weight: bold; min-height: 22px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
         
         .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -58,29 +57,30 @@
         .spin-btn { 
             width: 76px; 
             height: 76px; 
-            background: transparent; 
-            border: none; 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            border: 3px solid #fef08a; 
+            border-radius: 50%; 
             cursor: pointer; 
             display: flex; 
+            flex-direction: column;
             align-items: center; 
             justify-content: center; 
             transition: transform 0.1s; 
             flex-shrink: 0; 
-            padding: 0;
+            color: #fff;
+            font-weight: 900;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
-        .spin-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-        }
-        .spin-btn.rotating img {
+        .spin-btn span { font-size: 10px; font-weight: normal; }
+        .spin-btn.rotating {
             animation: spinRotate 0.8s linear infinite;
         }
         .spin-btn:active { transform: scale(0.92); }
         .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; height: 42px; }
         .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
         .back-link { color: #cbd5e1; text-decoration: none; font-size: 12px; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
@@ -102,56 +102,23 @@
             opacity: 1;
             pointer-events: auto;
         }
-        .win-popup-wrapper {
-            position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
-            text-align: center;
-            transform: scale(0.4);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .win-overlay.show .win-popup-wrapper {
-            transform: scale(1);
-        }
-        .win-popup-img {
-            width: 100%;
-            max-width: 420px;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.8));
-        }
-        .win-popup-number {
-            position: absolute;
-            bottom: 12%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 32px;
-            font-weight: 900;
-            color: #ffeb3b;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px #ff9800;
-            white-space: nowrap;
-            letter-spacing: 1px;
-        }
-
-        .freespin-popup-box {
-            background: linear-gradient(135deg, #064e3b, #022c22);
-            border: 4px solid #34d399;
-            padding: 30px 45px;
+        .win-popup-box {
+            background: linear-gradient(135deg, #7c2d12, #450a0a);
+            border: 4px solid #fbbf24;
+            padding: 25px 40px;
             border-radius: 20px;
-            box-shadow: 0 0 50px #059669;
+            box-shadow: 0 0 40px #f59e0b;
             text-align: center;
         }
-        .freespin-popup-title {
-            font-size: 24px;
+        .win-popup-title {
+            font-size: 22px;
             color: #fef08a;
             font-weight: bold;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        .freespin-popup-desc {
-            font-size: 34px;
+        .win-popup-desc {
+            font-size: 28px;
             color: #34d399;
             font-weight: 900;
             text-shadow: 0 2px 5px rgba(0,0,0,0.5);
@@ -196,7 +163,8 @@
             </div>
             
             <button class="spin-btn" id="spin-btn" onclick="startSpin()">
-                <img src="{{ url_for('static', filename='assets/nutquay.svg') }}" onerror="this.src='{{ url_for('static', filename='assets/2098.svg') }}'" alt="Quay ngay">
+                QUAY
+                <span>SPIN</span>
             </button>
             
             <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
@@ -205,26 +173,20 @@
     </div>
 
     <div class="win-overlay" id="win-overlay" onclick="closeWinPopupEarly()">
-        <div class="win-popup-wrapper" id="popup-content-box"></div>
-                    </div>
-        <script>
+        <div class="win-popup-box" id="popup-content-box"></div>
+    </div>
+
+    <script>
         let balance = {{ balance }};
         let isSpinning = false;
         let isAutoPlaying = false;
         let autoTimer = null;
         let freeSpinsLeft = 0;
-        let activeCountInterval = null;
-        let popupResolve = null;
         
-        const tiles = [
-            "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
-            "Pin1.svg", "Pin2.svg", "Pin3.svg", "Pin4.svg", "Pin5.svg", "Pin6.svg", "Pin7.svg", "Pin8.svg", "Pin9.svg",
-            "Sou1.svg", "Sou2.svg", "Sou3.svg", "Sou4.svg", "Sou5.svg", "Sou6.svg", "Sou7.svg", "Sou8.svg", "Sou9.svg",
-            "Ton.svg", "Nan.svg", "Shaa.svg", "Pei.svg",
-            "Haku.svg", "Hatsu.svg", "Chun.svg"
-        ];
-
-        const scatterTile = "Chun.svg";
+        // Sử dụng ký tự Mạt Chượt chuẩn (Unicode Tiles) để hiển thị tuyệt đẹp không cần file ảnh ngoài
+        const tiles = ["🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀙", "🀚", "🀛", "🀜", "🀝", "🀞", "🀟", "🀠", "🀡", "🀢", "🀣", "🀤", "🀥", "🀦", "🀧", "🀨"];
+        const scatterTile = "🀄"; // Ô Trung phát / Scatter
+        
         const rows = 4;
         const cols = 5;
         let currentMultiplierIndex = 0; 
@@ -257,11 +219,9 @@
                     cell.className = 'reel-cell';
                     if (Math.random() < 0.25) cell.classList.add('gold-border');
                     
-                    const img = document.createElement('img');
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                    img.src = `{{ url_for('static', filename='assets/') }}${randomTile}`;
+                    cell.innerText = randomTile;
                     cell.dataset.tile = randomTile;
-                    cell.appendChild(img);
                     trackDiv.appendChild(cell);
                 }
 
@@ -324,13 +284,13 @@
                 let htmlContent = '';
                 for (let i = 0; i < 8; i++) {
                     let randT = tiles[Math.floor(Math.random() * tiles.length)];
-                    htmlContent += `<div class="reel-cell"><img src="{{ url_for('static', filename='assets/') }}${randT}"></div>`;
+                    htmlContent += `<div class="reel-cell">${randT}</div>`;
                 }
                 for (let r = 0; r < rows; r++) {
                     let finalT = finalGridData[c][r];
                     let isGold = Math.random() < 0.2 ? 'gold-border' : '';
                     let isScatter = finalT === scatterTile ? 'scatter-glow' : '';
-                    htmlContent += `<div class="reel-cell ${isGold} ${isScatter}" data-tile="${finalT}"><img src="{{ url_for('static', filename='assets/') }}${finalT}"></div>`;
+                    htmlContent += `<div class="reel-cell ${isGold} ${isScatter}" data-tile="${finalT}">${finalT}</div>`;
                 }
                 track.innerHTML = htmlContent;
                 track.style.transition = 'none';
@@ -341,8 +301,8 @@
                 requestAnimationFrame(() => {
                     for (let c = 0; c < cols; c++) {
                         const track = document.getElementById(`reel-track-${c}`);
-                        track.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
-                        let targetY = -8 * 70;
+                        track.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+                        let targetY = -8 * 65;
                         track.style.transform = `translate3d(0, ${targetY}px, 0)`;
                     }
                 });
@@ -350,7 +310,7 @@
 
             setTimeout(() => {
                 finishSpinProcess(spinBtn, betInput);
-            }, 1050);
+            }, 850);
         }
 
         async function finishSpinProcess(spinBtn, betInput) {
@@ -366,7 +326,7 @@
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
                 
-                await showWinPopup("FREESPIN", 0);
+                await showWinPopup("FREESPIN", "10 LƯỢT QUAY MIỄN PHÍ");
             }
 
             await evaluateWin(betInput);
@@ -439,10 +399,8 @@
                 let freeText = freeSpinsLeft > 0 ? " (FREE SPIN x2)" : "";
                 document.getElementById('win-text').innerHTML = `🎉 THẮNG${freeText}: +${totalWin.toLocaleString()} VNĐ!`;
 
-                if (totalWin >= betInput * 25) {
-                    await showWinPopup("MEGA WIN", totalWin);
-                } else if (totalWin >= betInput * 10) {
-                    await showWinPopup("BIG WIN", totalWin);
+                if (totalWin >= betInput * 15) {
+                    await showWinPopup("BIG WIN", `+${totalWin.toLocaleString()} VNĐ`);
                 }
                 
                 if (currentMultiplierIndex < multipliers.length - 1) {
@@ -456,110 +414,29 @@
             updateBalance();
         }
 
-        function processImageWithoutCheckerboard(imgSrc, callback) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imgData.data;
-                
-                for (let i = 0; i < data.length; i += 4) {
-                    let r = data[i];
-                    let g = data[i+1];
-                    let b = data[i+2];
-                    
-                    if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6 && r > 150) {
-                        data[i+3] = 0;
-                    }
-                }
-                
-                ctx.putImageData(imgData, 0, 0);
-                callback(canvas.toDataURL('image/png'));
-            };
-            img.src = imgSrc;
-        }
-
-        function showWinPopup(type, targetAmount) {
+        function showWinPopup(title, desc) {
             return new Promise((resolve) => {
-                popupResolve = resolve;
                 const overlay = document.getElementById('win-overlay');
                 const popupBox = document.getElementById('popup-content-box');
 
-                if (type === "BIG WIN") {
-                    popupBox.innerHTML = `<img class="win-popup-img" id="dynamic-win-img" src="" alt="Big Win"><div class="win-popup-number" id="popup-amount">+0 VNĐ</div>`;
-                    processImageWithoutCheckerboard("{{ url_for('static', filename='assets/bigwin.png') }}", function(processedSrc) {
-                        const imgEl = document.getElementById('dynamic-win-img');
-                        if (imgEl) imgEl.src = processedSrc;
-                    });
-                } else if (type === "MEGA WIN") {
-                    popupBox.innerHTML = `<img class="win-popup-img" id="dynamic-win-img" src="" alt="Mega Win"><div class="win-popup-number" id="popup-amount">+0 VNĐ</div>`;
-                    processImageWithoutCheckerboard("{{ url_for('static', filename='assets/megawin.png') }}", function(processedSrc) {
-                        const imgEl = document.getElementById('dynamic-win-img');
-                        if (imgEl) imgEl.src = processedSrc;
-                    });
-                } else if (type === "FREESPIN") {
-                    popupBox.innerHTML = `
-                        <div class="freespin-popup-box">
-                            <div class="freespin-popup-title">🎉 Chúc mừng chiến thắng!</div>
-                            <div class="freespin-popup-desc">10 LƯỢT QUAY MIỄN PHÍ</div>
-                        </div>
-                    `;
-                }
+                popupBox.innerHTML = `
+                    <div class="win-popup-title">${title}</div>
+                    <div class="win-popup-desc">${desc}</div>
+                `;
 
                 overlay.classList.add('show');
 
-                if (type === "FREESPIN") {
-                    setTimeout(() => {
-                        closeWinPopupEarly();
-                    }, 2500);
-                    return;
-                }
-
-                let currentVal = 0;
-                let steps = 40;
-                let increment = Math.max(1, Math.floor(targetAmount / steps));
-                let duration = 1500;
-                let stepTime = duration / steps;
-
-                const currentAmountEl = document.getElementById('popup-amount');
-                if(currentAmountEl) currentAmountEl.innerText = "+0 VNĐ";
-                
-                if (activeCountInterval) clearInterval(activeCountInterval);
-
-                let currentStep = 0;
-                activeCountInterval = setInterval(() => {
-                    currentStep++;
-                    currentVal += increment;
-                    if (currentStep >= steps || currentVal >= targetAmount) {
-                        currentVal = targetAmount;
-                        clearInterval(activeCountInterval);
-                    }
-                    const el = document.getElementById('popup-amount');
-                    if(el) el.innerText = `+${currentVal.toLocaleString()} VNĐ`;
-                }, stepTime);
-
                 setTimeout(() => {
                     closeWinPopupEarly();
-                }, 2800);
+                    resolve();
+                }, 2200);
             });
         }
 
         function closeWinPopupEarly() {
-            if (activeCountInterval) clearInterval(activeCountInterval);
             const overlay = document.getElementById('win-overlay');
             if (overlay.classList.contains('show')) {
                 overlay.classList.remove('show');
-                if (popupResolve) {
-                    let temp = popupResolve;
-                    popupResolve = null;
-                    temp();
-                }
             }
         }
 

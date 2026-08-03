@@ -16,6 +16,7 @@
             align-items: center; 
             justify-content: space-between; 
             padding: 10px; 
+            overflow-x: hidden;
         }
         
         .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
@@ -31,13 +32,8 @@
         .mult-item { font-size: 14px; font-weight: bold; color: #94a3b8; padding: 2px 10px; border-radius: 6px; transition: 0.3s; }
         .mult-item.active { background: #fbbf24; color: #450a0a; text-shadow: none; box-shadow: 0 0 10px #fbbf24; transform: scale(1.1); }
 
-        /* Khung chứa 5 cột */
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
-        
-        /* Cửa sổ từng cột: Cố định chiều cao và cắt tuyệt đối không cho tràn ra ngoài */
         .reel-window { height: 275px; overflow: hidden; position: relative; background: #450a0a; border-radius: 6px; }
-        
-        /* Dải băng chứa các quân bài, tối ưu hóa phần cứng bằng will-change */
         .reel-track { display: flex; flex-direction: column; gap: 5px; position: absolute; width: 100%; top: 0; left: 0; will-change: transform; }
 
         .reel-cell { background: #f8fafc; border-radius: 6px; height: 65px; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); flex-shrink: 0; }
@@ -57,7 +53,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Nút quay mới sử dụng nutquay.svg */
         .spin-btn { 
             width: 76px; 
             height: 76px; 
@@ -83,65 +78,15 @@
         .spin-btn:active { transform: scale(0.92); }
         .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-
-        .back-link { color: #cbd5e1; text-decoration: none; font-size: 12px; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-        .back-link:hover { color: #fff; }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <div class="game-title">🀄 Mahjong Ways</div>
-        <div class="balance-box">Số dư: <span id="balance">{{ "{:,.0f}".format(balance).replace(",", ".") }}</span> VNĐ</div>
-    </div>
-
-    <div class="slot-machine">
-        <div class="freespin-badge" id="freespin-badge">MIỄN PHÍ: 10</div>
-        <div class="multiplier-bar">
-            <div class="mult-item" id="mult-1">x1</div>
-            <div class="mult-item" id="mult-2">x2</div>
-            <div class="mult-item" id="mult-3">x3</div>
-            <div class="mult-item" id="mult-5">x5</div>
-        </div>
-        <div class="grid-container" id="slot-grid"></div>
-    </div>
-
-    <div class="control-panel">
-        <div class="win-display" id="win-text">Sẵn sàng chinh phục Mạt Chượt!</div>
-        <div class="actions">
-            <div class="bet-control">
-                <span>Mức cược:</span>
-                <select id="bet-amount">
-                    <option value="0.2">0.2</option>
-                    <option value="0.5">0.5</option>
-                    <option value="1" selected>1.0</option>
-                    <option value="2">2.0</option>
-                    <option value="3">3.0</option>
-                    <option value="5">5.0</option>
-                    <option value="10">10.0</option>
-                    <option value="20">20.0</option>
-                    <option value="50">50.0</option>
-                    <option value="100">100.0</option>
-                </select>
-            </div>
-            
-            <button class="spin-btn" id="spin-btn" onclick="startSpin()">
-                <img src="/static/assets/nutquay.svg" alt="Quay ngay">
-            </button>
-            
-            <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
-        </div>
-        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
-    </div>
-
-    <script>
+        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px
+            <script>
         let balance = {{ balance }};
         let isSpinning = false;
         let isAutoPlaying = false;
         let autoTimer = null;
         let freeSpinsLeft = 0;
+        let activeCountInterval = null;
+        let popupResolve = null;
         
         const tiles = [
             "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
@@ -186,7 +131,7 @@
                     
                     const img = document.createElement('img');
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                    img.src = `/static/assets/${randomTile}`;
+                    img.src = `{{ url_for('static', filename='assets/') }}${randomTile}`;
                     cell.dataset.tile = randomTile;
                     cell.appendChild(img);
                     trackDiv.appendChild(cell);
@@ -251,13 +196,13 @@
                 let htmlContent = '';
                 for (let i = 0; i < 8; i++) {
                     let randT = tiles[Math.floor(Math.random() * tiles.length)];
-                    htmlContent += `<div class="reel-cell"><img src="/static/assets/${randT}"></div>`;
+                    htmlContent += `<div class="reel-cell"><img src="{{ url_for('static', filename='assets/') }}${randT}"></div>`;
                 }
                 for (let r = 0; r < rows; r++) {
                     let finalT = finalGridData[c][r];
                     let isGold = Math.random() < 0.2 ? 'gold-border' : '';
                     let isScatter = finalT === scatterTile ? 'scatter-glow' : '';
-                    htmlContent += `<div class="reel-cell ${isGold} ${isScatter}" data-tile="${finalT}"><img src="/static/assets/${finalT}"></div>`;
+                    htmlContent += `<div class="reel-cell ${isGold} ${isScatter}" data-tile="${finalT}"><img src="{{ url_for('static', filename='assets/') }}${finalT}"></div>`;
                 }
                 track.innerHTML = htmlContent;
                 track.style.transition = 'none';
@@ -280,7 +225,7 @@
             }, 1050);
         }
 
-        function finishSpinProcess(spinBtn, betInput) {
+        async function finishSpinProcess(spinBtn, betInput) {
             let totalScatters = 0;
             const cells = document.querySelectorAll('.reel-cell');
             cells.forEach(cell => {
@@ -292,10 +237,11 @@
                 const badge = document.getElementById('freespin-badge');
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-                document.getElementById('win-text').innerHTML = `🎊 TRÚNG 10 LƯỢT QUAY MIỄN PHÍ (x2 TỈ LỆ)!`;
+                
+                await showWinPopup("FREESPIN", 0);
             }
 
-            evaluateWin(betInput);
+            await evaluateWin(betInput);
 
             isSpinning = false;
             spinBtn.disabled = false;
@@ -331,7 +277,7 @@
             autoBtn.innerText = 'AUTO';
         }
 
-        function evaluateWin(betInput) {
+        async function evaluateWin(betInput) {
             let matchedSymbols = {};
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
@@ -363,7 +309,13 @@
                 balance += totalWin;
 
                 let freeText = freeSpinsLeft > 0 ? " (FREE SPIN x2)" : "";
-                document.getElementById('win-text').innerHTML = `🎉 THẮNG LỚN${freeText}: +${totalWin.toLocaleString()} VNĐ!`;
+                document.getElementById('win-text').innerHTML = `🎉 THẮNG${freeText}: +${totalWin.toLocaleString()} VNĐ!`;
+
+                if (totalWin >= betInput * 25) {
+                    await showWinPopup("MEGA WIN", totalWin);
+                } else if (totalWin >= betInput * 10) {
+                    await showWinPopup("BIG WIN", totalWin);
+                }
                 
                 if (currentMultiplierIndex < multipliers.length - 1) {
                     currentMultiplierIndex++;
@@ -376,6 +328,114 @@
             updateBalance();
         }
 
+        // Thuật toán tự động quét và xóa sạch nền caro trắng/xám của ảnh
+        function processImageWithoutCheckerboard(imgSrc, callback) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i];
+                    let g = data[i+1];
+                    let b = data[i+2];
+                    
+                    if (Math.abs(r - g) < 6 && Math.abs(g - b) < 6 && r > 150) {
+                        data[i+3] = 0;
+                    }
+                }
+                
+                ctx.putImageData(imgData, 0, 0);
+                callback(canvas.toDataURL('image/png'));
+            };
+            img.src = imgSrc;
+        }
+
+        function showWinPopup(type, targetAmount) {
+            return new Promise((resolve) => {
+                popupResolve = resolve;
+                const overlay = document.getElementById('win-overlay');
+                const popupBox = document.getElementById('popup-content-box');
+
+                if (type === "BIG WIN") {
+                    popupBox.innerHTML = `<img class="win-popup-img" id="dynamic-win-img" src="" alt="Big Win"><div class="win-popup-number" id="popup-amount">+0 VNĐ</div>`;
+                    processImageWithoutCheckerboard("{{ url_for('static', filename='assets/bigwin.png') }}", function(processedSrc) {
+                        const imgEl = document.getElementById('dynamic-win-img');
+                        if (imgEl) imgEl.src = processedSrc;
+                    });
+                } else if (type === "MEGA WIN") {
+                    popupBox.innerHTML = `<img class="win-popup-img" id="dynamic-win-img" src="" alt="Mega Win"><div class="win-popup-number" id="popup-amount">+0 VNĐ</div>`;
+                    processImageWithoutCheckerboard("{{ url_for('static', filename='assets/megawin.png') }}", function(processedSrc) {
+                        const imgEl = document.getElementById('dynamic-win-img');
+                        if (imgEl) imgEl.src = processedSrc;
+                    });
+                } else if (type === "FREESPIN") {
+                    popupBox.innerHTML = `
+                        <div class="freespin-popup-box">
+                            <div class="freespin-popup-title">🎉 Chúc mừng chiến thắng!</div>
+                            <div class="freespin-popup-desc">10 LƯỢT QUAY MIỄN PHÍ</div>
+                        </div>
+                    `;
+                }
+
+                overlay.classList.add('show');
+
+                if (type === "FREESPIN") {
+                    setTimeout(() => {
+                        closeWinPopupEarly();
+                    }, 2500);
+                    return;
+                }
+
+                let currentVal = 0;
+                let steps = 40;
+                let increment = Math.max(1, Math.floor(targetAmount / steps));
+                let duration = 1500;
+                let stepTime = duration / steps;
+
+                const currentAmountEl = document.getElementById('popup-amount');
+                if(currentAmountEl) currentAmountEl.innerText = "+0 VNĐ";
+                
+                if (activeCountInterval) clearInterval(activeCountInterval);
+
+                let currentStep = 0;
+                activeCountInterval = setInterval(() => {
+                    currentStep++;
+                    currentVal += increment;
+                    if (currentStep >= steps || currentVal >= targetAmount) {
+                        currentVal = targetAmount;
+                        clearInterval(activeCountInterval);
+                    }
+                    const el = document.getElementById('popup-amount');
+                    if(el) el.innerText = `+${currentVal.toLocaleString()} VNĐ`;
+                }, stepTime);
+
+                setTimeout(() => {
+                    closeWinPopupEarly();
+                }, 2800);
+            });
+        }
+
+        function closeWinPopupEarly() {
+            if (activeCountInterval) clearInterval(activeCountInterval);
+            const overlay = document.getElementById('win-overlay');
+            if (overlay.classList.contains('show')) {
+                overlay.classList.remove('show');
+                if (popupResolve) {
+                    let temp = popupResolve;
+                    popupResolve = null;
+                    temp();
+                }
+            }
+        }
+
         function updateBalance() {
             document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
         }
@@ -384,3 +444,4 @@
     </script>
 </body>
 </html>
+        

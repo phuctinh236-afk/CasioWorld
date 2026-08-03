@@ -7,7 +7,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Hiệu ứng nền phong cách Mạt Chượt (vàng cam ấm & xanh ngọc bích) */
         body { 
             background: radial-gradient(circle, #fef08a 0%, #ea580c 45%, #7c2d12 75%, #064e3b 100%); 
             color: #fff; 
@@ -30,11 +29,14 @@
         .mult-item { font-size: 14px; font-weight: bold; color: #94a3b8; padding: 2px 10px; border-radius: 6px; transition: 0.3s; }
         .mult-item.active { background: #fbbf24; color: #450a0a; text-shadow: none; box-shadow: 0 0 10px #fbbf24; transform: scale(1.1); }
 
-        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
-        .reel-cell { background: #f8fafc; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transition: opacity 0.3s ease; }
-        .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 10px #f59e0b; }
-        .reel-cell.dimmed { opacity: 0.25; filter: grayscale(50%); }
-        .reel-cell.highlight-slow { opacity: 1; transform: scale(1.05); z-index: 2; box-shadow: 0 0 15px #ef4444; border: 3px solid #ef4444; }
+        /* Khung hiển thị theo từng Cột (Reel) chuẩn Slot */
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #450a0a; padding: 4px; border-radius: 10px; }
+        .slot-reel { display: flex; flex-direction: column; gap: 5px; transition: opacity 0.3s ease; }
+        .slot-reel.dimmed { opacity: 0.25; filter: grayscale(50%); }
+        .slot-reel.anticipation { transform: scale(1.02); z-index: 2; }
+
+        .reel-cell { background: #f8fafc; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 3px; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .reel-cell.gold-border { border: 3px solid #fbbf24; background: #fef08a; box-shadow: 0 0 8px #f59e0b; }
         .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(5px); padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
@@ -48,10 +50,40 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        .spin-btn { width: 70px; height: 70px; background: radial-gradient(circle, #f59e0b 0%, #b45309 100%); color: #fff; border: 3px solid #fbbf24; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.6); display: flex; align-items: center; justify-content: center; text-align: center; transition: 0.1s; flex-shrink: 0; }
-        .spin-btn.rotating { animation: spinRotate 0.6s linear infinite; }
+
+        /* Nút quay chuẩn mẫu ảnh 2 (Vòng tròn vàng + Ô vuông bo góc chứa icon mũi tên xoay) */
+        .spin-btn { 
+            width: 72px; 
+            height: 72px; 
+            background: radial-gradient(circle, #fde047 0%, #ca8a04 60%, #854d0e 100%); 
+            border: 3px solid #fef08a; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.7); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.1s; 
+            flex-shrink: 0; 
+        }
+        .spin-inner-box {
+            width: 42px;
+            height: 42px;
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        .spin-btn.rotating .spin-inner-box {
+            animation: spinRotate 0.6s linear infinite;
+        }
         .spin-btn:active { transform: scale(0.92); }
-        .spin-btn:disabled { background: #475569; border-color: #64748b; cursor: not-allowed; box-shadow: none; }
+        .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
 
         .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
@@ -96,7 +128,14 @@
                 </select>
             </div>
             
-            <button class="spin-btn" id="spin-btn" onclick="startSpin()">🔄</button>
+            <!-- Nút quay chuẩn mẫu ảnh 2 -->
+            <button class="spin-btn" id="spin-btn" onclick="startSpin()">
+                <div class="spin-inner-box">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.73-5.73"/>
+                    </svg>
+                </div>
+            </button>
             
             <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
         </div>
@@ -119,7 +158,6 @@
 
         const rows = 4;
         const cols = 5;
-        const totalCells = rows * cols;
         let currentMultiplierIndex = 0; 
         const multipliers = [1, 2, 3, 5];
 
@@ -136,18 +174,23 @@
         function initGrid() {
             const grid = document.getElementById('slot-grid');
             grid.innerHTML = '';
-            for (let i = 0; i < totalCells; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'reel-cell';
-                if (Math.random() < 0.25) {
-                    cell.classList.add('gold-border');
+            for (let c = 0; c < cols; c++) {
+                const reelDiv = document.createElement('div');
+                reelDiv.className = 'slot-reel';
+                reelDiv.dataset.col = c;
+                for (let r = 0; r < rows; r++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'reel-cell';
+                    if (Math.random() < 0.25) cell.classList.add('gold-border');
+                    
+                    const img = document.createElement('img');
+                    const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                    img.src = `/static/assets/${randomTile}`;
+                    cell.dataset.tile = randomTile;
+                    cell.appendChild(img);
+                    reelDiv.appendChild(cell);
                 }
-                const img = document.createElement('img');
-                const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                img.src = `/static/assets/${randomTile}`;
-                cell.dataset.tile = randomTile;
-                cell.appendChild(img);
-                grid.appendChild(cell);
+                grid.appendChild(reelDiv);
             }
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
@@ -177,61 +220,60 @@
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
 
-            const cells = document.querySelectorAll('.reel-cell');
-            cells.forEach(c => {
-                c.classList.remove('dimmed', 'highlight-slow');
+            const reels = document.querySelectorAll('.slot-reel');
+            reels.forEach(r => r.classList.remove('dimmed', 'anticipation'));
+
+            // Tốc độ quay vòng cuộn từng cột từ trên xuống (0.6s - 0.75s mỗi vòng)
+            let spinIntervals = [];
+            reels.forEach((reel, colIdx) => {
+                let interval = setInterval(() => {
+                    const cells = reel.querySelectorAll('.reel-cell');
+                    cells.forEach(cell => {
+                        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                        cell.querySelector('img').src = `/static/assets/${randomTile}`;
+                        cell.dataset.tile = randomTile;
+                    });
+                }, 50);
+                spinIntervals.push(interval);
             });
 
-            let spinInterval = setInterval(() => {
-                cells.forEach(cell => {
-                    const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                    cell.querySelector('img').src = `/static/assets/${randomTile}`;
-                    cell.dataset.tile = randomTile;
-                });
-            }, 60);
+            // Dừng lần lượt từng cột từ trái sang phải với khoảng thời gian mượt mà
+            reels.forEach((reel, colIdx) => {
+                setTimeout(() => {
+                    clearInterval(spinIntervals[colIdx]);
 
-            setTimeout(() => {
-                clearInterval(spinInterval);
-                
-                cells.forEach(cell => {
-                    const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                    cell.querySelector('img').src = `/static/assets/${randomTile}`;
-                    cell.dataset.tile = randomTile;
-                    if (Math.random() < 0.2) cell.classList.add('gold-border');
-                    else cell.classList.remove('gold-border');
-                });
+                    const cells = reel.querySelectorAll('.reel-cell');
+                    cells.forEach(cell => {
+                        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                        cell.querySelector('img').src = `/static/assets/${randomTile}`;
+                        cell.dataset.tile = randomTile;
+                        if (Math.random() < 0.2) cell.classList.add('gold-border');
+                        else cell.classList.remove('gold-border');
+                    });
 
-                let goldCells = Array.from(cells).filter(c => c.classList.contains('gold-border') || Math.random() < 0.15);
-                
-                if (goldCells.length > 0) {
-                    cells.forEach(c => c.classList.add('dimmed'));
-                    
-                    let targetCell = goldCells[Math.floor(Math.random() * goldCells.length)];
-                    targetCell.classList.remove('dimmed');
-                    targetCell.classList.add('highlight-slow');
-
-                    let slowInterval = setInterval(() => {
-                        let rt = tiles[Math.floor(Math.random() * tiles.length)];
-                        targetCell.querySelector('img').src = `/static/assets/${rt}`;
-                        targetCell.dataset.tile = rt;
-                    }, 150);
-
-                    setTimeout(() => {
-                        clearInterval(slowInterval);
-                        targetCell.classList.remove('highlight-slow');
-                        cells.forEach(c => c.classList.remove('dimmed'));
+                    // Nếu là cột cuối hoặc có khung vàng, tạo hiệu ứng chờ (anticipation)
+                    if (colIdx === cols - 1 && Math.random() < 0.6) {
+                        reels.forEach((r, idx) => { if(idx < cols - 1) r.classList.add('dimmed'); });
+                        reel.classList.add('anticipation');
                         
-                        evaluateWin(betInput);
+                        setTimeout(() => {
+                            reel.classList.remove('anticipation');
+                            reels.forEach(r => r.classList.remove('dimmed'));
+                            if (colIdx === cols - 1) finishSpinProcess(spinBtn);
+                        }, 500);
+                    } else if (colIdx === cols - 1) {
                         finishSpinProcess(spinBtn);
-                    }, 900);
-                } else {
-                    evaluateWin(betInput);
-                    finishSpinProcess(spinBtn);
-                }
-            }, 800);
+                    }
+                }, 400 + colIdx * 120);
+            });
         }
 
         function finishSpinProcess(spinBtn) {
+            const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
+            const betInput = betMultiplier * 5000;
+            
+            evaluateWin(betInput);
+
             isSpinning = false;
             spinBtn.disabled = false;
             spinBtn.classList.remove('rotating');

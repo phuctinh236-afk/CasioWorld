@@ -28,14 +28,24 @@
         /* Bảng điều khiển */
         .control-panel { width: 100%; max-width: 480px; background: #1e293b; padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
         .win-display { text-align: center; font-size: 15px; color: #34d399; font-weight: bold; min-height: 22px; }
-        .actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .bet-control { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        .bet-control select { background: #0f172a; color: #fff; border: 1px solid #475569; padding: 6px; border-radius: 6px; font-weight: bold; }
         
-        .spin-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); flex-grow: 1; text-align: center; transition: 0.1s; }
-        .spin-btn:active { transform: scale(0.96); }
-        .spin-btn:disabled { background: #475569; cursor: not-allowed; box-shadow: none; }
+        .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .bet-control { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #94a3b8; }
+        .bet-control select { background: #0f172a; color: #fbbf24; border: 1px solid #475569; padding: 6px; border-radius: 6px; font-weight: bold; font-size: 14px; }
         
+        /* Nút quay tròn chuẩn game */
+        @keyframes spinRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spin-btn { width: 70px; height: 70px; background: radial-gradient(circle, #f59e0b 0%, #b45309 100%); color: #fff; border: 3px solid #fbbf24; border-radius: 50%; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.6); display: flex; align-items: center; justify-content: center; text-align: center; transition: 0.1s; flex-shrink: 0; }
+        .spin-btn.rotating { animation: spinRotate 0.6s linear infinite; }
+        .spin-btn:active { transform: scale(0.92); }
+        .spin-btn:disabled { background: #475569; border-color: #64748b; cursor: not-allowed; box-shadow: none; }
+
+        .auto-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .auto-btn.active { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+
         .back-link { color: #94a3b8; text-decoration: none; font-size: 12px; text-align: center; }
         .back-link:hover { color: #fff; }
     </style>
@@ -48,7 +58,6 @@
     </div>
 
     <div class="slot-machine">
-        <!-- Thanh hệ số x1, x2, x3, x5 chuẩn mẫu -->
         <div class="multiplier-bar">
             <div class="mult-item" id="mult-1">x1</div>
             <div class="mult-item" id="mult-2">x2</div>
@@ -62,21 +71,33 @@
         <div class="win-display" id="win-text">Sẵn sàng chinh phục Mạt Chượt!</div>
         <div class="actions">
             <div class="bet-control">
-                <span>Cược:</span>
+                <span>Mức cược:</span>
                 <select id="bet-amount">
-                    <option value="1000">1.000</option>
-                    <option value="5000" selected>5.000</option>
-                    <option value="10000">10.000</option>
-                    <option value="50000">50.000</option>
+                    <option value="0.2">0.2</option>
+                    <option value="0.5">0.5</option>
+                    <option value="1" selected>1.0</option>
+                    <option value="2">2.0</option>
+                    <option value="3">3.0</option>
+                    <option value="5">5.0</option>
+                    <option value="10">10.0</option>
+                    <option value="20">20.0</option>
+                    <option value="50">50.0</option>
+                    <option value="100">100.0</option>
                 </select>
             </div>
-            <button class="spin-btn" id="spin-btn" onclick="startSpin()">QUAY NGAY</button>
+            
+            <button class="spin-btn" id="spin-btn" onclick="startSpin()">QUAY</button>
+            
+            <button class="auto-btn" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
         </div>
         <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
     </div>
 
     <script>
         let balance = {{ balance }};
+        let isSpinning = false;
+        let isAutoPlaying = false;
+        let autoTimer = null;
         
         const tiles = [
             "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
@@ -89,7 +110,7 @@
         const rows = 4;
         const cols = 5;
         const totalCells = rows * cols;
-        let currentMultiplierIndex = 0; // 0: x1, 1: x2, 2: x3, 3: x5
+        let currentMultiplierIndex = 0; 
         const multipliers = [1, 2, 3, 5];
 
         function updateMultiplierDisplay() {
@@ -108,7 +129,6 @@
             for (let i = 0; i < totalCells; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'reel-cell';
-                // Tạo viền vàng ngẫu nhiên cho một số ô ở cột giữa (giống game thật)
                 if (Math.random() < 0.25) {
                     cell.classList.add('gold-border');
                 }
@@ -124,20 +144,30 @@
         }
 
         function startSpin() {
-            const betInput = parseInt(document.getElementById('bet-amount').value);
+            if (isSpinning) return;
+
+            // Tính tiền cược thực tế dựa trên mức cược nhân với hệ số cơ bản (1.0 = 5,000 VNĐ)
+            const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
+            const betInput = betMultiplier * 5000; 
+
             if (balance < betInput) {
                 alert("Số dư tài khoản không đủ để đặt cược!");
+                stopAutoPlay();
                 return;
             }
 
+            isSpinning = true;
             balance -= betInput;
             updateBalance();
-            document.getElementById('win-textinnerText'] = "";
-            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('win-text').innerText = "";
+            
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+            spinBtn.classList.add('rotating');
+            
             currentMultiplierIndex = 0;
             updateMultiplierDisplay();
 
-            // Hiệu ứng chạy quay số
             let spinInterval = setInterval(() => {
                 const cells = document.querySelectorAll('.reel-cell');
                 cells.forEach(cell => {
@@ -150,9 +180,7 @@
             setTimeout(() => {
                 clearInterval(spinInterval);
                 
-                // Cố định kết quả dừng quay và phân tích luật Mạt Chượt
                 const cells = document.querySelectorAll('.reel-cell');
-                let gridData = [];
                 cells.forEach(cell => {
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
                     cell.querySelector('img').src = `/static/assets/${randomTile}`;
@@ -162,10 +190,43 @@
                 });
 
                 evaluateWin(betInput);
+
+                isSpinning = false;
+                spinBtn.disabled = false;
+                spinBtn.classList.remove('rotating');
+
+                // Nếu đang bật Auto, tiếp tục vòng quay tiếp theo sau 800ms
+                if (isAutoPlaying) {
+                    autoTimer = setTimeout(() => {
+                        if (isAutoPlaying) startSpin();
+                    }, 800);
+                }
             }, 1000);
         }
 
-        // Thuật toán kiểm tra kết quả trúng thưởng theo tỷ lệ thực tế
+        function toggleAutoPlay() {
+            const autoBtn = document.getElementById('auto-btn');
+            isAutoPlaying = !isAutoPlaying;
+
+            if (isAutoPlaying) {
+                autoBtn.classList.add('active');
+                autoBtn.innerText = 'DỪNG';
+                if (!isSpinning) {
+                    startSpin();
+                }
+            } else {
+                stopAutoPlay();
+            }
+        }
+
+        function stopAutoPlay() {
+            isAutoPlaying = false;
+            clearTimeout(autoTimer);
+            const autoBtn = document.getElementById('auto-btn');
+            autoBtn.classList.remove('active');
+            autoBtn.innerText = 'AUTO';
+        }
+
         function evaluateWin(betInput) {
             let matchedSymbols = {};
             const cells = document.querySelectorAll('.reel-cell');
@@ -178,7 +239,6 @@
             let totalWin = 0;
             let hasWon = false;
 
-            // Kiểm tra nếu có biểu tượng xuất hiện từ 4 lần trở lên trên bàn
             for (let tile in matchedSymbols) {
                 if (matchedSymbols[tile] >= 4) {
                     hasWon = true;
@@ -188,14 +248,12 @@
             }
 
             if (hasWon) {
-                // Áp dụng hệ số nhân x1, x2, x3, x5 theo chuỗi nổ
                 let multValue = multipliers[currentMultiplierIndex];
                 totalWin = Math.floor(totalWin * multValue);
                 balance += totalWin;
 
-                document.getElementById('win-text').innerHTML = `🎉 NỔ HŨ (Hệ số x${multValue}): +${totalWin.toLocaleString()} VNĐ!`;
+                document.getElementById('win-text').innerHTML = `🎉 NỔ HŨ (x${multValue}): +${totalWin.toLocaleString()} VNĐ!`;
                 
-                // Tăng cấp hệ số nhân cho lần nổ tiếp theo (mô phỏng chuỗi cascading)
                 if (currentMultiplierIndex < multipliers.length - 1) {
                     currentMultiplierIndex++;
                 }
@@ -205,7 +263,6 @@
             }
 
             updateBalance();
-            document.getElementById('spin-btn').disabled = false;
         }
 
         function updateBalance() {

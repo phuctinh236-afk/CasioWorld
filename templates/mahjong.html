@@ -12,13 +12,11 @@
         .balance-box span { display: block; font-size: 18px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 18px; font-weight: bold; color: #f8fafc; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        /* Khung quay slot 5 cột x 4 hàng */
         .slot-machine { width: 100%; max-width: 500px; background: linear-gradient(135deg, #7f1d1d, #450a0a); border: 4px solid #fbbf24; border-radius: 16px; padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 15px 0; }
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
         .reel-cell { background: #fff; border-radius: 8px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
         .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Bảng điều khiển */
         .control-panel { width: 100%; max-width: 500px; background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 10px; }
         .win-display { text-align: center; font-size: 16px; color: #34d399; font-weight: bold; min-height: 24px; }
         .actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -34,13 +32,11 @@
 
     <div class="header">
         <div class="game-title">🀄 Mahjong Ways</div>
-        <div class="balance-box">Số dư: <span id="balance">1,000,000</span> VNĐ</div>
+        <div class="balance-box">Số dư: <span id="balance">{{ "{:,.0f}".format(balance).replace(",", ".") }}</span> VNĐ</div>
     </div>
 
     <div class="slot-machine">
-        <div class="grid-container" id="slot-grid">
-            <!-- Các ô quay sẽ được tạo tự động bằng JS -->
-        </div>
+        <div class="grid-container" id="slot-grid"></div>
     </div>
 
     <div class="control-panel">
@@ -57,11 +53,13 @@
             </div>
             <button class="spin-btn" id="spin-btn" onclick="startSpin()">QUAY NGAY</button>
         </div>
-        <a href="/" class="back-link">← Quay lại trang chủ CasioWorld</a>
+        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
     </div>
 
     <script>
-        // Danh sách các quân bài Mạt Chược từ thư mục static/assets/
+        // Lấy số dư từ Flask truyền vào JS
+        let balance = {{ balance }};
+        
         const tiles = [
             "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
             "Pin1.svg", "Pin2.svg", "Pin3.svg", "Pin4.svg", "Pin5.svg", "Pin6.svg", "Pin7.svg", "Pin8.svg", "Pin9.svg",
@@ -70,7 +68,6 @@
             "Haku.svg", "Hatsu.svg", "Chun.svg"
         ];
 
-        let balance = 1000000;
         const rows = 4;
         const cols = 5;
         const totalCells = rows * cols;
@@ -82,10 +79,8 @@
                 const cell = document.createElement('div');
                 cell.className = 'reel-cell';
                 const img = document.createElement('img');
-                // Lấy ngẫu nhiên quân bài hiển thị ban đầu
                 const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
                 img.src = `/static/assets/${randomTile}`;
-                img.dataset.tile = randomTile;
                 cell.appendChild(img);
                 grid.appendChild(cell);
             }
@@ -100,36 +95,29 @@
 
             balance -= betInput;
             updateBalance();
-            document.getElementById('win-textinnerText'] = "";
+            document.getElementById('win-text').innerText = "";
             document.getElementById('spin-btn').disabled = true;
 
-            // Hiệu ứng xoay đổi hình liên tục trong 0.8 giây
             let spinInterval = setInterval(() => {
                 const imgs = document.querySelectorAll('.reel-cell img');
                 imgs.forEach(img => {
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
                     img.src = `/static/assets/${randomTile}`;
-                    img.dataset.tile = randomTile;
                 });
             }, 100);
 
             setTimeout(() => {
                 clearInterval(spinInterval);
-                // Dừng lại kết quả cuối cùng
                 const imgs = document.querySelectorAll('.reel-cell img');
-                let results = [];
-                imgs.echo = imgs.forEach(img => {
+                imgs.forEach(img => {
                     const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
                     img.src = `/static/assets/${randomTile}`;
-                    img.dataset.tile = randomTile;
-                    results.push(randomTile);
                 });
 
-                // Tính toán thưởng ngẫu nhiên đơn giản
                 let winChance = Math.random();
                 let winAmount = 0;
-                if (winChance < 0.4) { // 40% tỉ lệ trúng
-                    winAmount = betInput * (Math.floor(Math.random() * 5) + 2); // Thưởng x2 đến x6
+                if (winChance < 0.4) {
+                    winAmount = betInput * (Math.floor(Math.random() * 5) + 2);
                     balance += winAmount;
                     document.getElementById('win-text').innerHTML = `🎉 THẮNG LỚN: +${winAmount.toLocaleString()} VNĐ!`;
                 } else {
@@ -142,10 +130,9 @@
         }
 
         function updateBalance() {
-            document.getElementById('balance').innerText = balance.toLocaleString();
+            document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
         }
 
-        // Khởi tạo bảng khi load xong trang
         window.onload = initGrid;
     </script>
 </body>

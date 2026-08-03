@@ -153,6 +153,16 @@ def mahjong():
     balance_val = session.get('balance', 500000)
     return render_safe('mahjong.html', balance=balance_val)
 
+@app.route('/mahjong-ways')
+def mahjong_ways():
+    balance_val = session.get('balance', 500000)
+    return render_safe('mahjong_ways.html', balance=balance_val)
+
+@app.route('/mahjong-ways-2')
+def mahjong_ways_2():
+    balance_val = session.get('balance', 500000)
+    return render_safe('mahjong_ways_2.html', balance=balance_val)
+
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
     if request.method == 'POST':
@@ -199,4 +209,4 @@ def catch_all(subpath):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-           
+    

@@ -93,12 +93,19 @@ def not_found_error(error):
     log_error(f"Lỗi 404 - Không tìm thấy: {request.path}")
     return redirect(url_for('index'))
 
+# FIX: Không redirect về index nữa để tránh lặp vô tận khi index bị lỗi
 @app.errorhandler(500)
 @app.errorhandler(Exception)
 def handle_exception(e):
     tb = traceback.format_exc()
     log_error(tb)
-    return redirect(url_for('index'))
+    return f"""
+    <div style="background:#0f172a; color:#ef4444; padding:30px; font-family:sans-serif; text-align:center;">
+        <h2>⚠️ Đã xảy ra lỗi hệ thống (500)</h2>
+        <p style="color:#94a3b8;">Vui lòng truy cập <a href="/ktraloibug" style="color:#cca352;">/ktraloibug</a> để xem chi tiết nguyên nhân.</p>
+        <a href="/" style="background:#cca352; color:#111; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold;">Thử lại trang chủ</a>
+    </div>
+    """, 500
 
 @app.context_processor
 def inject_defaults():
@@ -118,6 +125,13 @@ def generate_memo():
 @app.route('/index')
 def index():
     return render_safe('index.html')
+
+# THÊM ROUTE NÀY ĐỂ XỬ LÝ CLICK TỪNG GAME
+@app.route('/play/<game_id>')
+def play_game(game_id):
+    balance_val = session.get('balance', 500000)
+    # Mặc định điều hướng sang trang game mahjong hoặc game tương ứng
+    return render_safe('mahjong.html', game_id=game_id, balance=balance_val)
 
 @app.route('/profile')
 def profile():

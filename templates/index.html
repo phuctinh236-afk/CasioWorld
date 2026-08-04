@@ -127,211 +127,116 @@
         </div>
 
         <div class="game-section">
-                        <!-- TAB: HOT (Đủ 20 Game chuẩn hình ảnh) -->
+                                <!-- TAB: HOT (Đã fix link & sửa lỗi ảnh) -->
             <div class="tab-content active" id="tab-hot">
                 <div class="game-grid-hot">
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt="Dragon Gems">
+                    <!-- 1 -->
+                    <a href="{{ url_for('play_game', game_id='dragon_gems') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt="Dragon Gems" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dragon Gems 500</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt="Mithai Madness">
+                    <!-- 2 -->
+                    <a href="{{ url_for('play_game', game_id='mithai_madness') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt="Mithai Madness" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Mithai Madness</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt="Fortune Garuda">
+                    <!-- 3 -->
+                    <a href="{{ url_for('play_game', game_id='fortune_garuda') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt="Fortune Garuda" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Fortune Garuda</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt="NCVIP Super">
+                    <!-- 4 -->
+                    <a href="{{ url_for('play_game', game_id='ncvip_super') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt="NCVIP Super" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">NCVIP Super</div>
                     </a>
 
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt="Ultra Ace">
+                    <!-- 5 -->
+                    <a href="{{ url_for('play_game', game_id='ultra_ace') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt="Ultra Ace" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ultra Ace</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt="NCVIP Gates">
+                    <!-- 6 -->
+                    <a href="{{ url_for('play_game', game_id='ncvip_gates') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt="NCVIP Gates" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">NCVIP Gates...</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/nc_bountiful.jpg') }}" alt="NC Bountiful">
+                    <!-- 7: FIX TÊN ẢNH NC BOUNTIFUL -->
+                    <a href="{{ url_for('play_game', game_id='nc_bountiful') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/nc_bountiful_birds.jpg') }}" alt="NC Bountiful" onerror="this.onerror=null; this.src='/static/assets/nc_bountiful.png';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">NC Bountiful...</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt="Treasures of Aztec">
+                    <!-- 8 -->
+                    <a href="{{ url_for('play_game', game_id='treasures_aztec') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt="Treasures of Aztec" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Treasures of...</div>
                     </a>
 
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt="Wild Bounty">
+                    <!-- 9 -->
+                    <a href="{{ url_for('play_game', game_id='wild_bounty') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt="Wild Bounty" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Wild Bounty...</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt="Dragon Gems Wheel">
+                    <!-- 10 -->
+                    <a href="{{ url_for('play_game', game_id='dragon_gems_wheel') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt="Dragon Gems Wheel" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dragon Gems...</div>
                     </a>
+                    <!-- 11 -->
                     <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways">
+                        <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Mahjong Ways</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2">
+                    <!-- 12 -->
+                    <a href="{{ url_for('play_game', game_id='mahjong_ways_2') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Mahjong Ways 2</div>
                     </a>
 
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt="Pinata Wins">
+                    <!-- 13 -->
+                    <a href="{{ url_for('play_game', game_id='pinata_wins') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt="Pinata Wins" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Pinata Wins</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt="Super Ace">
+                    <!-- 14 -->
+                    <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt="Super Ace" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Super Ace</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt="Tongits Go">
+                    <!-- 15 -->
+                    <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt="Tongits Go" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tongits Go</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt="Jackpot Fishing">
+                    <!-- 16 -->
+                    <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt="Jackpot Fishing" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Jackpot Fish...</div>
                     </a>
 
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/super_niu.jpg') }}" alt="Super Niu Niu">
+                    <!-- 17: FIX TÊN ẢNH SUPER NIU NIU -->
+                    <a href="{{ url_for('play_game', game_id='super_niu') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/super_niu_niu.jpg') }}" alt="Super Niu Niu" onerror="this.onerror=null; this.src='/static/assets/super_niu.png';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Super Niu Niu</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt="Lucky Neko">
+                    <!-- 18 -->
+                    <a href="{{ url_for('play_game', game_id='lucky_neko') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt="Lucky Neko" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Lucky Neko</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt="Chinese New Year">
+                    <!-- 19 -->
+                    <a href="{{ url_for('play_game', game_id='chinese_new_year') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt="Chinese New Year" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CHINESE NEW...</div>
                     </a>
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" alt="Chicken Drop">
+                    <!-- 20: FIX TÊN ẢNH CHICKEN DROP -->
+                    <a href="{{ url_for('play_game', game_id='chicken_drop') }}" class="game-item-card">
+                        <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" alt="Chicken Drop" onerror="this.onerror=null; this.src='/static/assets/chicken_drop_10000.jpg';">
                         <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Chicken Drop...</div>
                     </a>
                 </div>
             </div>
-
-            <!-- TAB: ĐÁ GÀ -->
-            <div class="tab-content" id="tab-daga">
-                <div class="dagat-banner">
-                    <h3 style="color: #cca352; margin-bottom: 5px;">🔥 LỊCH ĐÁ GÀ THOMO HÔM NAY</h3>
-                    <p style="font-size: 12px; color: #bbb;">Phát sóng trực tiếp SV388 & DAGA68 chất lượng HD</p>
-                </div>
-                <div class="provider-grid">
-                    <div class="provider-card"><div class="provider-logo-text" style="color:#ef4444;">SV388</div><div class="provider-name">Đá Gà SV388</div></div>
-                    <div class="provider-card"><div class="provider-logo-text" style="color:#f59e0b;">DAGA68</div><div class="provider-name">Đá Gà Thomo</div></div>
-                    <div class="provider-card"><div class="provider-logo-text" style="color:#3b82f6;">RCB</div><div class="provider-name">Đá Gà RCB</div></div>
-                    <div class="provider-card"><div class="provider-logo-text" style="color:#10b981;">ODIN</div><div class="provider-name">Đá Gà Cựa Sắt</div></div>
-                </div>
-            </div>
-
-            <!-- TAB: SLOTS (7) -->
-            <div class="tab-content" id="tab-slots">
-                <div class="provider-grid">
-                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PG</div><div class="provider-name">PG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">JDB</div><div class="provider-name">JDB</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">FC</div><div class="provider-name">FC</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">X</div><div class="provider-name">NextSpin</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">FS</div><div class="provider-name">FASTSPIN</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">NET</div><div class="provider-name">NETENT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">BTG</div><div class="provider-name">BTG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">DS</div><div class="provider-name">Dragoonsoft</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">SG</div><div class="provider-name">SG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">YB</div><div class="provider-name">YELLOW BAT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">RT</div><div class="provider-name">RT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">MG</div><div class="provider-name">MG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PNG</div><div class="provider-name">PNG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">WM</div><div class="provider-name">WorldMatch</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">P8</div><div class="provider-name">P8</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">L365</div><div class="provider-name">Lucky365</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">CG</div><div class="provider-name">CG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">YL</div><div class="provider-name">YL</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">MAHA</div><div class="provider-name">MAHA</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">NLC</div><div class="provider-name">NLC</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">5G</div><div class="provider-name">5G</div></div>
-                </div>
-            </div>
-
-            <!-- TAB: CASINO -->
-            <div class="tab-content" id="tab-casino">
-                <div class="provider-grid">
-                    <div class="provider-card"><div class="provider-logo-text">EVO</div><div class="provider-name">EVO</div></div>
-                    <div class="provider-card"><div class="provider-logo-text" style="color:#ec4899;">SEXY</div><div class="provider-name">SEXY</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">DG</div><div class="provider-name">DG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">HR</div><div class="provider-name">HotRoad</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">WM</div><div class="provider-name">WM</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">MG</div><div class="provider-name">MG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">BG</div><div class="provider-name">BG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">VIA</div><div class="provider-name">VIA</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">MT</div><div class="provider-name">MT</div></div>
-                </div>
-            </div>
-
-            <!-- TAB: GAME BÀI -->
-            <div class="tab-content" id="tab-gamebai">
-                <div class="provider-grid">
-                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PG</div><div class="provider-name">PG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">SPRIBE</div><div class="provider-name">SPRIBE</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">WM</div><div class="provider-name">WorldMatch</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PNG</div><div class="provider-name">PNG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">NET</div><div class="provider-name">NETENT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">SBO</div><div class="provider-name">SBO</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">RELAX</div><div class="provider-name">RELAX</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">HACKSAW</div><div class="provider-name">HACKSAW</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">YL</div><div class="provider-name">YL</div></div>
-                </div>
-            </div>
-
-            <!-- TAB: BẮN CÁ -->
-            <div class="tab-content" id="tab-banca">
-                <div class="provider-grid">
-                    <div class="provider-card"><div class="provider-logo-text">P8</div><div class="provider-name">P8</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">JDB</div><div class="provider-name">JDB</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">FC</div><div class="provider-name">FC</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">YB</div><div class="provider-name">YELLOW BAT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">SPADE</div><div class="provider-name">SPADE</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">BG</div><div class="provider-name">BG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">L365</div><div class="provider-name">Lucky365</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">GTF</div><div class="provider-name">GTF</div></div>
-                </div>
-            </div>
-
-            <!-- TAB: XỔ SỐ -->
-            <div class="tab-content" id="tab-xoso">
-                <div class="provider-grid">
-                    <div class="provider-card"><div class="provider-logo-text">TCG</div><div class="provider-name">TCGaming</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">VR</div><div class="provider-name">VRGaming</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">PNG</div><div class="provider-name">PNG</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">YB</div><div class="provider-name">YELLOW BAT</div></div>
-                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
-                    <div class="provider-card">        <!-- Bottom Navigation Fixed -->
+                    <!-- Bottom Navigation Fixed -->
         <div class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item active">
                 <span class="nav-icon">🏠</span>
@@ -389,5 +294,4 @@
         }
     </script>
 </body>
-                </html>
-                    
+</html>

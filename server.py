@@ -2,9 +2,20 @@ import os
 import random
 import string
 import traceback
+import subprocess
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from jinja2 import TemplateNotFound
+
+# =========================================================
+# TỰ ĐỘNG CHẠY BOT.PY NGẦM KHI SERVER KHỞI ĐỘNG TRÊN RENDER
+# =========================================================
+if os.environ.get("RENDER"):
+    try:
+        subprocess.Popen(["python", "bot.py"])
+        print(">>> Đã kích hoạt bot.py chạy ngầm trên Render thành công!")
+    except Exception as e:
+        print(f">>> Lỗi khi khởi chạy bot.py: {e}")
 
 app = Flask(__name__)
 app.secret_key = 'casio_world_secret_key_123'
@@ -229,4 +240,3 @@ def catch_all(subpath):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    

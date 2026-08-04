@@ -88,11 +88,11 @@
             <button class="tab-btn" onclick="switchTab('tab-xoso', this)"><span class="icon">🎲</span>Xổ số</button>
             <button class="tab-btn" onclick="switchTab('tab-thethao', this)"><span class="icon">⚽</span>Thể thao</button>
         </div>
-        </div>
-            <!-- KHU VỰC CHỨA GAME DẠNG TAB -->
+    </div>
+        <!-- KHU VỰC CHỨA GAME DẠNG TAB (ĐÃ FIX FULL 100% CÁC TAB) -->
     <div class="game-content-container">
 
-        <!-- 1. TAB HOT (ĐỦ 20 GAME) -->
+        <!-- 1. TAB HOT (Đủ 20 Game như ảnh) -->
         <div class="tab-content active" id="tab-hot">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='dragon_gems') }}" class="game-item-card">
@@ -114,7 +114,6 @@
                 <a href="{{ url_for('play_game', game_id='ncvip_gates') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Gates';">
                 </a>
-                <!-- ẢNH LỖI ĐÃ ĐƯỢC FIX BẰNG LINK PLACEHOLD.CO -->
                 <a href="{{ url_for('play_game', game_id='nc_bountiful') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/nc_bountiful.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=NC+Bountiful';">
                 </a>
@@ -148,7 +147,6 @@
                     <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Fishing';">
                 </a>
 
-                <!-- ẢNH LỖI ĐÃ ĐƯỢC FIX BẰNG LINK PLACEHOLD.CO -->
                 <a href="{{ url_for('play_game', game_id='super_niu') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/super_niu_niu.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Super+Niu';">
                 </a>
@@ -158,7 +156,6 @@
                 <a href="{{ url_for('play_game', game_id='chinese_new_year') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=CNY';">
                 </a>
-                <!-- ẢNH LỖI ĐÃ ĐƯỢC FIX BẰNG LINK PLACEHOLD.CO -->
                 <a href="{{ url_for('play_game', game_id='chicken_drop') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Chicken';">
                 </a>
@@ -169,10 +166,10 @@
         <div class="tab-content" id="tab-daga" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='daga_ws151') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=WS151">
+                    <img src="{{ url_for('static', filename='assets/daga_ws151.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Da+Ga+WS151';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='daga_thomo') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Thomo">
+                    <img src="{{ url_for('static', filename='assets/daga_thomo.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Da+Ga+Thomo';">
                 </a>
             </div>
         </div>
@@ -181,7 +178,7 @@
         <div class="tab-content" id="tab-slots" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Mahjong';">
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Mahjong+Ways';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Super+Ace';">
@@ -193,10 +190,10 @@
         <div class="tab-content" id="tab-casino" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='baccarat') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Baccarat">
+                    <img src="{{ url_for('static', filename='assets/baccarat.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Baccarat+Live';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='roulette') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Roulette">
+                    <img src="{{ url_for('static', filename='assets/roulette.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Roulette';">
                 </a>
             </div>
         </div>
@@ -205,15 +202,15 @@
         <div class="tab-content" id="tab-gamebai" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Tongits';">
+                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Tongits+Go';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='tien_len') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Tien+Len">
+                    <img src="{{ url_for('static', filename='assets/tien_len.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Tien+Len';">
                 </a>
             </div>
         </div>
 
-        <!-- CÁC TAB KHÁC -->
+        <!-- 6. TAB BẮN CÁ -->
         <div class="tab-content" id="tab-banca" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
@@ -221,20 +218,25 @@
                 </a>
             </div>
         </div>
+
+        <!-- 7. TAB XỔ SỐ -->
         <div class="tab-content" id="tab-xoso" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='xo_so_3m') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Xo+So">
+                    <img src="{{ url_for('static', filename='assets/xo_so.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Xo+So';">
                 </a>
             </div>
         </div>
+
+        <!-- 8. TAB THỂ THAO -->
         <div class="tab-content" id="tab-thethao" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='saba_sports') }}" class="game-item-card">
-                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Saba">
+                    <img src="{{ url_for('static', filename='assets/saba.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=The+Thao';">
                 </a>
             </div>
         </div>
+
     </div>
         <!-- BOTTOM NAVIGATION -->
     <div class="bottom-nav">

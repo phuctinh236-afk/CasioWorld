@@ -9,16 +9,26 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: #0f1523; color: #ffffff; padding-bottom: 70px; font-size: 14px; }
         
+        /* SIDEBAR MENU (GÓC TRÁI) */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .sidebar { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background: #182032; transition: left 0.3s ease; z-index: 1000; padding-top: 15px; box-shadow: 2px 0 10px rgba(0,0,0,0.5); border-right: 1px solid #232d42; }
+        .sidebar.open { left: 0; }
+        .close-btn { color: #cca352; font-size: 20px; text-align: right; padding-right: 20px; cursor: pointer; display: block; margin-bottom: 15px; font-weight: bold; }
+        .sidebar-logo { text-align: center; color: #cca352; font-size: 18px; font-weight: bold; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #232d42; }
+        .sidebar a { display: block; color: #e2e8f0; padding: 15px 20px; text-decoration: none; font-size: 15px; border-bottom: 1px solid #232d42; display: flex; align-items: center; gap: 10px; }
+        .sidebar a:hover { background: #232d42; color: #cca352; }
+
         /* HEADER */
         .top-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #182032; border-bottom: 1px solid #232d42; position: sticky; top: 0; z-index: 100; }
-        .header-title { display: flex; align-items: center; gap: 8px; font-weight: bold; color: #e2e8f0; font-size: 16px; }
+        .header-title { display: flex; align-items: center; gap: 10px; font-weight: bold; color: #e2e8f0; font-size: 16px; }
+        .menu-icon { font-size: 22px; cursor: pointer; color: #e2e8f0; padding-right: 5px; }
         .cskh-btn { background: #232d42; color: #cca352; border: 1px solid #cca352; padding: 4px 10px; border-radius: 16px; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 4px; }
 
         /* BANNER */
         .banner-box { margin: 12px 16px; background: linear-gradient(135deg, #182238 0%, #111728 100%); border: 1px solid #28354e; border-radius: 12px; padding: 25px 15px; text-align: center; }
         .banner-title { color: #d4af37; font-weight: bold; font-size: 16px; letter-spacing: 1px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
 
-        /* TAB BAR SCROLLABLE */
+        /* TAB BAR */
         .tab-bar-container { overflow-x: auto; white-space: nowrap; padding: 5px 12px; scrollbar-width: none; }
         .tab-bar-container::-webkit-scrollbar { display: none; }
         .tab-nav { display: inline-flex; gap: 8px; }
@@ -26,11 +36,10 @@
         .tab-btn.active { background: linear-gradient(180deg, #2b3854 0%, #1c273e 100%); border-color: #cca352; color: #cca352; font-weight: bold; }
         .tab-btn .icon { font-size: 18px; }
 
-        /* GAME GRID */
+        /* GAME GRID (ĐÃ XOÁ CHỮ, CHỈ CÒN ẢNH) */
         .game-grid-hot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 16px; }
-        .game-item-card { background: #182032; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-decoration: none; border: 1px solid #232d42; position: relative; }
-        .game-item-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-bottom: 1px solid #232d42; background: #0f1523; }
-        .game-item-card div { font-size: 10px; color: #e2e8f0; text-align: center; padding: 4px 2px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .game-item-card { background: #182032; border-radius: 8px; overflow: hidden; display: block; text-decoration: none; border: 1px solid #232d42; position: relative; }
+        .game-item-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: #0f1523; }
 
         /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #182032; border-top: 1px solid #232d42; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
@@ -41,10 +50,23 @@
 </head>
 <body>
 
+    <!-- SIDEBAR MENU (Mới thêm) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <span class="close-btn" onclick="toggleMenu()">✖ Đóng</span>
+        <div class="sidebar-logo">TX68 VIP</div>
+        <a href="/"><span>🏠</span> Trang Chủ</a>
+        <a href="{{ url_for('profile') }}"><span>👤</span> Thông Tin Tài Khoản</a>
+        <a href="{{ url_for('deposit') }}"><span>💳</span> Nạp Tiền Hệ Thống</a>
+        <a href="{{ url_for('withdraw') }}"><span>💸</span> Rút Tiền</a>
+        <a href="{{ url_for('promotions') }}"><span>🎁</span> Khuyến Mãi Hot</a>
+        <a href="{{ url_for('cskh') }}"><span>💬</span> Chăm Sóc Khách Hàng</a>
+    </div>
+
     <!-- TOP HEADER -->
     <div class="top-header">
         <div class="header-title">
-            <span>☰</span> TX68 OFFICIAL
+            <span class="menu-icon" onclick="toggleMenu()">☰</span> TX68 OFFICIAL
         </div>
         <a href="{{ url_for('cskh') }}" class="cskh-btn">💬 CSKH</a>
     </div>
@@ -66,99 +88,79 @@
             <button class="tab-btn" onclick="switchTab('tab-xoso', this)"><span class="icon">🎲</span>Xổ số</button>
             <button class="tab-btn" onclick="switchTab('tab-thethao', this)"><span class="icon">⚽</span>Thể thao</button>
         </div>
-    </div>
-        <!-- KHU VỰC CHỨA GAME DẠNG TAB -->
+        </div>
+            <!-- KHU VỰC CHỨA GAME DẠNG TAB -->
     <div class="game-content-container">
 
         <!-- 1. TAB HOT (ĐỦ 20 GAME) -->
         <div class="tab-content active" id="tab-hot">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='dragon_gems') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Dragon+Gems';">
-                    <div>Dragon Gems 500</div>
+                    <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Dragon+Gems';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='mithai_madness') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mithai';">
-                    <div>Mithai Madness</div>
+                    <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Mithai';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='fortune_garuda') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Garuda';">
-                    <div>Fortune Garuda</div>
+                    <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Garuda';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='ncvip_super') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=NCVIP';">
-                    <div>NCVIP Super</div>
+                    <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=NCVIP';">
                 </a>
 
                 <a href="{{ url_for('play_game', game_id='ultra_ace') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Ultra+Ace';">
-                    <div>Ultra Ace</div>
+                    <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Ultra+Ace';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='ncvip_gates') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Gates';">
-                    <div>NCVIP Gates...</div>
+                    <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Gates';">
                 </a>
-                <!-- FIX ẢNH 1: NC BOUNTIFUL -->
+                <!-- ẢNH LỖI ĐÃ ĐƯỢC FIX BẰNG LINK PLACEHOLD.CO -->
                 <a href="{{ url_for('play_game', game_id='nc_bountiful') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/nc_bountiful.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=NC+Bountiful';">
-                    <div>NC Bountiful...</div>
+                    <img src="{{ url_for('static', filename='assets/nc_bountiful.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=NC+Bountiful';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='treasures_aztec') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Aztec';">
-                    <div>Treasures of...</div>
+                    <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Aztec';">
                 </a>
 
                 <a href="{{ url_for('play_game', game_id='wild_bounty') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Wild+Bounty';">
-                    <div>Wild Bounty...</div>
+                    <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Wild+Bounty';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='dragon_gems_wheel') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Gems+Wheel';">
-                    <div>Dragon Gems...</div>
+                    <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Gems+Wheel';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='mahjong') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mahjong';">
-                    <div>Mahjong Ways</div>
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Mahjong';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='mahjong_ways_2') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mahjong+2';">
-                    <div>Mahjong Ways 2</div>
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Mahjong+2';">
                 </a>
 
                 <a href="{{ url_for('play_game', game_id='pinata_wins') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Pinata';">
-                    <div>Pinata Wins</div>
+                    <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Pinata';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Super+Ace';">
-                    <div>Super Ace</div>
+                    <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Super+Ace';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Tongits';">
-                    <div>Tongits Go</div>
+                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Tongits';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Fishing';">
-                    <div>Jackpot Fish...</div>
+                    <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Fishing';">
                 </a>
 
-                <!-- FIX ẢNH 2: SUPER NIU NIU -->
+                <!-- ẢNH LỖI ĐÃ ĐƯỢC FIX BẰNG LINK PLACEHOLD.CO -->
                 <a href="{{ url_for('play_game', game_id='super_niu') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/super_niu_niu.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Super+Niu';">
-                    <div>Super Niu Niu</div>
+                    <img src="{{ url_for('static', filename='assets/super_niu_niu.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Super+Niu';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='lucky_neko') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Lucky+Neko';">
-                    <div>Lucky Neko</div>
+                    <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Lucky+Neko';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='chinese_new_year') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=CNY';">
-                    <div>CHINESE NEW...</div>
+                    <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=CNY';">
                 </a>
-                <!-- FIX ẢNH 3: CHICKEN DROP -->
+                <!-- ẢNH LỖI ĐÃ ĐƯỢC FIX BẰNG LINK PLACEHOLD.CO -->
                 <a href="{{ url_for('play_game', game_id='chicken_drop') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Chicken+Drop';">
-                    <div>Chicken Drop...</div>
+                    <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Chicken';">
                 </a>
             </div>
         </div>
@@ -167,12 +169,10 @@
         <div class="tab-content" id="tab-daga" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='daga_ws151') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Đá+Gà+WS151">
-                    <div>Đá Gà WS151</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=WS151">
                 </a>
                 <a href="{{ url_for('play_game', game_id='daga_thomo') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Đá+Gà+Thomo">
-                    <div>Đá Gà Thomo C1</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Thomo">
                 </a>
             </div>
         </div>
@@ -181,12 +181,10 @@
         <div class="tab-content" id="tab-slots" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mahjong';">
-                    <div>Mahjong Ways</div>
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Mahjong';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Super+Ace';">
-                    <div>Super Ace</div>
+                    <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Super+Ace';">
                 </a>
             </div>
         </div>
@@ -195,12 +193,10 @@
         <div class="tab-content" id="tab-casino" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='baccarat') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Baccarat">
-                    <div>Baccarat Live</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Baccarat">
                 </a>
                 <a href="{{ url_for('play_game', game_id='roulette') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Roulette">
-                    <div>Roulette</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Roulette">
                 </a>
             </div>
         </div>
@@ -209,12 +205,10 @@
         <div class="tab-content" id="tab-gamebai" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Tongits';">
-                    <div>Tongits Go</div>
+                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Tongits';">
                 </a>
                 <a href="{{ url_for('play_game', game_id='tien_len') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Tiến+Lên">
-                    <div>Tiến Lên Miền Nam</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Tien+Len">
                 </a>
             </div>
         </div>
@@ -223,24 +217,21 @@
         <div class="tab-content" id="tab-banca" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Fishing';">
-                    <div>Jackpot Fishing</div>
+                    <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://placehold.co/200x200/182032/cca352.png?text=Fishing';">
                 </a>
             </div>
         </div>
         <div class="tab-content" id="tab-xoso" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='xo_so_3m') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Xổ+Số">
-                    <div>Xổ Số 3 Miền</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Xo+So">
                 </a>
             </div>
         </div>
         <div class="tab-content" id="tab-thethao" style="display:none;">
             <div class="game-grid-hot">
                 <a href="{{ url_for('play_game', game_id='saba_sports') }}" class="game-item-card">
-                    <img src="https://via.placeholder.com/150/182032/cca352?text=Saba+Sports">
-                    <div>Saba Thể Thao</div>
+                    <img src="https://placehold.co/200x200/182032/cca352.png?text=Saba">
                 </a>
             </div>
         </div>
@@ -265,32 +256,45 @@
         </a>
     </div>
 
-    <!-- JAVASCRIPT CHUYỂN TAB CỰC MƯỢT -->
+    <!-- JAVASCRIPT XỬ LÝ GIAO DIỆN -->
     <script>
+        // 1. CHUYỂN TAB CỰC MƯỢT
         function switchTab(tabId, btnElement) {
-            // 1. Ẩn tất cả nội dung tab
             var contents = document.querySelectorAll('.tab-content');
             contents.forEach(function(content) {
                 content.style.display = 'none';
                 content.classList.remove('active');
             });
 
-            // 2. Bỏ trạng thái Active ở tất cả nút tab
             var buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(function(btn) {
                 btn.classList.remove('active');
             });
 
-            // 3. Hiển thị tab được bấm chọn
             var targetTab = document.getElementById(tabId);
             if (targetTab) {
                 targetTab.style.display = 'block';
                 targetTab.classList.add('active');
             }
 
-            // 4. Highlight nút tab đang chọn
             if (btnElement) {
                 btnElement.classList.add('active');
+            }
+        }
+
+        // 2. XỬ LÝ MENU BÊN TRÁI (SIDEBAR)
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            var overlay = document.getElementById("sidebarOverlay");
+            
+            if (sidebar.classList.contains("open")) {
+                // Đóng menu
+                sidebar.classList.remove("open");
+                overlay.style.display = "none";
+            } else {
+                // Mở menu
+                sidebar.classList.add("open");
+                overlay.style.display = "block";
             }
         }
     </script>

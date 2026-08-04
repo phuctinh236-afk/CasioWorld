@@ -43,7 +43,7 @@ def render_safe(template_name, **kwargs):
         <body>
             <div class="container">
                 <h2>✨ {title}</h2>
-                <p>Khu vực này đang hoạt động bình thường trên hệ thống TX68.</p>
+                <p>Game/Khu vực này đang được cập nhật thêm trên hệ thống TX68.</p>
                 <a href="/" class="btn">⬅ Quay lại Trang chủ</a>
             </div>
         </body>
@@ -93,17 +93,16 @@ def not_found_error(error):
     log_error(f"Lỗi 404 - Không tìm thấy: {request.path}")
     return redirect(url_for('index'))
 
-# FIX: Không redirect về index nữa để tránh lặp vô tận khi index bị lỗi
 @app.errorhandler(500)
 @app.errorhandler(Exception)
 def handle_exception(e):
     tb = traceback.format_exc()
     log_error(tb)
     return f"""
-    <div style="background:#0f172a; color:#ef4444; padding:30px; font-family:sans-serif; text-align:center;">
+    <div style="background:#0f172a; color:#ef4444; padding:30px; font-family:sans-serif; text-align:center; min-height:100vh;">
         <h2>⚠️ Đã xảy ra lỗi hệ thống (500)</h2>
-        <p style="color:#94a3b8;">Vui lòng truy cập <a href="/ktraloibug" style="color:#cca352;">/ktraloibug</a> để xem chi tiết nguyên nhân.</p>
-        <a href="/" style="background:#cca352; color:#111; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold;">Thử lại trang chủ</a>
+        <p style="color:#94a3b8;">Hệ thống đã ghi nhận. Xem chi tiết tại <a href="/ktraloibug" style="color:#cca352;">/ktraloibug</a></p>
+        <a href="/" style="background:#cca352; color:#111; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:15px;">Thử lại trang chủ</a>
     </div>
     """, 500
 
@@ -126,12 +125,19 @@ def generate_memo():
 def index():
     return render_safe('index.html')
 
-# THÊM ROUTE NÀY ĐỂ XỬ LÝ CLICK TỪNG GAME
+# ROUTE ĐIỀU HƯỚNG TỪNG GAME CHUẨN
 @app.route('/play/<game_id>')
 def play_game(game_id):
     balance_val = session.get('balance', 500000)
-    # Mặc định điều hướng sang trang game mahjong hoặc game tương ứng
-    return render_safe('mahjong.html', game_id=game_id, balance=balance_val)
+    
+    # Phân loại mở đúng giao diện game
+    if game_id in ['mahjong', 'mahjong_ways']:
+        return render_safe('mahjong.html', balance=balance_val)
+    elif game_id == 'mahjong_ways_2':
+        return render_safe('mahjong_ways_2.html', balance=balance_val)
+    
+    # Game chưa có file riêng sẽ render trang chung an toàn
+    return render_safe(f'{game_id}.html', game_id=game_id, balance=balance_val)
 
 @app.route('/profile')
 def profile():

@@ -3,293 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TX68 - Trang Chủ</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>TX68 OFFICIAL - SẢNH GIẢI TRÍ ĐỈNH CAO</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        html, body { width: 100%; height: 100%; background-color: #131521; margin: 0; padding: 0; overflow-x: hidden; }
-        body { color: #fff; display: flex; justify-content: center; align-items: flex-start; }
-        .app-container { width: 100%; max-width: 100%; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; overflow-y: auto; }
-        .header { padding: 10px 15px; background-color: #171a29; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; width: 100%; }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .menu-toggle-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; line-height: 1; }
-        .header-title { font-size: 15px; font-weight: bold; color: #cca352; }
-        .cskh-btn { background: #212537; padding: 5px 10px; border-radius: 20px; font-size: 11px; color: #cca352; border: 1px solid #303650; display: flex; align-items: center; gap: 4px; cursor: pointer; text-decoration: none; font-weight: 600; }
-        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 998; display: none; }
-        .drawer-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #171a29; z-index: 999; transition: left 0.3s ease; overflow-y: auto; }
-        .drawer-menu.open { left: 0; }
-        .drawer-header { padding: 15px; background: #131521; border-bottom: 1px solid #24293f; position: relative; }
-        .drawer-close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
-        .user-info-box { display: flex; align-items: center; gap: 12px; }
-        .user-avatar { width: 40px; height: 40px; background: #212537; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .user-name-text { font-size: 14px; font-weight: bold; color: #fff; }
-        .user-profile-link { font-size: 12px; color: #cca352; text-decoration: none; }
-        .wallet-box-mini { background-color: #cca352; color: #131521; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; overflow: hidden; margin: 15px 12px 0 12px; }
-        .wallet-info-content { overflow: hidden; max-width: 210px; }
-        .wallet-box-mini .balance-val { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .drawer-grid { padding: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .drawer-item { background-color: #212537; border: 1px solid #303650; border-radius: 8px; padding: 12px 5px; text-align: center; color: #fff; text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .drawer-item-icon { font-size: 20px; }
-        .banner { padding: 10px 15px; width: 100%; }
-        .banner-box { width: 100%; height: 110px; background: linear-gradient(135deg, #2b2f45, #171a29); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #cca352; font-size: 14px; font-weight: bold; border: 1px solid #303650; text-align: center; position: relative; }
-        .game-tabs { display: flex; background-color: #171a29; overflow-x: auto; padding: 8px 10px; gap: 6px; border-bottom: 1px solid #24293f; scrollbar-width: none; width: 100%; }
-        .game-tabs::-webkit-scrollbar { display: none; }
-        .g-tab { flex: 0 0 auto; background-color: #212537; border: 1px solid #303650; border-radius: 8px; padding: 8px 12px; text-align: center; color: #9fa5b9; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 68px; transition: all 0.2s ease; }
-        .g-tab.active { background-color: #2b2f45; border-color: #cca352; color: #cca352; font-weight: bold; }
-        .g-tab-icon { font-size: 18px; }
-        .game-section { padding: 10px 10px 80px 10px; width: 100%; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .game-grid-hot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .game-item-card { background-color: #171a29; border: 1px solid #24293f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; aspect-ratio: 1 / 1; display: block; }
-        .game-item-card img { width: 100%; height: 100%; object-fit: cover; }
-        .provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .provider-card { background-color: #1c2035; border: 1px solid #282d47; border-radius: 8px; aspect-ratio: 1 / 0.9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; padding: 5px; overflow: hidden; transition: transform 0.15s, border-color 0.15s; }
-        .provider-card:active { transform: scale(0.95); }
-        .provider-card::before { content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 16px 16px 0; border-color: transparent #cca352 transparent transparent; }
-        .provider-name { font-size: 12px; font-weight: bold; color: #d1d5db; text-align: center; margin-top: 4px; word-break: break-word; }
-        .provider-logo-text { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
-        .dagat-banner { width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #cca352; background: linear-gradient(180deg, #2b1f1d, #171a29); padding: 15px; text-align: center; margin-bottom: 12px; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; max-width: 100%; background-color: #171a29; border-top: 1px solid #24293f; display: flex; justify-content: space-around; padding: 8px 0; z-index: 900; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #7a83a0; font-size: 10px; gap: 3px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0f1523; color: #ffffff; padding-bottom: 70px; font-size: 14px; }
+        
+        /* HEADER */
+        .top-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #182032; border-bottom: 1px solid #232d42; position: sticky; top: 0; z-index: 100; }
+        .header-title { display: flex; align-items: center; gap: 8px; font-weight: bold; color: #e2e8f0; font-size: 16px; }
+        .cskh-btn { background: #232d42; color: #cca352; border: 1px solid #cca352; padding: 4px 10px; border-radius: 16px; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+
+        /* BANNER */
+        .banner-box { margin: 12px 16px; background: linear-gradient(135deg, #182238 0%, #111728 100%); border: 1px solid #28354e; border-radius: 12px; padding: 25px 15px; text-align: center; }
+        .banner-title { color: #d4af37; font-weight: bold; font-size: 16px; letter-spacing: 1px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+
+        /* TAB BAR SCROLLABLE */
+        .tab-bar-container { overflow-x: auto; white-space: nowrap; padding: 5px 12px; scrollbar-width: none; }
+        .tab-bar-container::-webkit-scrollbar { display: none; }
+        .tab-nav { display: inline-flex; gap: 8px; }
+        .tab-btn { background: #182032; border: 1px solid #28354e; color: #94a3b8; border-radius: 8px; padding: 8px 14px; min-width: 68px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; text-decoration: none; }
+        .tab-btn.active { background: linear-gradient(180deg, #2b3854 0%, #1c273e 100%); border-color: #cca352; color: #cca352; font-weight: bold; }
+        .tab-btn .icon { font-size: 18px; }
+
+        /* GAME GRID */
+        .game-grid-hot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 16px; }
+        .game-item-card { background: #182032; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-decoration: none; border: 1px solid #232d42; position: relative; }
+        .game-item-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-bottom: 1px solid #232d42; background: #0f1523; }
+        .game-item-card div { font-size: 10px; color: #e2e8f0; text-align: center; padding: 4px 2px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #182032; border-top: 1px solid #232d42; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; text-decoration: none; font-size: 11px; gap: 3px; }
         .nav-item.active { color: #cca352; }
-        .nav-icon { font-size: 20px; }
+        .nav-item .icon { font-size: 18px; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <button type="button" class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
-                <div class="header-title">TX68 OFFICIAL</div>
-            </div>
-            <a href="{{ url_for('cskh') }}" class="cskh-btn">💬 CSKH</a>
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+        <div class="header-title">
+            <span>☰</span> TX68 OFFICIAL
         </div>
-
-        <!-- Sidebar Drawer -->
-        <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
-        <div class="drawer-menu" id="drawerMenu">
-            <div class="drawer-header">
-                <button type="button" class="drawer-close-btn" onclick="toggleDrawer(false)">✕</button>
-                <div class="user-info-box">
-                    <div class="user-avatar">💎</div>
-                    <div>
-                        <div class="user-name-text">{{ username }}</div>
-                        <a href="{{ url_for('profile') }}" class="user-profile-link">Hồ Sơ</a>
-                    </div>
-                </div>
-            </div>
-            <div class="wallet-box-mini">
-                <div class="wallet-info-content">
-                    <div style="font-size: 10px; font-weight: normal;">Ví chính (VND)</div>
-                    <div class="balance-val">
-                        {{ "{:,.0f}".format(balance).replace(",", ".") }} đ
-                    </div>
-                </div>
-                <div>💳</div>
-            </div>
-            <div class="drawer-grid">
-                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💰</span><span>Nạp tiền</span></a>
-                <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💳</span><span>Rút tiền</span></a>
-                <a href="{{ url_for('mahjong') }}" class="drawer-item"><span class="drawer-item-icon">🀄</span><span>Mahjong</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('daga')" class="drawer-item"><span class="drawer-item-icon">🐓</span><span>ĐÁ GÀ</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('slots')" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('casino')" class="drawer-item"><span class="drawer-item-icon">🎲</span><span>Casino</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('gamebai')" class="drawer-item"><span class="drawer-item-icon">🎮</span><span>Game Bài</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('banca')" class="drawer-item"><span class="drawer-item-icon">🎣</span><span>Bắn Cá</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('xoso')" class="drawer-item"><span class="drawer-item-icon">🎟️</span><span>Xổ Số</span></a>
-                <a href="javascript:void(0)" onclick="switchTab('thethao')" class="drawer-item"><span class="drawer-item-icon">⚽</span><span>Thể Thao</span></a>
-                <a href="{{ url_for('promotions') }}" class="drawer-item"><span class="drawer-item-icon">🎁</span><span>Khuyến mãi</span></a>
-                <a href="{{ url_for('vip') }}" class="drawer-item"><span class="drawer-item-icon">⭐</span><span>VIP</span></a>
-            </div>
-        </div>
-
-        <!-- Banner Top -->
-        <div class="banner">
-            <div class="banner-box">
-                <span>TX68 - SẢNH GIẢI TRÍ ĐỈNH CAO</span>
-            </div>
-        </div>
-
-        <!-- Thanh Tabs Danh Mục Game -->
-        <div class="game-tabs">
-            <div class="g-tab active" onclick="switchTab('hot')"><span class="g-tab-icon">🔥</span><span>HOT</span></div>
-            <div class="g-tab" onclick="switchTab('daga')"><span class="g-tab-icon">🐓</span><span>ĐÁ GÀ</span></div>
-            <div class="g-tab" onclick="switchTab('slots')"><span class="g-tab-icon">7️⃣</span><span>Slots</span></div>
-            <div class="g-tab" onclick="switchTab('casino')"><span class="g-tab-icon">♠️</span><span>Casino</span></div>
-            <div class="g-tab" onclick="switchTab('gamebai')"><span class="g-tab-icon">🎴</span><span>Game bài</span></div>
-            <div class="g-tab" onclick="switchTab('banca')"><span class="g-tab-icon">🐟</span><span>Bắn Cá</span></div>
-            <div class="g-tab" onclick="switchTab('xoso')"><span class="g-tab-icon">🎱</span><span>Xổ Số</span></div>
-            <div class="g-tab" onclick="switchTab('thethao')"><span class="g-tab-icon">⚽</span><span>Thể Thao</span></div>
-            <div class="g-tab" onclick="switchTab('crash')"><span class="g-tab-icon">🚀</span><span>Crash</span></div>
-            <div class="g-tab" onclick="switchTab('arcade')"><span class="g-tab-icon">🕹️</span><span>Arcade</span></div>
-        </div>
-
-        <div class="game-section">
-                                <!-- TAB: HOT (Đã fix link & sửa lỗi ảnh) -->
-            <div class="tab-content active" id="tab-hot">
-                <div class="game-grid-hot">
-                    <!-- 1 -->
-                    <a href="{{ url_for('play_game', game_id='dragon_gems') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt="Dragon Gems" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dragon Gems 500</div>
-                    </a>
-                    <!-- 2 -->
-                    <a href="{{ url_for('play_game', game_id='mithai_madness') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt="Mithai Madness" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Mithai Madness</div>
-                    </a>
-                    <!-- 3 -->
-                    <a href="{{ url_for('play_game', game_id='fortune_garuda') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt="Fortune Garuda" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Fortune Garuda</div>
-                    </a>
-                    <!-- 4 -->
-                    <a href="{{ url_for('play_game', game_id='ncvip_super') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt="NCVIP Super" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">NCVIP Super</div>
-                    </a>
-
-                    <!-- 5 -->
-                    <a href="{{ url_for('play_game', game_id='ultra_ace') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt="Ultra Ace" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ultra Ace</div>
-                    </a>
-                    <!-- 6 -->
-                    <a href="{{ url_for('play_game', game_id='ncvip_gates') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt="NCVIP Gates" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">NCVIP Gates...</div>
-                    </a>
-                    <!-- 7: FIX TÊN ẢNH NC BOUNTIFUL -->
-                    <a href="{{ url_for('play_game', game_id='nc_bountiful') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/nc_bountiful_birds.jpg') }}" alt="NC Bountiful" onerror="this.onerror=null; this.src='/static/assets/nc_bountiful.png';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">NC Bountiful...</div>
-                    </a>
-                    <!-- 8 -->
-                    <a href="{{ url_for('play_game', game_id='treasures_aztec') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt="Treasures of Aztec" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Treasures of...</div>
-                    </a>
-
-                    <!-- 9 -->
-                    <a href="{{ url_for('play_game', game_id='wild_bounty') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt="Wild Bounty" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Wild Bounty...</div>
-                    </a>
-                    <!-- 10 -->
-                    <a href="{{ url_for('play_game', game_id='dragon_gems_wheel') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt="Dragon Gems Wheel" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dragon Gems...</div>
-                    </a>
-                    <!-- 11 -->
-                    <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Mahjong Ways</div>
-                    </a>
-                    <!-- 12 -->
-                    <a href="{{ url_for('play_game', game_id='mahjong_ways_2') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Mahjong Ways 2</div>
-                    </a>
-
-                    <!-- 13 -->
-                    <a href="{{ url_for('play_game', game_id='pinata_wins') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt="Pinata Wins" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Pinata Wins</div>
-                    </a>
-                    <!-- 14 -->
-                    <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt="Super Ace" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Super Ace</div>
-                    </a>
-                    <!-- 15 -->
-                    <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt="Tongits Go" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tongits Go</div>
-                    </a>
-                    <!-- 16 -->
-                    <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt="Jackpot Fishing" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Jackpot Fish...</div>
-                    </a>
-
-                    <!-- 17: FIX TÊN ẢNH SUPER NIU NIU -->
-                    <a href="{{ url_for('play_game', game_id='super_niu') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/super_niu_niu.jpg') }}" alt="Super Niu Niu" onerror="this.onerror=null; this.src='/static/assets/super_niu.png';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Super Niu Niu</div>
-                    </a>
-                    <!-- 18 -->
-                    <a href="{{ url_for('play_game', game_id='lucky_neko') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt="Lucky Neko" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Lucky Neko</div>
-                    </a>
-                    <!-- 19 -->
-                    <a href="{{ url_for('play_game', game_id='chinese_new_year') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt="Chinese New Year" onerror="this.onerror=null; this.src='/static/assets/placeholder.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CHINESE NEW...</div>
-                    </a>
-                    <!-- 20: FIX TÊN ẢNH CHICKEN DROP -->
-                    <a href="{{ url_for('play_game', game_id='chicken_drop') }}" class="game-item-card">
-                        <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" alt="Chicken Drop" onerror="this.onerror=null; this.src='/static/assets/chicken_drop_10000.jpg';">
-                        <div style="font-size: 11px; color: #fff; text-align: center; padding: 4px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Chicken Drop...</div>
-                    </a>
-                </div>
-            </div>
-                    <!-- Bottom Navigation Fixed -->
-        <div class="bottom-nav">
-            <a href="{{ url_for('index') }}" class="nav-item active">
-                <span class="nav-icon">🏠</span>
-                <span>Trang chủ</span>
-            </a>
-            <a href="{{ url_for('promotions') }}" class="nav-item">
-                <span class="nav-icon">🎁</span>
-                <span>Khuyến mãi</span>
-            </a>
-            <a href="{{ url_for('deposit') }}" class="nav-item">
-                <span class="nav-icon">💳</span>
-                <span>Nạp tiền</span>
-            </a>
-            <a href="{{ url_for('profile') }}" class="nav-item">
-                <span class="nav-icon">👤</span>
-                <span>Tài khoản</span>
-            </a>
-        </div>
+        <a href="{{ url_for('cskh') }}" class="cskh-btn">💬 CSKH</a>
     </div>
 
+    <!-- BANNER BAN ĐẦU -->
+    <div class="banner-box">
+        <div class="banner-title">TX68 – SẢNH GIẢI TRÍ ĐỈNH CAO</div>
+    </div>
+
+    <!-- THANH CHỌN TAB DANH MỤC GAME -->
+    <div class="tab-bar-container">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('tab-hot', this)"><span class="icon">🔥</span>HOT</button>
+            <button class="tab-btn" onclick="switchTab('tab-daga', this)"><span class="icon">🐓</span>ĐÁ GÀ</button>
+            <button class="tab-btn" onclick="switchTab('tab-slots', this)"><span class="icon">🎰</span>Slots</button>
+            <button class="tab-btn" onclick="switchTab('tab-casino', this)"><span class="icon">♠️</span>Casino</button>
+            <button class="tab-btn" onclick="switchTab('tab-gamebai', this)"><span class="icon">🎴</span>Game bài</button>
+            <button class="tab-btn" onclick="switchTab('tab-banca', this)"><span class="icon">🐟</span>Bắn cá</button>
+            <button class="tab-btn" onclick="switchTab('tab-xoso', this)"><span class="icon">🎲</span>Xổ số</button>
+            <button class="tab-btn" onclick="switchTab('tab-thethao', this)"><span class="icon">⚽</span>Thể thao</button>
+        </div>
+    </div>
+        <!-- KHU VỰC CHỨA GAME DẠNG TAB -->
+    <div class="game-content-container">
+
+        <!-- 1. TAB HOT (ĐỦ 20 GAME) -->
+        <div class="tab-content active" id="tab-hot">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='dragon_gems') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Dragon+Gems';">
+                    <div>Dragon Gems 500</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='mithai_madness') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mithai';">
+                    <div>Mithai Madness</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='fortune_garuda') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Garuda';">
+                    <div>Fortune Garuda</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='ncvip_super') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=NCVIP';">
+                    <div>NCVIP Super</div>
+                </a>
+
+                <a href="{{ url_for('play_game', game_id='ultra_ace') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Ultra+Ace';">
+                    <div>Ultra Ace</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='ncvip_gates') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Gates';">
+                    <div>NCVIP Gates...</div>
+                </a>
+                <!-- FIX ẢNH 1: NC BOUNTIFUL -->
+                <a href="{{ url_for('play_game', game_id='nc_bountiful') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/nc_bountiful.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=NC+Bountiful';">
+                    <div>NC Bountiful...</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='treasures_aztec') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Aztec';">
+                    <div>Treasures of...</div>
+                </a>
+
+                <a href="{{ url_for('play_game', game_id='wild_bounty') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Wild+Bounty';">
+                    <div>Wild Bounty...</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='dragon_gems_wheel') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Gems+Wheel';">
+                    <div>Dragon Gems...</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='mahjong') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mahjong';">
+                    <div>Mahjong Ways</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='mahjong_ways_2') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mahjong+2';">
+                    <div>Mahjong Ways 2</div>
+                </a>
+
+                <a href="{{ url_for('play_game', game_id='pinata_wins') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Pinata';">
+                    <div>Pinata Wins</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Super+Ace';">
+                    <div>Super Ace</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Tongits';">
+                    <div>Tongits Go</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Fishing';">
+                    <div>Jackpot Fish...</div>
+                </a>
+
+                <!-- FIX ẢNH 2: SUPER NIU NIU -->
+                <a href="{{ url_for('play_game', game_id='super_niu') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/super_niu_niu.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Super+Niu';">
+                    <div>Super Niu Niu</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='lucky_neko') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Lucky+Neko';">
+                    <div>Lucky Neko</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='chinese_new_year') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=CNY';">
+                    <div>CHINESE NEW...</div>
+                </a>
+                <!-- FIX ẢNH 3: CHICKEN DROP -->
+                <a href="{{ url_for('play_game', game_id='chicken_drop') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/chicken_drop.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Chicken+Drop';">
+                    <div>Chicken Drop...</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. TAB ĐÁ GÀ -->
+        <div class="tab-content" id="tab-daga" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='daga_ws151') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Đá+Gà+WS151">
+                    <div>Đá Gà WS151</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='daga_thomo') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Đá+Gà+Thomo">
+                    <div>Đá Gà Thomo C1</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. TAB SLOTS -->
+        <div class="tab-content" id="tab-slots" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('mahjong') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Mahjong';">
+                    <div>Mahjong Ways</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='super_ace') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Super+Ace';">
+                    <div>Super Ace</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 4. TAB CASINO -->
+        <div class="tab-content" id="tab-casino" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='baccarat') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Baccarat">
+                    <div>Baccarat Live</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='roulette') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Roulette">
+                    <div>Roulette</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5. TAB GAME BÀI -->
+        <div class="tab-content" id="tab-gamebai" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Tongits';">
+                    <div>Tongits Go</div>
+                </a>
+                <a href="{{ url_for('play_game', game_id='tien_len') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Tiến+Lên">
+                    <div>Tiến Lên Miền Nam</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- CÁC TAB KHÁC -->
+        <div class="tab-content" id="tab-banca" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
+                    <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/182032/cca352?text=Fishing';">
+                    <div>Jackpot Fishing</div>
+                </a>
+            </div>
+        </div>
+        <div class="tab-content" id="tab-xoso" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='xo_so_3m') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Xổ+Số">
+                    <div>Xổ Số 3 Miền</div>
+                </a>
+            </div>
+        </div>
+        <div class="tab-content" id="tab-thethao" style="display:none;">
+            <div class="game-grid-hot">
+                <a href="{{ url_for('play_game', game_id='saba_sports') }}" class="game-item-card">
+                    <img src="https://via.placeholder.com/150/182032/cca352?text=Saba+Sports">
+                    <div>Saba Thể Thao</div>
+                </a>
+            </div>
+        </div>
+    </div>
+        <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+        <a href="{{ url_for('index') }}" class="nav-item active">
+            <span class="icon">🏠</span>
+            <span>Trang chủ</span>
+        </a>
+        <a href="{{ url_for('promotions') }}" class="nav-item">
+            <span class="icon">🎁</span>
+            <span>Khuyến mãi</span>
+        </a>
+        <a href="{{ url_for('deposit') }}" class="nav-item">
+            <span class="icon">💳</span>
+            <span>Nạp tiền</span>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-item">
+            <span class="icon">👤</span>
+            <span>Tài khoản</span>
+        </a>
+    </div>
+
+    <!-- JAVASCRIPT CHUYỂN TAB CỰC MƯỢT -->
     <script>
-        // Bật/tắt Sidebar Menu Drawer
-        function toggleDrawer(show) {
-            const drawer = document.getElementById('drawerMenu');
-            const overlay = document.getElementById('drawerOverlay');
-            if (show) {
-                drawer.classList.add('open');
-                overlay.style.display = 'block';
-            } else {
-                drawer.classList.remove('open');
-                overlay.style.display = 'none';
-            }
-        }
+        function switchTab(tabId, btnElement) {
+            // 1. Ẩn tất cả nội dung tab
+            var contents = document.querySelectorAll('.tab-content');
+            contents.forEach(function(content) {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
 
-        // Chuyển danh mục Tab & Nội dung
-        function switchTab(tabKey) {
-            toggleDrawer(false);
+            // 2. Bỏ trạng thái Active ở tất cả nút tab
+            var buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(function(btn) {
+                btn.classList.remove('active');
+            });
 
-            const tabs = document.querySelectorAll('.g-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
-
-            const selectedContent = document.getElementById('tab-' + tabKey);
-            if (selectedContent) {
-                selectedContent.classList.add('active');
+            // 3. Hiển thị tab được bấm chọn
+            var targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                targetTab.classList.add('active');
             }
 
-            const activeTabBtn = Array.from(tabs).find(t => t.getAttribute('onclick').includes(tabKey));
-            if (activeTabBtn) {
-                activeTabBtn.classList.add('active');
-                activeTabBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // 4. Highlight nút tab đang chọn
+            if (btnElement) {
+                btnElement.classList.add('active');
             }
         }
     </script>

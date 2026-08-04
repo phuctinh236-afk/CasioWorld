@@ -2,335 +2,63 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TX68 - Trang Chủ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        body {
-            background-color: #131521;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            min-height: 100vh;
-            background-color: #131521;
-            position: relative;
-            padding-bottom: 70px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            overflow-y: auto;
-        }
-        .header {
-            padding: 10px 15px;
-            background-color: #171a29;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #24293f;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .menu-toggle-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-        .header-title {
-            font-size: 15px;
-            font-weight: bold;
-            color: #cca352;
-        }
-        .cskh-btn {
-            background: #212537;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            color: #cca352;
-            border: 1px solid #303650;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        /* Sidebar Menu Drawer */
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 998;
-            display: none;
-        }
-        .drawer-menu {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: #171a29;
-            z-index: 999;
-            transition: left 0.3s ease;
-            overflow-y: auto;
-        }
-        .drawer-menu.open {
-            left: 0;
-        }
-        .drawer-header {
-            padding: 15px;
-            background: #131521;
-            border-bottom: 1px solid #24293f;
-            position: relative;
-        }
-        .drawer-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        .user-info-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: #212537;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        .user-name-text {
-            font-size: 14px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .user-profile-link {
-            font-size: 12px;
-            color: #cca352;
-            text-decoration: none;
-        }
-        .wallet-box-mini {
-            background-color: #cca352;
-            color: #131521;
-            padding: 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            overflow: hidden;
-            margin: 15px 12px 0 12px;
-        }
-        .wallet-info-content {
-            overflow: hidden;
-            max-width: 210px;
-        }
-        .wallet-box-mini .balance-val {
-            font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .drawer-grid {
-            padding: 12px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-        }
-        .drawer-item {
-            background-color: #212537;
-            border: 1px solid #303650;
-            border-radius: 8px;
-            padding: 12px 5px;
-            text-align: center;
-            color: #fff;
-            text-decoration: none;
-            font-size: 11px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-        .drawer-item:hover {
-            border-color: #cca352;
-        }
-        .drawer-item-icon {
-            font-size: 20px;
-        }
-        .banner {
-            padding: 10px 15px;
-        }
-        .banner-box {
-            width: 100%;
-            height: 110px;
-            background: linear-gradient(135deg, #2b2f45, #171a29);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #cca352;
-            font-size: 14px;
-            font-weight: bold;
-            border: 1px solid #303650;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .banner-dots {
-            position: absolute;
-            bottom: 8px;
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        .dot {
-            width: 5px;
-            height: 5px;
-            background: #555;
-            border-radius: 50%;
-        }
-        .dot.active {
-            background: #cca352;
-        }
-        .game-tabs {
-            display: flex;
-            background-color: #171a29;
-            overflow-x: auto;
-            padding: 8px 10px;
-            gap: 6px;
-            border-bottom: 1px solid #24293f;
-            scrollbar-width: none;
-        }
-        .game-tabs::-webkit-scrollbar {
-            display: none;
-        }
-        .g-tab {
-            flex: 0 0 auto;
-            background-color: #212537;
-            border: 1px solid #303650;
-            border-radius: 8px;
-            padding: 6px 12px;
-            text-align: center;
-            color: #9fa5b9;
-            font-size: 11px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            min-width: 60px;
-        }
-        .g-tab.active {
-            background-color: #2b2f45;
-            border-color: #cca352;
-            color: #cca352;
-            font-weight: bold;
-        }
-        .g-tab-icon {
-            font-size: 16px;
-        }
-        .game-section {
-            padding: 10px 10px 80px 10px;
-        }
-        .game-grid-detailed {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-        }
-        .game-item-card {
-            background-color: #171a29;
-            border: 1px solid #24293f;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.15s, border-color 0.15s;
-            position: relative;
-            aspect-ratio: 1 / 1;
-            display: block;
-        }
-        .game-item-card:hover {
-            border-color: #cca352;
-        }
-        .game-item-card:active {
-            transform: scale(0.95);
-        }
-        .game-item-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            background-color: #171a29;
-            border-top: 1px solid #24293f;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            z-index: 900;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #7a83a0;
-            font-size: 10px;
-            gap: 3px;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        .nav-item.active {
-            color: #cca352;
-        }
-        .nav-icon {
-            font-size: 20px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        html, body { width: 100%; height: 100%; background-color: #131521; margin: 0; padding: 0; overflow-x: hidden; }
+        body { color: #fff; display: flex; justify-content: center; align-items: flex-start; }
+        .app-container { width: 100%; max-width: 100%; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; overflow-y: auto; }
+        .header { padding: 10px 15px; background-color: #171a29; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; width: 100%; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .header-title { font-size: 15px; font-weight: bold; color: #cca352; }
+        .cskh-btn { background: #212537; padding: 5px 10px; border-radius: 20px; font-size: 11px; color: #cca352; border: 1px solid #303650; display: flex; align-items: center; gap: 4px; cursor: pointer; text-decoration: none; font-weight: 600; }
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 998; display: none; }
+        .drawer-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #171a29; z-index: 999; transition: left 0.3s ease; overflow-y: auto; }
+        .drawer-menu.open { left: 0; }
+        .drawer-header { padding: 15px; background: #131521; border-bottom: 1px solid #24293f; position: relative; }
+        .drawer-close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+        .user-info-box { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; background: #212537; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .user-name-text { font-size: 14px; font-weight: bold; color: #fff; }
+        .user-profile-link { font-size: 12px; color: #cca352; text-decoration: none; }
+        .wallet-box-mini { background-color: #cca352; color: #131521; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; overflow: hidden; margin: 15px 12px 0 12px; }
+        .wallet-info-content { overflow: hidden; max-width: 210px; }
+        .wallet-box-mini .balance-val { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .drawer-grid { padding: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .drawer-item { background-color: #212537; border: 1px solid #303650; border-radius: 8px; padding: 12px 5px; text-align: center; color: #fff; text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .drawer-item-icon { font-size: 20px; }
+        .banner { padding: 10px 15px; width: 100%; }
+        .banner-box { width: 100%; height: 110px; background: linear-gradient(135deg, #2b2f45, #171a29); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #cca352; font-size: 14px; font-weight: bold; border: 1px solid #303650; text-align: center; position: relative; }
+        .game-tabs { display: flex; background-color: #171a29; overflow-x: auto; padding: 8px 10px; gap: 6px; border-bottom: 1px solid #24293f; scrollbar-width: none; width: 100%; }
+        .game-tabs::-webkit-scrollbar { display: none; }
+        .g-tab { flex: 0 0 auto; background-color: #212537; border: 1px solid #303650; border-radius: 8px; padding: 8px 12px; text-align: center; color: #9fa5b9; font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 68px; transition: all 0.2s ease; }
+        .g-tab.active { background-color: #2b2f45; border-color: #cca352; color: #cca352; font-weight: bold; }
+        .g-tab-icon { font-size: 18px; }
+        .game-section { padding: 10px 10px 80px 10px; width: 100%; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .game-grid-hot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .game-item-card { background-color: #171a29; border: 1px solid #24293f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; aspect-ratio: 1 / 1; display: block; }
+        .game-item-card img { width: 100%; height: 100%; object-fit: cover; }
+        .provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .provider-card { background-color: #1c2035; border: 1px solid #282d47; border-radius: 8px; aspect-ratio: 1 / 0.9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; padding: 5px; overflow: hidden; transition: transform 0.15s, border-color 0.15s; }
+        .provider-card:active { transform: scale(0.95); }
+        .provider-card::before { content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 16px 16px 0; border-color: transparent #cca352 transparent transparent; }
+        .provider-name { font-size: 12px; font-weight: bold; color: #d1d5db; text-align: center; margin-top: 4px; word-break: break-word; }
+        .provider-logo-text { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        .dagat-banner { width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #cca352; background: linear-gradient(180deg, #2b1f1d, #171a29); padding: 15px; text-align: center; margin-bottom: 12px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; max-width: 100%; background-color: #171a29; border-top: 1px solid #24293f; display: flex; justify-content: space-around; padding: 8px 0; z-index: 900; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #7a83a0; font-size: 10px; gap: 3px; }
+        .nav-item.active { color: #cca352; }
+        .nav-icon { font-size: 20px; }
     </style>
 </head>
 <body>
     <div class="app-container">
+        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <button type="button" class="menu-toggle-btn" onclick="toggleDrawer(true)">☰</button>
@@ -339,7 +67,7 @@
             <a href="{{ url_for('cskh') }}" class="cskh-btn">💬 CSKH</a>
         </div>
 
-        <!-- Sidebar Menu Drawer -->
+        <!-- Sidebar Drawer -->
         <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
         <div class="drawer-menu" id="drawerMenu">
             <div class="drawer-header">
@@ -365,74 +93,232 @@
                 <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💰</span><span>Nạp tiền</span></a>
                 <a href="{{ url_for('deposit') }}" class="drawer-item"><span class="drawer-item-icon">💳</span><span>Rút tiền</span></a>
                 <a href="{{ url_for('mahjong') }}" class="drawer-item"><span class="drawer-item-icon">🀄</span><span>Mahjong</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🐓</span><span>ĐÁ GÀ</span></a>
-                <a href="{{ url_for('mahjong') }}" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎲</span><span>Casino</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎮</span><span>Game Bài</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎣</span><span>Bắn Cá</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">🎟️</span><span>Xổ Số</span></a>
-                <a href="{{ url_for('index') }}" class="drawer-item"><span class="drawer-item-icon">⚽</span><span>Thể Thao</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('daga')" class="drawer-item"><span class="drawer-item-icon">🐓</span><span>ĐÁ GÀ</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('slots')" class="drawer-item"><span class="drawer-item-icon">🎰</span><span>Slots</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('casino')" class="drawer-item"><span class="drawer-item-icon">🎲</span><span>Casino</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('gamebai')" class="drawer-item"><span class="drawer-item-icon">🎮</span><span>Game Bài</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('banca')" class="drawer-item"><span class="drawer-item-icon">🎣</span><span>Bắn Cá</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('xoso')" class="drawer-item"><span class="drawer-item-icon">🎟️</span><span>Xổ Số</span></a>
+                <a href="javascript:void(0)" onclick="switchTab('thethao')" class="drawer-item"><span class="drawer-item-icon">⚽</span><span>Thể Thao</span></a>
                 <a href="{{ url_for('promotions') }}" class="drawer-item"><span class="drawer-item-icon">🎁</span><span>Khuyến mãi</span></a>
                 <a href="{{ url_for('vip') }}" class="drawer-item"><span class="drawer-item-icon">⭐</span><span>VIP</span></a>
             </div>
         </div>
 
+        <!-- Banner Top -->
         <div class="banner">
             <div class="banner-box">
                 <span>TX68 - SẢNH GIẢI TRÍ ĐỈNH CAO</span>
-                <div class="banner-dots">
-                    <div class="dot active"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Thanh Tabs Danh Mục Game -->
+        <div class="game-tabs">
+            <div class="g-tab active" onclick="switchTab('hot')"><span class="g-tab-icon">🔥</span><span>HOT</span></div>
+            <div class="g-tab" onclick="switchTab('daga')"><span class="g-tab-icon">🐓</span><span>ĐÁ GÀ</span></div>
+            <div class="g-tab" onclick="switchTab('slots')"><span class="g-tab-icon">7️⃣</span><span>Slots</span></div>
+            <div class="g-tab" onclick="switchTab('casino')"><span class="g-tab-icon">♠️</span><span>Casino</span></div>
+            <div class="g-tab" onclick="switchTab('gamebai')"><span class="g-tab-icon">🎴</span><span>Game bài</span></div>
+            <div class="g-tab" onclick="switchTab('banca')"><span class="g-tab-icon">🐟</span><span>Bắn Cá</span></div>
+            <div class="g-tab" onclick="switchTab('xoso')"><span class="g-tab-icon">🎱</span><span>Xổ Số</span></div>
+            <div class="g-tab" onclick="switchTab('thethao')"><span class="g-tab-icon">⚽</span><span>Thể Thao</span></div>
+            <div class="g-tab" onclick="switchTab('crash')"><span class="g-tab-icon">🚀</span><span>Crash</span></div>
+            <div class="g-tab" onclick="switchTab('arcade')"><span class="g-tab-icon">🕹️</span><span>Arcade</span></div>
+        </div>
+
+        <div class="game-section">
+                                                                                       <!-- TAB: HOT -->
+            <div class="tab-content active" id="tab-hot">
+                <div class="game-grid-hot">
+                    <a href="{{ url_for('mahjong') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways"></a>
+                    <a href="{{ url_for('mahjong') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2"></a>
+                    <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt=""></div>
+                    <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt=""></div>
+                    <div class="game-item-card"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt=""></div>
+                    <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt=""></div>
+                    <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt=""></div>
+                    <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt=""></div>
                 </div>
             </div>
-        </div>
 
-        <div class="game-tabs">
-            <div class="g-tab active"><span class="g-tab-icon">🔥</span><span>HOT</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🐓</span><span>ĐÁ GÀ</span></div>
-            <div class="g-tab" onclick="location.href='{{ url_for('mahjong') }}'"><span class="g-tab-icon">🎰</span><span>Slots</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🎲</span><span>Casino</span></div>
-            <div class="g-tab"><span class="g-tab-icon">🎮</span><span>Game Bài</span></div>
-    </div>
-                                                                                                                                      <div class="game-section">
-            <div class="game-grid-detailed">
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" alt=""></div>
-
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" alt=""></div>
-
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" alt=""></div>
-                
-                <!-- 🀄 Ô game Mahjong Ways được liên kết trực tiếp tới sảnh game Python Flask -->
-                <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" alt="Mahjong Ways">
-                </a>
-
-                <a href="{{ url_for('mahjong') }}" class="game-item-card">
-                    <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" alt="Mahjong Ways 2">
-                </a>
-
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" alt=""></div>
-
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/super_niubi.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" alt=""></div>
-                <div class="game-item-card"><img src="{{ url_for('static', filename='assets/chicken_dash.jpg') }}" alt=""></div>
+            <!-- TAB: ĐÁ GÀ -->
+            <div class="tab-content" id="tab-daga">
+                <div class="dagat-banner">
+                    <h3 style="color: #cca352; margin-bottom: 5px;">🔥 LỊCH ĐÁ GÀ THOMO HÔM NAY</h3>
+                    <p style="font-size: 12px; color: #bbb;">Phát sóng trực tiếp SV388 & DAGA68 chất lượng HD</p>
+                </div>
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text" style="color:#ef4444;">SV388</div><div class="provider-name">Đá Gà SV388</div></div>
+                    <div class="provider-card"><div class="provider-logo-text" style="color:#f59e0b;">DAGA68</div><div class="provider-name">Đá Gà Thomo</div></div>
+                    <div class="provider-card"><div class="provider-logo-text" style="color:#3b82f6;">RCB</div><div class="provider-name">Đá Gà RCB</div></div>
+                    <div class="provider-card"><div class="provider-logo-text" style="color:#10b981;">ODIN</div><div class="provider-name">Đá Gà Cựa Sắt</div></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Thanh Điều Hướng Dưới Cùng (Bottom Nav) -->
+            <!-- TAB: SLOTS (7) -->
+            <div class="tab-content" id="tab-slots">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PG</div><div class="provider-name">PG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JDB</div><div class="provider-name">JDB</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">FC</div><div class="provider-name">FC</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">X</div><div class="provider-name">NextSpin</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">FS</div><div class="provider-name">FASTSPIN</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">NET</div><div class="provider-name">NETENT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">BTG</div><div class="provider-name">BTG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">DS</div><div class="provider-name">Dragoonsoft</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">SG</div><div class="provider-name">SG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YB</div><div class="provider-name">YELLOW BAT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">RT</div><div class="provider-name">RT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MG</div><div class="provider-name">MG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PNG</div><div class="provider-name">PNG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">WM</div><div class="provider-name">WorldMatch</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">P8</div><div class="provider-name">P8</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">L365</div><div class="provider-name">Lucky365</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CG</div><div class="provider-name">CG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YL</div><div class="provider-name">YL</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MAHA</div><div class="provider-name">MAHA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">NLC</div><div class="provider-name">NLC</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">5G</div><div class="provider-name">5G</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: CASINO -->
+            <div class="tab-content" id="tab-casino">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">EVO</div><div class="provider-name">EVO</div></div>
+                    <div class="provider-card"><div class="provider-logo-text" style="color:#ec4899;">SEXY</div><div class="provider-name">SEXY</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">DG</div><div class="provider-name">DG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">HR</div><div class="provider-name">HotRoad</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">WM</div><div class="provider-name">WM</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MG</div><div class="provider-name">MG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">BG</div><div class="provider-name">BG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">VIA</div><div class="provider-name">VIA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MT</div><div class="provider-name">MT</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: GAME BÀI -->
+            <div class="tab-content" id="tab-gamebai">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PG</div><div class="provider-name">PG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">SPRIBE</div><div class="provider-name">SPRIBE</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">WM</div><div class="provider-name">WorldMatch</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PNG</div><div class="provider-name">PNG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">NET</div><div class="provider-name">NETENT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">SBO</div><div class="provider-name">SBO</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">RELAX</div><div class="provider-name">RELAX</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">HACKSAW</div><div class="provider-name">HACKSAW</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YL</div><div class="provider-name">YL</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: BẮN CÁ -->
+            <div class="tab-content" id="tab-banca">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">P8</div><div class="provider-name">P8</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JDB</div><div class="provider-name">JDB</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">FC</div><div class="provider-name">FC</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YB</div><div class="provider-name">YELLOW BAT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">SPADE</div><div class="provider-name">SPADE</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">BG</div><div class="provider-name">BG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">L365</div><div class="provider-name">Lucky365</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">GTF</div><div class="provider-name">GTF</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: XỔ SỐ -->
+            <div class="tab-content" id="tab-xoso">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">TCG</div><div class="provider-name">TCGaming</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">VR</div><div class="provider-name">VRGaming</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PNG</div><div class="provider-name">PNG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YB</div><div class="provider-name">YELLOW BAT</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">NUM</div><div class="provider-name">Number</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">SPRIBE</div><div class="provider-name">SPRIBE</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">HACKSAW</div><div class="provider-name">HACKSAW</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: THỂ THAO -->
+            <div class="tab-content" id="tab-thethao">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">SPORTS</div><div class="provider-name">Sportsbook</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">UG</div><div class="provider-name">UG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">BTi</div><div class="provider-name">BTi</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CMD</div><div class="provider-name">CMD</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">SBO</div><div class="provider-name">SBO</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">HORSE</div><div class="provider-name">Horsebook</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">iN</div><div class="provider-name">iNsports</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PINN</div><div class="provider-name">Pinnacle</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: CRASH -->
+            <div class="tab-content" id="tab-crash">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">SPRIBE</div><div class="provider-name">SPRIBE</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">FC</div><div class="provider-name">FC</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JDB</div><div class="provider-name">JDB</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YL</div><div class="provider-name">YL</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MG</div><div class="provider-name">MG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">RELAX</div><div class="provider-name">RELAX</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CRASH88</div><div class="provider-name">CRASH88</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PT</div><div class="provider-name">PT</div></div>
+                </div>
+            </div>
+
+            <!-- TAB: ARCADE -->
+            <div class="tab-content" id="tab-arcade">
+                <div class="provider-grid">
+                    <div class="provider-card"><div class="provider-logo-text">PG</div><div class="provider-name">PG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">PP</div><div class="provider-name">PP</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JDB</div><div class="provider-name">JDB</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">JILI</div><div class="provider-name">JILI</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">FC</div><div class="provider-name">FC</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">R88</div><div class="provider-name">RICH88</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KA</div><div class="provider-name">KA</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CQ9</div><div class="provider-name">CQ9</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">L365</div><div class="provider-name">Lucky365</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">X</div><div class="provider-name">NextSpin</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">KM</div><div class="provider-name">KM</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MG</div><div class="provider-name">MG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">YL</div><div class="provider-name">YL</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">RELAX</div><div class="provider-name">RELAX</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">HACKSAW</div><div class="provider-name">HACKSAW</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">CG</div><div class="provider-name">CG</div></div>
+                    <div class="provider-card"><div class="provider-logo-text">MMG</div><div class="provider-name">MMG</div></div>
+                </div>
+            </div>
+                                                                                           </div>
+            <!-- Bottom Navigation Fixed -->
         <div class="bottom-nav">
             <a href="{{ url_for('index') }}" class="nav-item active">
                 <span class="nav-icon">🏠</span>
@@ -453,8 +339,8 @@
         </div>
     </div>
 
-    <!-- Script điều khiển Sidebar Menu Drawer -->
     <script>
+        // Bật/tắt Sidebar Menu Drawer
         function toggleDrawer(show) {
             const drawer = document.getElementById('drawerMenu');
             const overlay = document.getElementById('drawerOverlay');
@@ -464,6 +350,28 @@
             } else {
                 drawer.classList.remove('open');
                 overlay.style.display = 'none';
+            }
+        }
+
+        // Chuyển danh mục Tab & Nội dung
+        function switchTab(tabKey) {
+            toggleDrawer(false);
+
+            const tabs = document.querySelectorAll('.g-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const selectedContent = document.getElementById('tab-' + tabKey);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+
+            const activeTabBtn = Array.from(tabs).find(t => t.getAttribute('onclick').includes(tabKey));
+            if (activeTabBtn) {
+                activeTabBtn.classList.add('active');
+                activeTabBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
         }
     </script>

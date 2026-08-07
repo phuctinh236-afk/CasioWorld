@@ -57,7 +57,15 @@
             100% { border-color: #ef4444; box-shadow: 0 0 20px #ef4444; }
         }
 
+        /* Animation quay vô tận từ trên xuống dưới */
+        @keyframes reelSpinLoop {
+            0% { transform: translate3d(0, -520px, 0); }
+            100% { transform: translate3d(0, 0px, 0); }
+        }
+
         .reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; }
+        .reel-track.spinning { animation: reelSpinLoop 0.3s linear infinite; }
+        .reel-track.spinning-slow { animation: reelSpinLoop 0.9s linear infinite; }
 
         .reel-cell { 
             background: #f8fafc; 
@@ -209,7 +217,6 @@
         let autoTimer = null;
         let freeSpinsLeft = 0;
 
-        // Loại bỏ hoàn toàn Blank.svg để không xuất hiện ô trắng rỗng
         const tileAssets = [
             "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg",
             "Sou7.svg", "Sou8.svg", "Sou9.svg",
@@ -289,6 +296,16 @@
             updateBalance();
         }
 
+        // Tạo dải bài lặp lại để quay vô tận mượt mà từ trên xuống
+        function generateSpinningTrackHTML() {
+            let html = '';
+            for (let i = 0; i < 16; i++) {
+                let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
+                html += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
+            }
+            return html;
+        }
+
         async function startSpin() {
             if (isSpinning) return;
 
@@ -318,9 +335,9 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
-            // Tạo ma trận kết quả mới
+            // Tính toán trước kết quả vòng quay
             let newMatrix = [];
-            let forceFreeSpin = Math.random() < 0.25; // 25% tỷ lệ ra Free Spin
+            let forceFreeSpin = Math.random() < 0.3; // Tỷ lệ ra Free Spin
             
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
@@ -338,57 +355,62 @@
 
             const gridContainer = document.getElementById('slot-grid');
 
-            // BƯỚC 1: BẮT ĐẦU CHO CẢ 5 HÀNG CÙNG QUAY ĐỒNG THỜI
+            // BƯỚC 1: KÍCH HOẠT QUAY LIÊN TỤC DOWNSIDE CHO TẤT CẢ 5 CỘT
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
-                let spinHTML = '';
-                
-                // Tạo hiệu ứng cuộn dải bài dài 20 ô
-                for (let i = 0; i < 20; i++) {
-                    let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
-                    spinHTML += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
-                }
-                for (let r = 0; r < rows; r++) {
-                    let finalT = newMatrix[c][r];
-                    let extraClass = (finalT === scatterTile) ? 'scatter-cell' : ((finalT === wildTile) ? 'wild-cell' : '');
-                    spinHTML += `<div class="reel-cell ${extraClass}" data-tile="${finalT}">${getCellContentHTML(finalT)}</div>`;
-                }
-
-                track.innerHTML = spinHTML;
+                track.innerHTML = generateSpinningTrackHTML();
                 track.style.transition = 'none';
-                track.style.transform = 'translate3d(0, 0px, 0)';
-
-                // Kích hoạt animation quay liên tục cho cả 5 cột
-                setTimeout(() => {
-                    track.style.transition = 'transform 8s linear';
-                    track.style.transform = `translate3d(0, ${-20 * 65}px, 0)`;
-                }, 20);
+                track.className = 'reel-track spinning';
             }
 
-            // BƯỚC 2: LẦN LƯỢT DỪNG TỪNG CỘT TỪ TRÁI SANG PHẢI (CÓ TENSION SPIN NẾU ĐƯỢC 2 SCATTER)
+            // BƯỚC 2: DỪNG LẦN LƯỢT TỪNG CỘT (CỘT CHỜ VẪN GIỮ NGUYÊN TRẠNG THÁI QUAY LIÊN TỤC)
             let currentScatters = 0;
 
             for (let c = 0; c < cols; c++) {
                 const windowEl = document.getElementById(`reel-window-${c}`);
                 const track = document.getElementById(`reel-track-${c}`);
 
-                // Nếu đã xuất hiện từ 2 quân Scatter trở lên -> Cột tiếp theo quay từ từ
                 let isTension = (currentScatters >= 2);
+
                 if (isTension) {
                     gridContainer.classList.add('dimmed');
                     windowEl.classList.add('tension-active');
-                    await sleep(isTurbo ? 800 : 1600); // Thời gian chờ quay từ từ
+                    // Cột c quay chậm hồi hộp, các cột sau vẫn tiếp tục quay nhanh chờ lượt
+                    track.className = 'reel-track spinning-slow';
+                    await sleep(isTurbo ? 600 : 1400);
                 } else {
-                    await sleep(isTurbo ? 100 : 250);
+                    await sleep(isTurbo ? 80 : 220);
                 }
 
-                // Chốt dừng cột c tại vị trí chuẩn
-                track.style.transition = `transform ${isTension ? 400 : 200}ms cubic-bezier(0.1, 0.9, 0.2, 1)`;
-                track.style.transform = `translate3d(0, ${-20 * 65}px, 0)`;
+                // Dừng cột c chính xác tại kết quả
+                track.className = 'reel-track'; // Bỏ class animation vô tận
                 
-                await sleep(isTension ? 400 : 200);
+                let finalHTML = '';
+                // 4 ô kết quả ở trên cùng
+                for (let r = 0; r < rows; r++) {
+                    let finalT = newMatrix[c][r];
+                    let extraClass = (finalT === scatterTile) ? 'scatter-cell' : ((finalT === wildTile) ? 'wild-cell' : '');
+                    finalHTML += `<div class="reel-cell ${extraClass}" id="cell-${c}-${r}" data-tile="${finalT}">${getCellContentHTML(finalT)}</div>`;
+                }
+                // Thêm một số ô ngẫu nhiên bên dưới để tạo hiệu ứng trượt hạ cánh
+                for (let i = 0; i < 8; i++) {
+                    let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
+                    finalHTML += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
+                }
 
-                // Kiểm tra xem cột vừa dừng có Scatter không
+                track.innerHTML = finalHTML;
+                track.style.transition = 'none';
+                track.style.transform = 'translate3d(0, -520px, 0)';
+
+                void track.offsetWidth; // Force Reflow
+
+                // Trượt mượt xuống vị trí chuẩn 0px (chiều từ trên xuống)
+                track.style.transition = 'transform 260ms cubic-bezier(0.15, 0.85, 0.35, 1.05)';
+                track.style.transform = 'translate3d(0, 0px, 0)';
+
+                await sleep(260);
+
+                // Đếm số Scatter trên cột vừa dừng
                 for (let r = 0; r < rows; r++) {
                     if (newMatrix[c][r] === scatterTile) {
                         currentScatters++;
@@ -402,7 +424,7 @@
             gridData = newMatrix;
             renderCleanGrid();
 
-            // Nếu đủ 3 Scatter -> Nhận 10 vòng quay miễn phí
+            // Nhận 10 vòng quay miễn phí khi đủ 3 Scatter
             if (currentScatters >= 3 && freeSpinsLeft === 0) {
                 freeSpinsLeft = 10;
                 const badge = document.getElementById('freespin-badge');

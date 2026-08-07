@@ -65,15 +65,15 @@
         .reel-track.spinning-slow { animation: reelSpinLoop 0.9s linear infinite; }
 
         .reel-cell { 
-            background: #f8fafc; 
-            color: #1e293b; 
+            background: #064e3b; 
+            color: #fef08a; 
             border-radius: 6px; 
             height: 61px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             position: relative; 
-            box-shadow: inset 0 -3px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.3); 
+            box-shadow: inset 0 -3px 0 #047857, 0 2px 4px rgba(0,0,0,0.3); 
             flex-shrink: 0; 
             font-weight: bold; 
             transition: transform 0.3s ease, opacity 0.3s ease, border 0.2s ease;
@@ -197,7 +197,7 @@
     </div>
 
     <div class="info-banner" id="info-banner">
-        3 <img src="static/assets/abcxyz111.svg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.svg';"> TRỞ LÊN SẼ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ
+        3 <img src="static/assets/abcxyz111.jpg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.jpg';"> TRỞ LÊN SẼ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ
     </div>
 
     <div class="stats-bar">
@@ -217,16 +217,14 @@
 
     <div class="control-panel">
         <div class="actions">
-            <div>
-                <select class="bet-select" id="bet-amount" onchange="updateBetDisplay()">
-                    <option value="0.2">0.20</option>
-                    <option value="0.4" selected>0.40</option>
-                    <option value="1">1.00</option>
-                    <option value="2">2.00</option>
-                    <option value="5">5.00</option>
-                    <option value="10">10.00</option>
-                </select>
-            </div>
+            <select class="bet-select" id="bet-amount" onchange="updateBetDisplay()">
+                <option value="0.2">0.20</option>
+                <option value="0.4" selected>0.40</option>
+                <option value="1">1.00</option>
+                <option value="2">2.00</option>
+                <option value="5">5.00</option>
+                <option value="10">10.00</option>
+            </select>
 
             <button class="btn-circle" id="turbo-btn" onclick="toggleTurbo()">TURBO</button>
             
@@ -266,7 +264,7 @@
 
         function getCellContentHTML(tileName) {
             if (tileName === scatterTile) {
-                return `<img src="static/assets/abcxyz111.svg" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.svg';">`;
+                return `<img src="static/assets/abcxyz111.jpg" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.jpg';">`;
             }
             if (tileName === wildTile) {
                 return `WILD`;

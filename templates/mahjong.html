@@ -15,18 +15,16 @@
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-start; 
-            gap: 10px;
+            gap: 8px;
             padding: 10px; 
             overflow-y: auto;
             overflow-x: hidden;
         }
 
         .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
-        .balance-box { font-size: 13px; color: #94a3b8; text-align: right; }
-        .balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
         .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
 
-        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #50130a, #2a0503); border: 3px solid #b45309; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); margin: 5px 0; position: relative; }
+        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #50130a, #2a0503); border: 3px solid #b45309; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); margin: 2px 0; position: relative; }
 
         .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 20; }
 
@@ -57,7 +55,6 @@
             100% { border-color: #ef4444; box-shadow: 0 0 20px #ef4444; }
         }
 
-        /* Animation quay vô tận từ trên xuống dưới */
         @keyframes reelSpinLoop {
             0% { transform: translate3d(0, -520px, 0); }
             100% { transform: translate3d(0, 0px, 0); }
@@ -119,15 +116,49 @@
         }
 
         .info-banner {
-            width: 100%; max-width: 480px; background: linear-gradient(180deg, #991b1b, #450a0a); border: 2px solid #facc15; border-radius: 20px; padding: 6px 15px; text-align: center; color: #fef08a; font-weight: bold; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin: 5px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; max-width: 480px; background: linear-gradient(180deg, #991b1b, #450a0a); border: 2px solid #facc15; border-radius: 20px; padding: 6px 15px; text-align: center; color: #fef08a; font-weight: bold; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin: 2px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
         .banner-scatter-img { height: 24px; width: auto; vertical-align: middle; }
 
-        .stats-bar { display: flex; justify-content: space-between; width: 100%; max-width: 480px; gap: 6px; margin-bottom: 5px; }
-        .stat-card { flex: 1; background: rgba(20, 10, 5, 0.85); border: 1px solid #78350f; border-radius: 8px; padding: 4px 8px; text-align: center; }
-        .stat-label { font-size: 11px; color: #a1a1aa; text-transform: uppercase; }
-        .stat-value { font-size: 13px; font-weight: bold; color: #38bdf8; }
-        .stat-value.win { color: #4ade80; }
+        /* KHOẢNG HIỂN THỊ TIỀN & THÔNG SỐ PHÍA DƯỚI DẠNG THẺ GIỐNG ẢNH 1 */
+        .stats-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%; 
+            max-width: 480px; 
+            gap: 8px; 
+            margin: 4px 0 2px 0; 
+        }
+        
+        .stat-card { 
+            flex: 1; 
+            background: rgba(30, 20, 15, 0.75); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            border-radius: 10px; 
+            padding: 8px 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .stat-icon {
+            font-size: 14px;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-value { 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: #38bdf8; 
+            white-space: nowrap;
+        }
+        
+        .stat-value.win { color: #38bdf8; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(20, 10, 5, 0.95); padding: 12px; border-radius: 16px; border: 1px solid #78350f; display: flex; flex-direction: column; gap: 8px; }
         .actions { display: flex; justify-content: space-around; align-items: center; gap: 8px; }
@@ -150,7 +181,7 @@
 
     <div class="header">
         <div class="game-title">🀄 Mahjong Ways</div>
-        <div class="balance-box">Số dư: <span id="balance">5.000</span> VNĐ</div>
+        <div style="color: #94a3b8; font-size: 12px;">TX68-GAME</div>
     </div>
 
     <div class="slot-machine">
@@ -170,18 +201,19 @@
         3 <img src="static/assets/freespin.svg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/freespin.svg';"> TRỞ LÊN SẼ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ
     </div>
 
+    <!-- 3 Ô CHỈ SỐ NẰM NGANG PHÍA DƯỚI GIỐNG ẢNH 1 -->
     <div class="stats-bar">
         <div class="stat-card">
-            <div class="stat-label">Cược Base</div>
-            <div class="stat-value" id="disp-bet-base">0.40</div>
+            <span class="stat-icon">💼</span>
+            <span class="stat-value" id="disp-balance">đ5.000,00</span>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Tổng Cược</div>
-            <div class="stat-value" id="disp-bet-total">400</div>
+            <span class="stat-icon">💲</span>
+            <span class="stat-value" id="disp-bet-total">đ0.40</span>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Thắng (WIN)</div>
-            <div class="stat-value win" id="disp-win-amount">0.00 đ</div>
+            <span class="stat-icon">🏆</span>
+            <span class="stat-value win" id="disp-win-amount">đ0.00</span>
         </div>
     </div>
 
@@ -253,12 +285,11 @@
 
         function updateBetDisplay() {
             let val = parseFloat(document.getElementById('bet-amount').value);
-            document.getElementById('disp-bet-base').innerText = val.toFixed(2);
-            document.getElementById('disp-bet-total').innerText = (val * 1000).toLocaleString('vi-VN');
+            document.getElementById('disp-bet-total').innerText = 'đ' + val.toFixed(2);
         }
 
         function updateBalance() {
-            document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
+            document.getElementById('disp-balance').innerText = 'đ' + balance.toLocaleString('vi-VN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
         function initGrid() {
@@ -296,7 +327,6 @@
             updateBalance();
         }
 
-        // Tạo dải bài lặp lại để quay vô tận mượt mà từ trên xuống
         function generateSpinningTrackHTML() {
             let html = '';
             for (let i = 0; i < 16; i++) {
@@ -309,8 +339,7 @@
         async function startSpin() {
             if (isSpinning) return;
 
-            const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
-            const betTotal = betMultiplier * 1000;
+            const betTotal = parseFloat(document.getElementById('bet-amount').value);
 
             if (freeSpinsLeft > 0) {
                 freeSpinsLeft--;
@@ -327,7 +356,7 @@
             }
 
             isSpinning = true;
-            document.getElementById('disp-win-amount').innerText = "0.00 đ";
+            document.getElementById('disp-win-amount').innerText = "đ0.00";
             const spinBtn = document.getElementById('spin-btn');
             spinBtn.disabled = true;
             spinBtn.classList.add('rotating');
@@ -335,9 +364,8 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
-            // Tính toán trước kết quả vòng quay
             let newMatrix = [];
-            let forceFreeSpin = Math.random() < 0.3; // Tỷ lệ ra Free Spin
+            let forceFreeSpin = Math.random() < 0.3;
             
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
@@ -355,7 +383,6 @@
 
             const gridContainer = document.getElementById('slot-grid');
 
-            // BƯỚC 1: KÍCH HOẠT QUAY LIÊN TỤC DOWNSIDE CHO TẤT CẢ 5 CỘT
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
                 track.innerHTML = generateSpinningTrackHTML();
@@ -363,7 +390,6 @@
                 track.className = 'reel-track spinning';
             }
 
-            // BƯỚC 2: DỪNG LẦN LƯỢT TỪNG CỘT (CỘT CHỜ VẪN GIỮ NGUYÊN TRẠNG THÁI QUAY LIÊN TỤC)
             let currentScatters = 0;
 
             for (let c = 0; c < cols; c++) {
@@ -375,24 +401,20 @@
                 if (isTension) {
                     gridContainer.classList.add('dimmed');
                     windowEl.classList.add('tension-active');
-                    // Cột c quay chậm hồi hộp, các cột sau vẫn tiếp tục quay nhanh chờ lượt
                     track.className = 'reel-track spinning-slow';
                     await sleep(isTurbo ? 600 : 1400);
                 } else {
                     await sleep(isTurbo ? 80 : 220);
                 }
 
-                // Dừng cột c chính xác tại kết quả
-                track.className = 'reel-track'; // Bỏ class animation vô tận
+                track.className = 'reel-track';
                 
                 let finalHTML = '';
-                // 4 ô kết quả ở trên cùng
                 for (let r = 0; r < rows; r++) {
                     let finalT = newMatrix[c][r];
                     let extraClass = (finalT === scatterTile) ? 'scatter-cell' : ((finalT === wildTile) ? 'wild-cell' : '');
                     finalHTML += `<div class="reel-cell ${extraClass}" id="cell-${c}-${r}" data-tile="${finalT}">${getCellContentHTML(finalT)}</div>`;
                 }
-                // Thêm một số ô ngẫu nhiên bên dưới để tạo hiệu ứng trượt hạ cánh
                 for (let i = 0; i < 8; i++) {
                     let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
                     finalHTML += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
@@ -402,15 +424,13 @@
                 track.style.transition = 'none';
                 track.style.transform = 'translate3d(0, -520px, 0)';
 
-                void track.offsetWidth; // Force Reflow
+                void track.offsetWidth;
 
-                // Trượt mượt xuống vị trí chuẩn 0px (chiều từ trên xuống)
                 track.style.transition = 'transform 260ms cubic-bezier(0.15, 0.85, 0.35, 1.05)';
                 track.style.transform = 'translate3d(0, 0px, 0)';
 
                 await sleep(260);
 
-                // Đếm số Scatter trên cột vừa dừng
                 for (let r = 0; r < rows; r++) {
                     if (newMatrix[c][r] === scatterTile) {
                         currentScatters++;
@@ -424,7 +444,6 @@
             gridData = newMatrix;
             renderCleanGrid();
 
-            // Nhận 10 vòng quay miễn phí khi đủ 3 Scatter
             if (currentScatters >= 3 && freeSpinsLeft === 0) {
                 freeSpinsLeft = 10;
                 const badge = document.getElementById('freespin-badge');
@@ -478,7 +497,7 @@
                     totalSpinWin += baseWin;
                     balance += baseWin;
                     updateBalance();
-                    document.getElementById('disp-win-amount').innerText = `${Math.floor(totalSpinWin).toLocaleString('vi-VN')} đ`;
+                    document.getElementById('disp-win-amount').innerText = `đ${totalSpinWin.toFixed(2)}`;
 
                     await sleep(600);
 

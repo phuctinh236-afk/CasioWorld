@@ -49,6 +49,12 @@
             opacity: 1 !important;
             box-shadow: 0 0 15px #facc15, inset 0 0 10px #facc15;
             border: 2px solid #fde047;
+            animation: tensionPulse 0.6s infinite alternate;
+        }
+
+        @keyframes tensionPulse {
+            0% { border-color: #fde047; box-shadow: 0 0 10px #facc15; }
+            100% { border-color: #ef4444; box-shadow: 0 0 20px #ef4444; }
         }
 
         .reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; }
@@ -153,7 +159,7 @@
     </div>
 
     <div class="info-banner" id="info-banner">
-        3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Free Spin"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ
+        3 <img src="static/assets/freespin.svg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/freespin.svg';"> TRỞ LÊN SẼ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ
     </div>
 
     <div class="stats-bar">
@@ -203,7 +209,7 @@
         let autoTimer = null;
         let freeSpinsLeft = 0;
 
-        // Chỉ chứa danh sách quân mạt chược SVG chính xác (đã loại bỏ các file .jpg)
+        // Loại bỏ hoàn toàn Blank.svg để không xuất hiện ô trắng rỗng
         const tileAssets = [
             "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg",
             "Sou7.svg", "Sou8.svg", "Sou9.svg",
@@ -221,15 +227,14 @@
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // Hàm hiển thị hình ảnh đúng đường dẫn freespin.svg cho ô Scatter
         function getCellContentHTML(tileName) {
             if (tileName === scatterTile) {
-                return `<img src="/static/assets/freespin.svg" alt="Free Spin">`;
+                return `<img src="static/assets/freespin.svg" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/freespin.svg';">`;
             }
             if (tileName === wildTile) {
                 return `WILD`;
             }
-            return `<img src="/static/assets/${tileName}" alt="${tileName}">`;
+            return `<img src="static/assets/${tileName}" alt="${tileName}" onerror="this.onerror=null; this.src='/static/assets/${tileName}';">`;
         }
 
         function updateMultiplierDisplay() {
@@ -313,8 +318,9 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
+            // Tạo ma trận kết quả mới
             let newMatrix = [];
-            let forceFreeSpin = Math.random() < 0.2;
+            let forceFreeSpin = Math.random() < 0.25; // 25% tỷ lệ ra Free Spin
             
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
@@ -330,21 +336,15 @@
                 newMatrix.push(colTiles);
             }
 
-            let currentScatters = 0;
             const gridContainer = document.getElementById('slot-grid');
 
+            // BƯỚC 1: BẮT ĐẦU CHO CẢ 5 HÀNG CÙNG QUAY ĐỒNG THỜI
             for (let c = 0; c < cols; c++) {
-                const windowEl = document.getElementById(`reel-window-${c}`);
                 const track = document.getElementById(`reel-track-${c}`);
-
-                let isTension = (currentScatters >= 2);
-                if (isTension) {
-                    gridContainer.classList.add('dimmed');
-                    windowEl.classList.add('tension-active');
-                }
-
                 let spinHTML = '';
-                for (let i = 0; i < 8; i++) {
+                
+                // Tạo hiệu ứng cuộn dải bài dài 20 ô
+                for (let i = 0; i < 20; i++) {
                     let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
                     spinHTML += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
                 }
@@ -358,16 +358,41 @@
                 track.style.transition = 'none';
                 track.style.transform = 'translate3d(0, 0px, 0)';
 
-                let duration = isTension ? 1200 : (isTurbo ? 150 : 350);
+                // Kích hoạt animation quay liên tục cho cả 5 cột
+                setTimeout(() => {
+                    track.style.transition = 'transform 8s linear';
+                    track.style.transform = `translate3d(0, ${-20 * 65}px, 0)`;
+                }, 20);
+            }
 
-                await sleep(20);
-                track.style.transition = `transform ${duration}ms cubic-bezier(0.15, 0.9, 0.3, 1)`;
-                track.style.transform = `translate3d(0, ${-8 * 65}px, 0)`;
+            // BƯỚC 2: LẦN LƯỢT DỪNG TỪNG CỘT TỪ TRÁI SANG PHẢI (CÓ TENSION SPIN NẾU ĐƯỢC 2 SCATTER)
+            let currentScatters = 0;
 
-                await sleep(duration);
+            for (let c = 0; c < cols; c++) {
+                const windowEl = document.getElementById(`reel-window-${c}`);
+                const track = document.getElementById(`reel-track-${c}`);
 
+                // Nếu đã xuất hiện từ 2 quân Scatter trở lên -> Cột tiếp theo quay từ từ
+                let isTension = (currentScatters >= 2);
+                if (isTension) {
+                    gridContainer.classList.add('dimmed');
+                    windowEl.classList.add('tension-active');
+                    await sleep(isTurbo ? 800 : 1600); // Thời gian chờ quay từ từ
+                } else {
+                    await sleep(isTurbo ? 100 : 250);
+                }
+
+                // Chốt dừng cột c tại vị trí chuẩn
+                track.style.transition = `transform ${isTension ? 400 : 200}ms cubic-bezier(0.1, 0.9, 0.2, 1)`;
+                track.style.transform = `translate3d(0, ${-20 * 65}px, 0)`;
+                
+                await sleep(isTension ? 400 : 200);
+
+                // Kiểm tra xem cột vừa dừng có Scatter không
                 for (let r = 0; r < rows; r++) {
-                    if (newMatrix[c][r] === scatterTile) currentScatters++;
+                    if (newMatrix[c][r] === scatterTile) {
+                        currentScatters++;
+                    }
                 }
 
                 windowEl.classList.remove('tension-active');
@@ -377,12 +402,13 @@
             gridData = newMatrix;
             renderCleanGrid();
 
+            // Nếu đủ 3 Scatter -> Nhận 10 vòng quay miễn phí
             if (currentScatters >= 3 && freeSpinsLeft === 0) {
-                freeSpinsLeft = 12;
+                freeSpinsLeft = 10;
                 const badge = document.getElementById('freespin-badge');
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-                document.getElementById('info-banner').innerHTML = `🎉 BẠN ĐÃ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!`;
+                document.getElementById('info-banner').innerText = "🎉 BẠN ĐÃ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ!";
             }
 
             await processCascade(betTotal);

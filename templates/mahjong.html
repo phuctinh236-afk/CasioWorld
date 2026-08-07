@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mahjong Ways - TX68</title>
+    <title>Mahjong Ways - Full Mechanics</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body { 
-            background: #110803; 
+            background: #0d0502; 
             color: #fff; 
             min-height: 100vh; 
             display: flex; 
@@ -28,144 +28,99 @@
 
         .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #50130a, #2a0503); border: 3px solid #b45309; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); margin: 5px 0; position: relative; }
 
-        .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 10; }
+        .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 20; }
 
         .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
         .mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
         .mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
 
-        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #15803d; padding: 6px; border-radius: 10px; border: 2px solid #166534; }
-        .reel-window { height: 260px; overflow: hidden; position: relative; background: #166534; border-radius: 6px; }
-        .reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; will-change: transform; }
+        /* GRID CONTAINER & HIỆU ỨNG TỐI MÀN HÌNH CHỜ SCATTER */
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #15803d; padding: 6px; border-radius: 10px; border: 2px solid #166534; position: relative; transition: filter 0.3s ease; }
+        
+        .grid-container.dimmed .reel-window:not(.tension-active) {
+            filter: brightness(0.35);
+            opacity: 0.65;
+        }
 
-        .reel-cell { background: #f8fafc; color: #1e293b; border-radius: 6px; height: 61px; display: flex; align-items: center; justify-content: center; font-size: 32px; position: relative; box-shadow: inset 0 -3px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.3); flex-shrink: 0; font-weight: bold; }
-        .reel-cell.gold-border { border: 3px solid #eab308; background: #fef9c3; box-shadow: inset 0 -3px 0 #fde047, 0 0 10px #eab308; color: #854d0e; }
+        .reel-window { height: 260px; overflow: hidden; position: relative; background: #166534; border-radius: 6px; transition: all 0.3s ease; }
+        
+        /* CỘT SÁNG NỔI BẬT KHI CHỜ SCATTER */
+        .reel-window.tension-active {
+            z-index: 10;
+            filter: brightness(1.3);
+            opacity: 1 !important;
+            box-shadow: 0 0 15px #facc15, inset 0 0 10px #facc15;
+            border: 2px solid #fde047;
+        }
+
+        .reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; }
+
+        .reel-cell { 
+            background: #f8fafc; 
+            color: #1e293b; 
+            border-radius: 6px; 
+            height: 61px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 30px; 
+            position: relative; 
+            box-shadow: inset 0 -3px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.3); 
+            flex-shrink: 0; 
+            font-weight: bold; 
+            transition: transform 0.3s ease, opacity 0.3s ease, border 0.2s ease;
+        }
+
+        /* VIỀN VÀNG RỰC RỠ KHI NỔ THẮNG */
+        .reel-cell.win-gold-frame { 
+            border: 3.5px solid #facc15 !important; 
+            box-shadow: 0 0 12px #facc15, inset 0 0 8px #facc15 !important; 
+            background: #fef9c3 !important;
+            animation: pulseFrame 0.4s infinite alternate;
+            z-index: 5;
+        }
+
+        @keyframes pulseFrame {
+            0% { transform: scale(0.96); }
+            100% { transform: scale(1.04); }
+        }
 
         .reel-cell.scatter-cell { 
             background: linear-gradient(135deg, #fef08a 0%, #facc15 100%); 
-            border: 3px solid #eab308; 
+            border: 2px solid #eab308; 
             box-shadow: inset 0 -3px 0 #fde047, 0 0 12px rgba(250, 204, 21, 0.8);
             padding: 3px;
         }
-        .reel-cell.scatter-cell img {
-            width: 88%;
-            height: 88%;
-            object-fit: contain;
-            filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.4));
-        }
+        .reel-cell.scatter-cell img { width: 85%; height: 85%; object-fit: contain; }
 
         .reel-cell.wild-cell { background: linear-gradient(135deg, #fef08a, #eab308); color: #713f12; font-size: 13px; font-weight: 900; border: 2px solid #facc15; }
 
         .info-banner {
-            width: 100%;
-            max-width: 480px;
-            background: linear-gradient(180deg, #991b1b, #450a0a);
-            border: 2px solid #facc15;
-            border-radius: 20px;
-            padding: 6px 15px;
-            text-align: center;
-            color: #fef08a;
-            font-weight: bold;
-            font-size: 13px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            margin: 5px 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            width: 100%; max-width: 480px; background: linear-gradient(180deg, #991b1b, #450a0a); border: 2px solid #facc15; border-radius: 20px; padding: 6px 15px; text-align: center; color: #fef08a; font-weight: bold; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin: 5px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
+        .banner-scatter-img { height: 22px; width: auto; vertical-align: middle; }
 
-        .banner-scatter-img {
-            height: 24px;
-            width: auto;
-            vertical-align: middle;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
-        }
-
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 480px;
-            gap: 6px;
-            margin-bottom: 5px;
-        }
-        .stat-card {
-            flex: 1;
-            background: rgba(20, 10, 5, 0.85);
-            border: 1px solid #78350f;
-            border-radius: 8px;
-            padding: 4px 8px;
-            text-align: center;
-        }
+        .stats-bar { display: flex; justify-content: space-between; width: 100%; max-width: 480px; gap: 6px; margin-bottom: 5px; }
+        .stat-card { flex: 1; background: rgba(20, 10, 5, 0.85); border: 1px solid #78350f; border-radius: 8px; padding: 4px 8px; text-align: center; }
         .stat-label { font-size: 11px; color: #a1a1aa; text-transform: uppercase; }
         .stat-value { font-size: 13px; font-weight: bold; color: #38bdf8; }
         .stat-value.win { color: #4ade80; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(20, 10, 5, 0.95); padding: 12px; border-radius: 16px; border: 1px solid #78350f; display: flex; flex-direction: column; gap: 8px; }
-
         .actions { display: flex; justify-content: space-around; align-items: center; gap: 8px; }
 
-        .btn-circle {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #27272a;
-            border: 1px solid #52525b;
-            color: #e4e4e7;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .btn-circle { width: 45px; height: 45px; border-radius: 50%; background: #27272a; border: 1px solid #52525b; color: #e4e4e7; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-circle.active { background: #dc2626; color: #fff; border-color: #f87171; }
 
-        @keyframes spinRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spinRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .spin-btn { 
-            width: 72px; 
-            height: 72px; 
-            background: radial-gradient(circle, #facc15 0%, #ca8a04 70%, #854d0e 100%); 
-            border: 3px solid #fef08a; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-shrink: 0; 
-            box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
-        }
-        .spin-icon {
-            width: 38px;
-            height: 38px;
-            border: 4px solid #713f12;
-            border-top-color: transparent;
-            border-radius: 50%;
-        }
-        .spin-btn.rotating .spin-icon {
-            animation: spinRotate 0.6s linear infinite;
-        }
+        .spin-btn { width: 72px; height: 72px; background: radial-gradient(circle, #facc15 0%, #ca8a04 70%, #854d0e 100%); border: 3px solid #fef08a; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+        .spin-icon { width: 38px; height: 38px; border: 4px solid #713f12; border-top-color: transparent; border-radius: 50%; }
+        .spin-btn.rotating .spin-icon { animation: spinRotate 0.6s linear infinite; }
         .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .bet-select {
-            background: #18181b;
-            color: #facc15;
-            border: 1px solid #52525b;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
+        .bet-select { background: #18181b; color: #facc15; border: 1px solid #52525b; padding: 6px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         .back-link { color: #a1a1aa; text-decoration: none; font-size: 12px; text-align: center; margin-top: 4px; display: block; }
-        .back-link:hover { color: #fff; }
     </style>
 </head>
 <body>
@@ -194,7 +149,7 @@
 
     <div class="stats-bar">
         <div class="stat-card">
-            <div class="stat-label">Cược</div>
+            <div class="stat-label">Cược Base</div>
             <div class="stat-value" id="disp-bet-base">0.40</div>
         </div>
         <div class="stat-card">
@@ -239,39 +194,26 @@
         let autoTimer = null;
         let freeSpinsLeft = 0;
 
-        const bannerMessages = [
-            '3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src=\'/static/assets/freespin.png\';"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ',
-            'TĂNG SỐ NHÂN TỐI ĐA X10 TRONG CÁC VÒNG QUAY MIỄN PHÍ'
-        ];
-        let currentBannerIdx = 0;
-
-        setInterval(() => {
-            if (freeSpinsLeft === 0) {
-                currentBannerIdx = (currentBannerIdx + 1) % bannerMessages.length;
-                const bannerEl = document.getElementById('info-banner');
-                if (bannerEl) bannerEl.innerHTML = bannerMessages[currentBannerIdx];
-            }
-        }, 4000);
-
-        const tiles = ["🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀙", "🀚", "🀛", "🀜", "🀝", "🀞", "🀟", "🀠", "🀡", "🀢", "🀣", "🀤", "🀥", "🀦", "🀧", "🀨", "發"];
+        const tiles = ["🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒"];
         const scatterTile = "SCATTER";
-
         const rows = 4;
         const cols = 5;
-        let currentMultiplierIndex = 0; 
+
+        // Lưu trữ trạng thái ma trận bàn chơi [col][row]
+        let gridData = [];
+        let currentMultiplierIdx = 0;
         const multipliers = [1, 2, 3, 5];
 
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
         function getScatterHTML() {
-            return `<img src="/static/assets/freespin.svg" alt="FreeSpin" onerror="this.onerror=null; this.src='/static/assets/freespin.png';">`;
+            return `<img src="/static/assets/freespin.svg" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/freespin.png';">`;
         }
 
         function updateMultiplierDisplay() {
             document.querySelectorAll('.mult-item').forEach((el, idx) => {
-                if (idx === currentMultiplierIndex) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
+                if (idx === currentMultiplierIdx) el.classList.add('active');
+                else el.classList.remove('active');
             });
         }
 
@@ -281,151 +223,161 @@
             document.getElementById('disp-bet-total').innerText = (val * 1000).toLocaleString('vi-VN');
         }
 
+        function updateBalance() {
+            document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
+        }
+
+        // Tạo bàn chơi ban đầu
         function initGrid() {
             const grid = document.getElementById('slot-grid');
-            if (!grid) return;
             grid.innerHTML = '';
-            
+            gridData = [];
+
             for (let c = 0; c < cols; c++) {
+                let colData = [];
                 const windowDiv = document.createElement('div');
                 windowDiv.className = 'reel-window';
+                windowDiv.id = `reel-window-${c}`;
 
                 const trackDiv = document.createElement('div');
                 trackDiv.className = 'reel-track';
                 trackDiv.id = `reel-track-${c}`;
 
                 for (let r = 0; r < rows; r++) {
+                    let tile = tiles[Math.floor(Math.random() * tiles.length)];
+                    colData.push(tile);
+
                     const cell = document.createElement('div');
-                    
-                    if (Math.random() < 0.18) {
-                        cell.className = 'reel-cell scatter-cell';
-                        cell.innerHTML = getScatterHTML();
-                        cell.dataset.tile = scatterTile;
-                    } else {
-                        cell.className = 'reel-cell';
-                        if (Math.random() < 0.2) cell.classList.add('gold-border');
-                        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                        cell.innerText = randomTile;
-                        cell.dataset.tile = randomTile;
-                    }
+                    cell.className = 'reel-cell';
+                    cell.id = `cell-${c}-${r}`;
+                    cell.innerText = tile;
+                    cell.dataset.tile = tile;
                     trackDiv.appendChild(cell);
                 }
 
+                gridData.push(colData);
                 windowDiv.appendChild(trackDiv);
                 grid.appendChild(windowDiv);
             }
-            currentMultiplierIndex = 0;
-            updateMultiplierDisplay();
             updateBetDisplay();
             updateBalance();
         }
 
-        function startSpin() {
+        // BẮT ĐẦU QUAY
+        async function startSpin() {
             if (isSpinning) return;
 
             const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
-            const betInput = betMultiplier * 1000; 
+            const betTotal = betMultiplier * 1000;
 
             if (freeSpinsLeft > 0) {
                 freeSpinsLeft--;
                 document.getElementById('freespin-badge').innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-                document.getElementById('info-banner').innerHTML = `TRONG CÁC VÒNG QUAY MIỄN PHÍ: CÒN ${freeSpinsLeft} LƯỢT`;
-                if (freeSpinsLeft === 0) {
-                    document.getElementById('freespin-badge').style.display = 'none';
-                }
+                if (freeSpinsLeft === 0) document.getElementById('freespin-badge').style.display = 'none';
             } else {
-                if (balance < betInput) {
-                    alert("Số dư tài khoản không đủ!");
+                if (balance < betTotal) {
+                    alert("Số dư không đủ!");
                     stopAutoPlay();
                     return;
                 }
-                balance -= betInput;
+                balance -= betTotal;
                 updateBalance();
             }
 
             isSpinning = true;
-            
+            document.getElementById('disp-win-amount').innerText = "0.00 đ";
             const spinBtn = document.getElementById('spin-btn');
             spinBtn.disabled = true;
             spinBtn.classList.add('rotating');
-            
-            currentMultiplierIndex = 0;
+
+            currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
-            let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
-            let finalGridData = [];
-
+            // Lập trình kết quả ngẫu nhiên trước khi quay
+            let newMatrix = [];
+            let forceFreeSpin = Math.random() < 0.2; // 20% cơ hội nổ FreeSpin
+            
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
                 for (let r = 0; r < rows; r++) {
-                    let chosen = tiles[Math.floor(Math.random() * tiles.length)];
-                    if (willTriggerFreeSpins && c < 3 && r === 0 && Math.random() < 0.75) {
-                        chosen = scatterTile;
+                    let tile = tiles[Math.floor(Math.random() * tiles.length)];
+                    // Tạo tỷ lệ Scatter
+                    if ((forceFreeSpin && c < 3 && r === 0) || Math.random() < 0.08) {
+                        tile = scatterTile;
                     }
-                    colTiles.push(chosen);
+                    colTiles.push(tile);
                 }
-                finalGridData.push(colTiles);
+                newMatrix.push(colTiles);
             }
+
+            // TIẾN HÀNH QUAY TỪNG CỘT & HIỆU ỨNG CHỜ SCATTER
+            let currentScatters = 0;
+            const gridContainer = document.getElementById('slot-grid');
 
             for (let c = 0; c < cols; c++) {
+                const windowEl = document.getElementById(`reel-window-${c}`);
                 const track = document.getElementById(`reel-track-${c}`);
-                let htmlContent = '';
-                for (let i = 0; i < 6; i++) {
+
+                // NẾU ĐÃ CÓ 2 SCATTER -> KÍCH HOẠT HIỆU ỨNG TỐI MÀN HÌNH & CHỜ QUAY CHẬM
+                let isTension = (currentScatters >= 2);
+                if (isTension) {
+                    gridContainer.classList.add('dimmed');
+                    windowEl.classList.add('tension-active');
+                }
+
+                // Chuẩn bị các ô quay cuộn
+                let spinHTML = '';
+                for (let i = 0; i < 8; i++) {
                     let randT = tiles[Math.floor(Math.random() * tiles.length)];
-                    htmlContent += `<div class="reel-cell">${randT}</div>`;
+                    spinHTML += `<div class="reel-cell">${randT}</div>`;
                 }
                 for (let r = 0; r < rows; r++) {
-                    let finalT = finalGridData[c][r];
-                    let isGold = Math.random() < 0.2 ? 'gold-border' : '';
-                    let isWild = (Math.random() < 0.08 && finalT !== scatterTile);
-                    
+                    let finalT = newMatrix[c][r];
                     if (finalT === scatterTile) {
-                        htmlContent += `<div class="reel-cell scatter-cell" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
-                    } else if (isWild) {
-                        htmlContent += `<div class="reel-cell wild-cell" data-tile="WILD">WILD</div>`;
+                        spinHTML += `<div class="reel-cell scatter-cell" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
                     } else {
-                        htmlContent += `<div class="reel-cell ${isGold}" data-tile="${finalT}">${finalT}</div>`;
+                        spinHTML += `<div class="reel-cell" data-tile="${finalT}">${finalT}</div>`;
                     }
                 }
-                track.innerHTML = htmlContent;
+
+                track.innerHTML = spinHTML;
                 track.style.transition = 'none';
                 track.style.transform = 'translate3d(0, 0px, 0)';
+
+                // Thời gian quay: Nếu đang chờ Scatter thì quay chậm hơn (1.2s), bình thường 0.3s
+                let duration = isTension ? 1200 : (isTurbo ? 150 : 350);
+
+                await sleep(20);
+                track.style.transition = `transform ${duration}ms cubic-bezier(0.15, 0.9, 0.3, 1)`;
+                track.style.transform = `translate3d(0, ${-8 * 65}px, 0)`;
+
+                await sleep(duration);
+
+                // Kiểm tra Scatter ở cột vừa dừng
+                for (let r = 0; r < rows; r++) {
+                    if (newMatrix[c][r] === scatterTile) currentScatters++;
+                }
+
+                windowEl.classList.remove('tension-active');
             }
 
-            let spinDuration = isTurbo ? 350 : 700;
+            gridContainer.classList.remove('dimmed');
 
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    for (let c = 0; c < cols; c++) {
-                        const track = document.getElementById(`reel-track-${c}`);
-                        track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
-                        let targetY = -6 * 65;
-                        track.style.transform = `translate3d(0, ${targetY}px, 0)`;
-                    }
-                });
-            });
+            // Cập nhật lại gridData
+            gridData = newMatrix;
+            renderCleanGrid();
 
-            setTimeout(() => {
-                finishSpinProcess(spinBtn, betInput);
-            }, spinDuration + 50);
-        }
-
-        function finishSpinProcess(spinBtn, betInput) {
-            let totalScatters = 0;
-            const cells = document.querySelectorAll('.reel-cell');
-            cells.forEach(cell => {
-                if (cell.dataset.tile === scatterTile) totalScatters++;
-            });
-
-            if (totalScatters >= 3 && freeSpinsLeft === 0) {
+            // Kiểm tra kích hoạt Free Spin
+            if (currentScatters >= 3 && freeSpinsLeft === 0) {
                 freeSpinsLeft = 12;
                 const badge = document.getElementById('freespin-badge');
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-                document.getElementById('info-banner').innerHTML = "KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!";
+                document.getElementById('info-banner').innerText = "🎉 BẠN ĐÃ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!";
             }
 
-            evaluateWin(betInput);
+            // TIẾN HÀNH XỬ LÝ NỔ SỦP (CASCADE)
+            await processCascade(betTotal);
 
             isSpinning = false;
             spinBtn.disabled = false;
@@ -434,92 +386,147 @@
             if (isAutoPlaying || freeSpinsLeft > 0) {
                 autoTimer = setTimeout(() => {
                     if (isAutoPlaying || freeSpinsLeft > 0) startSpin();
-                }, isTurbo ? 400 : 800);
+                }, 500);
             }
         }
 
-        function toggleAutoPlay() {
-            const autoBtn = document.getElementById('auto-btn');
-            isAutoPlaying = !isAutoPlaying;
+        // Vẽ lại bàn chơi sạch gọn sau khi cuộn dừng
+        function renderCleanGrid() {
+            for (let c = 0; c < cols; c++) {
+                const track = document.getElementById(`reel-track-${c}`);
+                track.style.transition = 'none';
+                track.style.transform = 'translate3d(0, 0px, 0)';
+                let html = '';
+                for (let r = 0; r < rows; r++) {
+                    let tile = gridData[c][r];
+                    if (tile === scatterTile) {
+                        html += `<div class="reel-cell scatter-cell" id="cell-${c}-${r}" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
+                    } else {
+                        html += `<div class="reel-cell" id="cell-${c}-${r}" data-tile="${tile}">${tile}</div>`;
+                    }
+                }
+                track.innerHTML = html;
+            }
+        }
 
+        // CƠ CHẾ NỔ SỦP & VIỀN VÀNG & TẠO Ô MỚI DỒN TỪ TRÊN XUỐNG
+        async function processCascade(betTotal) {
+            let hasWin = true;
+            let totalSpinWin = 0;
+
+            while (hasWin) {
+                let winningCoords = findWinningMatches();
+
+                if (winningCoords.length > 0) {
+                    // 1. Tạo hiệu ứng Viền Vàng xung quanh các ô trúng
+                    winningCoords.forEach(coord => {
+                        let cell = document.getElementById(`cell-${coord.c}-${coord.r}`);
+                        if (cell) cell.classList.add('win-gold-frame');
+                    });
+
+                    // Tính tiền thắng đợt này
+                    let baseWin = winningCoords.length * (betTotal * 0.3) * multipliers[currentMultiplierIdx];
+                    totalSpinWin += baseWin;
+                    balance += baseWin;
+                    updateBalance();
+                    document.getElementById('disp-win-amount').innerText = `${Math.floor(totalSpinWin).toLocaleString('vi-VN')} đ`;
+
+                    await sleep(600); // Tạm dừng để xem viền vàng nổ
+
+                    // 2. Làm biến mất các ô thắng
+                    winningCoords.forEach(coord => {
+                        let cell = document.getElementById(`cell-${coord.c}-${coord.r}`);
+                        if (cell) {
+                            cell.style.transform = 'scale(0)';
+                            cell.style.opacity = '0';
+                        }
+                    });
+
+                    await sleep(300);
+
+                    // 3. Dồn ô từ trên xuống & Tạo con mới ngẫu nhiên lấp vào
+                    for (let c = 0; c < cols; c++) {
+                        let colTiles = gridData[c];
+                        let newCol = [];
+
+                        // Lọc các ô không nổ
+                        for (let r = 0; r < rows; r++) {
+                            let isExploded = winningCoords.some(coord => coord.c === c && coord.r === r);
+                            if (!isExploded) newCol.push(colTiles[r]);
+                        }
+
+                        // Thêm các con mới lên đầu hàng
+                        while (newCol.length < rows) {
+                            let newT = tiles[Math.floor(Math.random() * tiles.length)];
+                            newCol.unshift(newT);
+                        }
+
+                        gridData[c] = newCol;
+                    }
+
+                    // Render lại ma trận mới dồn từ trên xuống
+                    renderCleanGrid();
+                    await sleep(200);
+
+                    // Tăng số nhân (x1 -> x2 -> x3 -> x5)
+                    if (currentMultiplierIdx < multipliers.length - 1) {
+                        currentMultiplierIdx++;
+                        updateMultiplierDisplay();
+                    }
+                } else {
+                    hasWin = false;
+                }
+            }
+        }
+
+        // TÌM CÁC Ô TRÚNG NỔ (3 con giống nhau trở lên xuất hiện liên tiếp)
+        function findWinningMatches() {
+            let matched = [];
+            let symbolCounts = {};
+
+            // Thống kê số lượng symbol xuất hiện
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                    let tile = gridData[c][r];
+                    if (tile !== scatterTile) {
+                        symbolCounts[tile] = (symbolCounts[tile] || 0) + 1;
+                    }
+                }
+            }
+
+            // Tìm con nào xuất hiện từ 3 ô trở lên trên bàn
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                    let tile = gridData[c][r];
+                    if (tile !== scatterTile && symbolCounts[tile] >= 3) {
+                        matched.push({ c, r });
+                    }
+                }
+            }
+            return matched;
+        }
+
+        function toggleAutoPlay() {
+            isAutoPlaying = !isAutoPlaying;
+            const autoBtn = document.getElementById('auto-btn');
             if (isAutoPlaying) {
                 autoBtn.classList.add('active');
                 if (!isSpinning) startSpin();
-            } else {
-                stopAutoPlay();
-            }
+            } else stopAutoPlay();
         }
 
         function stopAutoPlay() {
             isAutoPlaying = false;
             clearTimeout(autoTimer);
-            const autoBtn = document.getElementById('auto-btn');
-            autoBtn.classList.remove('active');
+            document.getElementById('auto-btn').classList.remove('active');
         }
 
         function toggleTurbo() {
             isTurbo = !isTurbo;
-            const turboBtn = document.getElementById('turbo-btn');
-            if(isTurbo) turboBtn.classList.add('active');
-            else turboBtn.classList.remove('active');
+            document.getElementById('turbo-btn').classList.toggle('active', isTurbo);
         }
 
-        function evaluateWin(betInput) {
-            let matchedSymbols = {};
-            for (let c = 0; c < cols; c++) {
-                const track = document.getElementById(`reel-track-${c}`);
-                if (!track) continue;
-                const allCellsInTrack = track.querySelectorAll('.reel-cell');
-                for (let i = allCellsInTrack.length - rows; i < allCellsInTrack.length; i++) {
-                    if(allCellsInTrack[i]) {
-                        let t = allCellsInTrack[i].dataset.tile;
-                        if(t) matchedSymbols[t] = (matchedSymbols[t] || 0) + 1;
-                    }
-                }
-            }
-
-            let totalWin = 0;
-            let hasWon = false;
-
-            for (let tile in matchedSymbols) {
-                if (matchedSymbols[tile] >= 3 || tile === "WILD") {
-                    hasWon = true;
-                    let baseMultiplier = matchedSymbols[tile] * 0.4;
-                    totalWin += betInput * baseMultiplier;
-                }
-            }
-
-            let luckFactor = (freeSpinsLeft > 0) ? 2 : 1;
-
-            if (hasWon && totalWin > 0) {
-                let multValue = multipliers[currentMultiplierIndex];
-                totalWin = Math.floor(totalWin * multValue * luckFactor);
-                
-                balance += totalWin;
-
-                document.getElementById('disp-win-amount').innerText = `${totalWin.toLocaleString('vi-VN')} đ`;
-
-                if (currentMultiplierIndex < multipliers.length - 1) {
-                    currentMultiplierIndex++;
-                }
-                updateMultiplierDisplay();
-            } else {
-                document.getElementById('disp-win-amount').innerText = "0.00 đ";
-            }
-
-            updateBalance();
-        }
-
-        function updateBalance() {
-            const balanceEl = document.getElementById('balance');
-            if (balanceEl) balanceEl.innerText = balance.toLocaleString('vi-VN');
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initGrid);
-        } else {
-            initGrid();
-        }
+        window.onload = initGrid;
     </script>
 </body>
 </html>

@@ -1,526 +1,525 @@
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahjong Ways - TX68</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-body { 
-    background: #110803; 
-    color: #fff; 
-    min-height: 100vh; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-start; 
-    gap: 10px;
-    padding: 10px; 
-    overflow-y: auto;
-    overflow-x: hidden;
-}
+        body { 
+            background: #110803; 
+            color: #fff; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 10px;
+            padding: 10px; 
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
 
-.header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
-.balance-box { font-size: 13px; color: #94a3b8; text-align: right; }
-.balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
-.game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
+        .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
+        .balance-box { font-size: 13px; color: #94a3b8; text-align: right; }
+        .balance-box span { display: block; font-size: 16px; font-weight: bold; color: #fbbf24; }
+        .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
 
-.slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #50130a, #2a0503); border: 3px solid #b45309; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); margin: 5px 0; position: relative; }
+        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #50130a, #2a0503); border: 3px solid #b45309; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); margin: 5px 0; position: relative; }
 
-.freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 10; }
+        .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 10; }
 
-/* Khung hệ số nhân x1 x2 x3 x5 */
-.multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
-.mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
-.mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
+        .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
+        .mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
+        .mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
 
-.grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #15803d; padding: 6px; border-radius: 10px; border: 2px solid #166534; }
-.reel-window { height: 260px; overflow: hidden; position: relative; background: #166534; border-radius: 6px; }
-.reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; will-change: transform; }
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #15803d; padding: 6px; border-radius: 10px; border: 2px solid #166534; }
+        .reel-window { height: 260px; overflow: hidden; position: relative; background: #166534; border-radius: 6px; }
+        .reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; will-change: transform; }
 
-/* Thiết kế quân bài Mạt Chượt */
-.reel-cell { background: #f8fafc; color: #1e293b; border-radius: 6px; height: 61px; display: flex; align-items: center; justify-content: center; font-size: 32px; position: relative; box-shadow: inset 0 -3px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.3); flex-shrink: 0; font-weight: bold; }
-.reel-cell.gold-border { border: 3px solid #eab308; background: #fef9c3; box-shadow: inset 0 -3px 0 #fde047, 0 0 10px #eab308; color: #854d0e; }
+        .reel-cell { background: #f8fafc; color: #1e293b; border-radius: 6px; height: 61px; display: flex; align-items: center; justify-content: center; font-size: 32px; position: relative; box-shadow: inset 0 -3px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.3); flex-shrink: 0; font-weight: bold; }
+        .reel-cell.gold-border { border: 3px solid #eab308; background: #fef9c3; box-shadow: inset 0 -3px 0 #fde047, 0 0 10px #eab308; color: #854d0e; }
 
-/* QUÂN FREESPIN / SCATTER BẰNG HÌNH ẢNH FREESPIN.SVG */
-.reel-cell.scatter-cell { 
-    background: linear-gradient(135deg, #fef08a 0%, #facc15 100%); 
-    border: 3px solid #eab308; 
-    box-shadow: inset 0 -3px 0 #fde047, 0 0 12px rgba(250, 204, 21, 0.8);
-    padding: 3px;
-}
-.reel-cell.scatter-cell img {
-    width: 88%;
-    height: 88%;
-    object-fit: contain;
-    filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.4));
-}
+        .reel-cell.scatter-cell { 
+            background: linear-gradient(135deg, #fef08a 0%, #facc15 100%); 
+            border: 3px solid #eab308; 
+            box-shadow: inset 0 -3px 0 #fde047, 0 0 12px rgba(250, 204, 21, 0.8);
+            padding: 3px;
+        }
+        .reel-cell.scatter-cell img {
+            width: 88%;
+            height: 88%;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.4));
+        }
 
-.reel-cell.wild-cell { background: linear-gradient(135deg, #fef08a, #eab308); color: #713f12; font-size: 13px; font-weight: 900; border: 2px solid #facc15; }
+        .reel-cell.wild-cell { background: linear-gradient(135deg, #fef08a, #eab308); color: #713f12; font-size: 13px; font-weight: 900; border: 2px solid #facc15; }
 
-/* Banner thông báo đỏ chạy chữ bên trên nút quay */
-.info-banner {
-    width: 100%;
-    max-width: 480px;
-    background: linear-gradient(180deg, #991b1b, #450a0a);
-    border: 2px solid #facc15;
-    border-radius: 20px;
-    padding: 6px 15px;
-    text-align: center;
-    color: #fef08a;
-    font-weight: bold;
-    font-size: 13px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-    margin: 5px 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    min-height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
+        .info-banner {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(180deg, #991b1b, #450a0a);
+            border: 2px solid #facc15;
+            border-radius: 20px;
+            padding: 6px 15px;
+            text-align: center;
+            color: #fef08a;
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            margin: 5px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
 
-/* Icon ảnh Scatter trong dải banner */
-.banner-scatter-img {
-    height: 24px;
-    width: auto;
-    vertical-align: middle;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
-}
+        .banner-scatter-img {
+            height: 24px;
+            width: auto;
+            vertical-align: middle;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+        }
 
-/* Thanh thông số 3 ô bên dưới: Mức Cược, Tổng Cược, Tiền Thắng (WIN) */
-.stats-bar {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 480px;
-    gap: 6px;
-    margin-bottom: 5px;
-}
-.stat-card {
-    flex: 1;
-    background: rgba(20, 10, 5, 0.85);
-    border: 1px solid #78350f;
-    border-radius: 8px;
-    padding: 4px 8px;
-    text-align: center;
-}
-.stat-label { font-size: 11px; color: #a1a1aa; text-transform: uppercase; }
-.stat-value { font-size: 13px; font-weight: bold; color: #38bdf8; }
-.stat-value.win { color: #4ade80; }
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 480px;
+            gap: 6px;
+            margin-bottom: 5px;
+        }
+        .stat-card {
+            flex: 1;
+            background: rgba(20, 10, 5, 0.85);
+            border: 1px solid #78350f;
+            border-radius: 8px;
+            padding: 4px 8px;
+            text-align: center;
+        }
+        .stat-label { font-size: 11px; color: #a1a1aa; text-transform: uppercase; }
+        .stat-value { font-size: 13px; font-weight: bold; color: #38bdf8; }
+        .stat-value.win { color: #4ade80; }
 
-.control-panel { width: 100%; max-width: 480px; background: rgba(20, 10, 5, 0.95); padding: 12px; border-radius: 16px; border: 1px solid #78350f; display: flex; flex-direction: column; gap: 8px; }
+        .control-panel { width: 100%; max-width: 480px; background: rgba(20, 10, 5, 0.95); padding: 12px; border-radius: 16px; border: 1px solid #78350f; display: flex; flex-direction: column; gap: 8px; }
 
-.actions { display: flex; justify-content: space-around; align-items: center; gap: 8px; }
+        .actions { display: flex; justify-content: space-around; align-items: center; gap: 8px; }
 
-.btn-circle {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: #27272a;
-    border: 1px solid #52525b;
-    color: #e4e4e7;
-    font-weight: bold;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.btn-circle.active { background: #dc2626; color: #fff; border-color: #f87171; }
+        .btn-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #27272a;
+            border: 1px solid #52525b;
+            color: #e4e4e7;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-circle.active { background: #dc2626; color: #fff; border-color: #f87171; }
 
-@keyframes spinRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
+        @keyframes spinRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-.spin-btn { 
-    width: 72px; 
-    height: 72px; 
-    background: radial-gradient(circle, #facc15 0%, #ca8a04 70%, #854d0e 100%); 
-    border: 3px solid #fef08a; 
-    border-radius: 50%; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    flex-shrink: 0; 
-    box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
-}
-.spin-icon {
-    width: 38px;
-    height: 38px;
-    border: 4px solid #713f12;
-    border-top-color: transparent;
-    border-radius: 50%;
-}
-.spin-btn.rotating .spin-icon {
-    animation: spinRotate 0.6s linear infinite;
-}
-.spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .spin-btn { 
+            width: 72px; 
+            height: 72px; 
+            background: radial-gradient(circle, #facc15 0%, #ca8a04 70%, #854d0e 100%); 
+            border: 3px solid #fef08a; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-shrink: 0; 
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+        }
+        .spin-icon {
+            width: 38px;
+            height: 38px;
+            border: 4px solid #713f12;
+            border-top-color: transparent;
+            border-radius: 50%;
+        }
+        .spin-btn.rotating .spin-icon {
+            animation: spinRotate 0.6s linear infinite;
+        }
+        .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.bet-select {
-    background: #18181b;
-    color: #facc15;
-    border: 1px solid #52525b;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 13px;
-}
+        .bet-select {
+            background: #18181b;
+            color: #facc15;
+            border: 1px solid #52525b;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+        }
 
-.back-link { color: #a1a1aa; text-decoration: none; font-size: 12px; text-align: center; margin-top: 4px; display: block; }
-.back-link:hover { color: #fff; }
-<div class="header">
-    <div class="game-title">🀄 Mahjong Ways</div>
-    <div class="balance-box">Số dư: <span id="balance">5.000</span> VNĐ</div>
-</div>
+        .back-link { color: #a1a1aa; text-decoration: none; font-size: 12px; text-align: center; margin-top: 4px; display: block; }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
 
-<div class="slot-machine">
-    <div class="freespin-badge" id="freespin-badge">MIỄN PHÍ: 10</div>
-    
-    <!-- Khung hệ số nhân -->
-    <div class="multiplier-bar">
-        <div class="mult-item active" id="mult-1">x1</div>
-        <div class="mult-item" id="mult-2">x2</div>
-        <div class="mult-item" id="mult-3">x3</div>
-        <div class="mult-item" id="mult-5">x5</div>
+    <div class="header">
+        <div class="game-title">🀄 Mahjong Ways</div>
+        <div class="balance-box">Số dư: <span id="balance">5.000</span> VNĐ</div>
     </div>
 
-    <!-- Bàn quay Mạt chượt -->
-    <div class="grid-container" id="slot-grid"></div>
-</div>
-
-<!-- Banner thông báo đỏ chạy chữ -->
-<div class="info-banner" id="info-banner">
-    3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/freespin.png';"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ
-</div>
-
-<!-- 3 Ô thông số tài chính bên dưới banner -->
-<div class="stats-bar">
-    <div class="stat-card">
-        <div class="stat-label">Cược</div>
-        <div class="stat-value" id="disp-bet-base">0.40</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Tổng Cược</div>
-        <div class="stat-value" id="disp-bet-total">400</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Thắng (WIN)</div>
-        <div class="stat-value win" id="disp-win-amount">0.00 đ</div>
-    </div>
-</div>
-
-<!-- Khung điều khiển chính -->
-<div class="control-panel">
-    <div class="actions">
-        <div>
-            <select class="bet-select" id="bet-amount" onchange="updateBetDisplay()">
-                <option value="0.2">0.20</option>
-                <option value="0.4" selected>0.40</option>
-                <option value="1">1.00</option>
-                <option value="2">2.00</option>
-                <option value="5">5.00</option>
-                <option value="10">10.00</option>
-            </select>
+    <div class="slot-machine">
+        <div class="freespin-badge" id="freespin-badge">MIỄN PHÍ: 10</div>
+        
+        <div class="multiplier-bar">
+            <div class="mult-item active" id="mult-1">x1</div>
+            <div class="mult-item" id="mult-2">x2</div>
+            <div class="mult-item" id="mult-3">x3</div>
+            <div class="mult-item" id="mult-5">x5</div>
         </div>
 
-        <button class="btn-circle" id="turbo-btn" onclick="toggleTurbo()">TURBO</button>
-        
-        <button class="spin-btn" id="spin-btn" onclick="startSpin()">
-            <div class="spin-icon"></div>
-        </button>
-        
-        <button class="btn-circle" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
+        <div class="grid-container" id="slot-grid"></div>
     </div>
-    
-    <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
-</div>
-let balance = 5000; // Số dư mặc định 5.000 VNĐ
-let isSpinning = false;
-let isAutoPlaying = false;
-let isTurbo = false;
-let autoTimer = null;
-let freeSpinsLeft = 0;
 
-// Banner thông báo luân phiên
-const bannerMessages = [
-    '3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src=\'/static/assets/freespin.png\';"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ',
-    'TĂNG SỐ NHÂN TỐI ĐA X10 TRONG CÁC VÒNG QUAY MIỄN PHÍ'
-];
-let currentBannerIdx = 0;
+    <div class="info-banner" id="info-banner">
+        3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/freespin.png';"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ
+    </div>
 
-setInterval(() => {
-    if (freeSpinsLeft === 0) {
-        currentBannerIdx = (currentBannerIdx + 1) % bannerMessages.length;
-        const bannerEl = document.getElementById('info-banner');
-        if (bannerEl) bannerEl.innerHTML = bannerMessages[currentBannerIdx];
-    }
-}, 4000);
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-label">Cược</div>
+            <div class="stat-value" id="disp-bet-base">0.40</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Tổng Cược</div>
+            <div class="stat-value" id="disp-bet-total">400</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Thắng (WIN)</div>
+            <div class="stat-value win" id="disp-win-amount">0.00 đ</div>
+        </div>
+    </div>
 
-// Các quân bài Mạt Chượt
-const tiles = ["🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀙", "🀚", "🀛", "🀜", "🀝", "🀞", "🀟", "🀠", "🀡", "🀢", "🀣", "🀤", "🀥", "🀦", "🀧", "🀨", "發"];
-const scatterTile = "SCATTER";
+    <div class="control-panel">
+        <div class="actions">
+            <div>
+                <select class="bet-select" id="bet-amount" onchange="updateBetDisplay()">
+                    <option value="0.2">0.20</option>
+                    <option value="0.4" selected>0.40</option>
+                    <option value="1">1.00</option>
+                    <option value="2">2.00</option>
+                    <option value="5">5.00</option>
+                    <option value="10">10.00</option>
+                </select>
+            </div>
 
-const rows = 4;
-const cols = 5;
-let currentMultiplierIndex = 0; 
-const multipliers = [1, 2, 3, 5];
-
-function getScatterHTML() {
-    return `<img src="/static/assets/freespin.svg" alt="FreeSpin" onerror="this.onerror=null; this.src='/static/assets/freespin.png';">`;
-}
-
-function updateMultiplierDisplay() {
-    document.querySelectorAll('.mult-item').forEach((el, idx) => {
-        if (idx === currentMultiplierIndex) {
-            el.classList.add('active');
-        } else {
-            el.classList.remove('active');
-        }
-    });
-}
-
-// 1 điểm = 1.000 VNĐ (VD: 0.40 -> 400 VNĐ)
-function updateBetDisplay() {
-    let val = parseFloat(document.getElementById('bet-amount').value);
-    document.getElementById('disp-bet-base').innerText = val.toFixed(2);
-    document.getElementById('disp-bet-total').innerText = (val * 1000).toLocaleString('vi-VN');
-}
-
-function initGrid() {
-    const grid = document.getElementById('slot-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    
-    for (let c = 0; c < cols; c++) {
-        const windowDiv = document.createElement('div');
-        windowDiv.className = 'reel-window';
-
-        const trackDiv = document.createElement('div');
-        trackDiv.className = 'reel-track';
-        trackDiv.id = `reel-track-${c}`;
-
-        for (let r = 0; r < rows; r++) {
-            const cell = document.createElement('div');
+            <button class="btn-circle" id="turbo-btn" onclick="toggleTurbo()">TURBO</button>
             
-            if (Math.random() < 0.18) {
-                cell.className = 'reel-cell scatter-cell';
-                cell.innerHTML = getScatterHTML();
-                cell.dataset.tile = scatterTile;
-            } else {
-                cell.className = 'reel-cell';
-                if (Math.random() < 0.2) cell.classList.add('gold-border');
-                const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-                cell.innerText = randomTile;
-                cell.dataset.tile = randomTile;
-            }
-            trackDiv.appendChild(cell);
-        }
-
-        windowDiv.appendChild(trackDiv);
-        grid.appendChild(windowDiv);
-    }
-    currentMultiplierIndex = 0;
-    updateMultiplierDisplay();
-    updateBetDisplay();
-    updateBalance();
-}
-
-function startSpin() {
-    if (isSpinning) return;
-
-    const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
-    const betInput = betMultiplier * 1000; 
-
-    if (freeSpinsLeft > 0) {
-        freeSpinsLeft--;
-        document.getElementById('freespin-badge').innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-        document.getElementById('info-banner').innerHTML = `TRONG CÁC VÒNG QUAY MIỄN PHÍ: CÒN ${freeSpinsLeft} LƯỢT`;
-        if (freeSpinsLeft === 0) {
-            document.getElementById('freespin-badge').style.display = 'none';
-        }
-    } else {
-        if (balance < betInput) {
-            alert("Số dư tài khoản không đủ!");
-            stopAutoPlay();
-            return;
-        }
-        balance -= betInput;
-        updateBalance();
-    }
-
-    isSpinning = true;
-    
-    const spinBtn = document.getElementById('spin-btn');
-    spinBtn.disabled = true;
-    spinBtn.classList.add('rotating');
-    
-    currentMultiplierIndex = 0;
-    updateMultiplierDisplay();
-
-    let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
-    let finalGridData = [];
-
-    for (let c = 0; c < cols; c++) {
-        let colTiles = [];
-        for (let r = 0; r < rows; r++) {
-            let chosen = tiles[Math.floor(Math.random() * tiles.length)];
-            if (willTriggerFreeSpins && c < 3 && r === 0 && Math.random() < 0.75) {
-                chosen = scatterTile;
-            }
-            colTiles.push(chosen);
-        }
-        finalGridData.push(colTiles);
-    }
-
-    for (let c = 0; c < cols; c++) {
-        const track = document.getElementById(`reel-track-${c}`);
-        let htmlContent = '';
-        for (let i = 0; i < 6; i++) {
-            let randT = tiles[Math.floor(Math.random() * tiles.length)];
-            htmlContent += `<div class="reel-cell">${randT}</div>`;
-        }
-        for (let r = 0; r < rows; r++) {
-            let finalT = finalGridData[c][r];
-            let isGold = Math.random() < 0.2 ? 'gold-border' : '';
-            let isWild = (Math.random() < 0.08 && finalT !== scatterTile);
+            <button class="spin-btn" id="spin-btn" onclick="startSpin()">
+                <div class="spin-icon"></div>
+            </button>
             
-            if (finalT === scatterTile) {
-                htmlContent += `<div class="reel-cell scatter-cell" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
-            } else if (isWild) {
-                htmlContent += `<div class="reel-cell wild-cell" data-tile="WILD">WILD</div>`;
-            } else {
-                htmlContent += `<div class="reel-cell ${isGold}" data-tile="${finalT}">${finalT}</div>`;
+            <button class="btn-circle" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
+        </div>
+        
+        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
+    </div>
+        <script>
+        let balance = 5000;
+        let isSpinning = false;
+        let isAutoPlaying = false;
+        let isTurbo = false;
+        let autoTimer = null;
+        let freeSpinsLeft = 0;
+
+        const bannerMessages = [
+            '3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src=\'/static/assets/freespin.png\';"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ',
+            'TĂNG SỐ NHÂN TỐI ĐA X10 TRONG CÁC VÒNG QUAY MIỄN PHÍ'
+        ];
+        let currentBannerIdx = 0;
+
+        setInterval(() => {
+            if (freeSpinsLeft === 0) {
+                currentBannerIdx = (currentBannerIdx + 1) % bannerMessages.length;
+                const bannerEl = document.getElementById('info-banner');
+                if (bannerEl) bannerEl.innerHTML = bannerMessages[currentBannerIdx];
             }
+        }, 4000);
+
+        const tiles = ["🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀙", "🀚", "🀛", "🀜", "🀝", "🀞", "🀟", "🀠", "🀡", "🀢", "🀣", "🀤", "🀥", "🀦", "🀧", "🀨", "發"];
+        const scatterTile = "SCATTER";
+
+        const rows = 4;
+        const cols = 5;
+        let currentMultiplierIndex = 0; 
+        const multipliers = [1, 2, 3, 5];
+
+        function getScatterHTML() {
+            return `<img src="/static/assets/freespin.svg" alt="FreeSpin" onerror="this.onerror=null; this.src='/static/assets/freespin.png';">`;
         }
-        track.innerHTML = htmlContent;
-        track.style.transition = 'none';
-        track.style.transform = 'translate3d(0, 0px, 0)';
-    }
 
-    let spinDuration = isTurbo ? 350 : 700;
+        function updateMultiplierDisplay() {
+            document.querySelectorAll('.mult-item').forEach((el, idx) => {
+                if (idx === currentMultiplierIndex) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+        }
 
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+        function updateBetDisplay() {
+            let val = parseFloat(document.getElementById('bet-amount').value);
+            document.getElementById('disp-bet-base').innerText = val.toFixed(2);
+            document.getElementById('disp-bet-total').innerText = (val * 1000).toLocaleString('vi-VN');
+        }
+
+        function initGrid() {
+            const grid = document.getElementById('slot-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            for (let c = 0; c < cols; c++) {
+                const windowDiv = document.createElement('div');
+                windowDiv.className = 'reel-window';
+
+                const trackDiv = document.createElement('div');
+                trackDiv.className = 'reel-track';
+                trackDiv.id = `reel-track-${c}`;
+
+                for (let r = 0; r < rows; r++) {
+                    const cell = document.createElement('div');
+                    
+                    if (Math.random() < 0.18) {
+                        cell.className = 'reel-cell scatter-cell';
+                        cell.innerHTML = getScatterHTML();
+                        cell.dataset.tile = scatterTile;
+                    } else {
+                        cell.className = 'reel-cell';
+                        if (Math.random() < 0.2) cell.classList.add('gold-border');
+                        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                        cell.innerText = randomTile;
+                        cell.dataset.tile = randomTile;
+                    }
+                    trackDiv.appendChild(cell);
+                }
+
+                windowDiv.appendChild(trackDiv);
+                grid.appendChild(windowDiv);
+            }
+            currentMultiplierIndex = 0;
+            updateMultiplierDisplay();
+            updateBetDisplay();
+            updateBalance();
+        }
+
+        function startSpin() {
+            if (isSpinning) return;
+
+            const betMultiplier = parseFloat(document.getElementById('bet-amount').value);
+            const betInput = betMultiplier * 1000; 
+
+            if (freeSpinsLeft > 0) {
+                freeSpinsLeft--;
+                document.getElementById('freespin-badge').innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
+                document.getElementById('info-banner').innerHTML = `TRONG CÁC VÒNG QUAY MIỄN PHÍ: CÒN ${freeSpinsLeft} LƯỢT`;
+                if (freeSpinsLeft === 0) {
+                    document.getElementById('freespin-badge').style.display = 'none';
+                }
+            } else {
+                if (balance < betInput) {
+                    alert("Số dư tài khoản không đủ!");
+                    stopAutoPlay();
+                    return;
+                }
+                balance -= betInput;
+                updateBalance();
+            }
+
+            isSpinning = true;
+            
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+            spinBtn.classList.add('rotating');
+            
+            currentMultiplierIndex = 0;
+            updateMultiplierDisplay();
+
+            let willTriggerFreeSpins = (Math.random() < 0.25 || freeSpinsLeft > 0);
+            let finalGridData = [];
+
+            for (let c = 0; c < cols; c++) {
+                let colTiles = [];
+                for (let r = 0; r < rows; r++) {
+                    let chosen = tiles[Math.floor(Math.random() * tiles.length)];
+                    if (willTriggerFreeSpins && c < 3 && r === 0 && Math.random() < 0.75) {
+                        chosen = scatterTile;
+                    }
+                    colTiles.push(chosen);
+                }
+                finalGridData.push(colTiles);
+            }
+
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
-                track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
-                let targetY = -6 * 65;
-                track.style.transform = `translate3d(0, ${targetY}px, 0)`;
+                let htmlContent = '';
+                for (let i = 0; i < 6; i++) {
+                    let randT = tiles[Math.floor(Math.random() * tiles.length)];
+                    htmlContent += `<div class="reel-cell">${randT}</div>`;
+                }
+                for (let r = 0; r < rows; r++) {
+                    let finalT = finalGridData[c][r];
+                    let isGold = Math.random() < 0.2 ? 'gold-border' : '';
+                    let isWild = (Math.random() < 0.08 && finalT !== scatterTile);
+                    
+                    if (finalT === scatterTile) {
+                        htmlContent += `<div class="reel-cell scatter-cell" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
+                    } else if (isWild) {
+                        htmlContent += `<div class="reel-cell wild-cell" data-tile="WILD">WILD</div>`;
+                    } else {
+                        htmlContent += `<div class="reel-cell ${isGold}" data-tile="${finalT}">${finalT}</div>`;
+                    }
+                }
+                track.innerHTML = htmlContent;
+                track.style.transition = 'none';
+                track.style.transform = 'translate3d(0, 0px, 0)';
             }
-        });
-    });
 
-    setTimeout(() => {
-        finishSpinProcess(spinBtn, betInput);
-    }, spinDuration + 50);
-}
+            let spinDuration = isTurbo ? 350 : 700;
 
-function finishSpinProcess(spinBtn, betInput) {
-    let totalScatters = 0;
-    const cells = document.querySelectorAll('.reel-cell');
-    cells.forEach(cell => {
-        if (cell.dataset.tile === scatterTile) totalScatters++;
-    });
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    for (let c = 0; c < cols; c++) {
+                        const track = document.getElementById(`reel-track-${c}`);
+                        track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+                        let targetY = -6 * 65;
+                        track.style.transform = `translate3d(0, ${targetY}px, 0)`;
+                    }
+                });
+            });
 
-    if (totalScatters >= 3 && freeSpinsLeft === 0) {
-        freeSpinsLeft = 12;
-        const badge = document.getElementById('freespin-badge');
-        badge.style.display = 'block';
-        badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-        document.getElementById('info-banner').innerHTML = "KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!";
-    }
+            setTimeout(() => {
+                finishSpinProcess(spinBtn, betInput);
+            }, spinDuration + 50);
+        }
 
-    evaluateWin(betInput);
+        function finishSpinProcess(spinBtn, betInput) {
+            let totalScatters = 0;
+            const cells = document.querySelectorAll('.reel-cell');
+            cells.forEach(cell => {
+                if (cell.dataset.tile === scatterTile) totalScatters++;
+            });
 
-    isSpinning = false;
-    spinBtn.disabled = false;
-    spinBtn.classList.remove('rotating');
+            if (totalScatters >= 3 && freeSpinsLeft === 0) {
+                freeSpinsLeft = 12;
+                const badge = document.getElementById('freespin-badge');
+                badge.style.display = 'block';
+                badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
+                document.getElementById('info-banner').innerHTML = "KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!";
+            }
 
-    if (isAutoPlaying || freeSpinsLeft > 0) {
-        autoTimer = setTimeout(() => {
-            if (isAutoPlaying || freeSpinsLeft > 0) startSpin();
-        }, isTurbo ? 400 : 800);
-    }
-}
+            evaluateWin(betInput);
 
-function toggleAutoPlay() {
-    const autoBtn = document.getElementById('auto-btn');
-    isAutoPlaying = !isAutoPlaying;
+            isSpinning = false;
+            spinBtn.disabled = false;
+            spinBtn.classList.remove('rotating');
 
-    if (isAutoPlaying) {
-        autoBtn.classList.add('active');
-        if (!isSpinning) startSpin();
-    } else {
-        stopAutoPlay();
-    }
-}
-
-function stopAutoPlay() {
-    isAutoPlaying = false;
-    clearTimeout(autoTimer);
-    const autoBtn = document.getElementById('auto-btn');
-    autoBtn.classList.remove('active');
-}
-
-function toggleTurbo() {
-    isTurbo = !isTurbo;
-    const turboBtn = document.getElementById('turbo-btn');
-    if(isTurbo) turboBtn.classList.add('active');
-    else turboBtn.classList.remove('active');
-}
-
-function evaluateWin(betInput) {
-    let matchedSymbols = {};
-    for (let c = 0; c < cols; c++) {
-        const track = document.getElementById(`reel-track-${c}`);
-        if (!track) continue;
-        const allCellsInTrack = track.querySelectorAll('.reel-cell');
-        for (let i = allCellsInTrack.length - rows; i < allCellsInTrack.length; i++) {
-            if(allCellsInTrack[i]) {
-                let t = allCellsInTrack[i].dataset.tile;
-                if(t) matchedSymbols[t] = (matchedSymbols[t] || 0) + 1;
+            if (isAutoPlaying || freeSpinsLeft > 0) {
+                autoTimer = setTimeout(() => {
+                    if (isAutoPlaying || freeSpinsLeft > 0) startSpin();
+                }, isTurbo ? 400 : 800);
             }
         }
-    }
 
-    let totalWin = 0;
-    let hasWon = false;
+        function toggleAutoPlay() {
+            const autoBtn = document.getElementById('auto-btn');
+            isAutoPlaying = !isAutoPlaying;
 
-    for (let tile in matchedSymbols) {
-        if (matchedSymbols[tile] >= 3 || tile === "WILD") {
-            hasWon = true;
-            let baseMultiplier = matchedSymbols[tile] * 0.4;
-            totalWin += betInput * baseMultiplier;
+            if (isAutoPlaying) {
+                autoBtn.classList.add('active');
+                if (!isSpinning) startSpin();
+            } else {
+                stopAutoPlay();
+            }
         }
-    }
 
-    let luckFactor = (freeSpinsLeft > 0) ? 2 : 1;
-
-    if (hasWon && totalWin > 0) {
-        let multValue = multipliers[currentMultiplierIndex];
-        totalWin = Math.floor(totalWin * multValue * luckFactor);
-        
-        balance += totalWin;
-
-        document.getElementById('disp-win-amount').innerText = `${totalWin.toLocaleString('vi-VN')} đ`;
-
-        if (currentMultiplierIndex < multipliers.length - 1) {
-            currentMultiplierIndex++;
+        function stopAutoPlay() {
+            isAutoPlaying = false;
+            clearTimeout(autoTimer);
+            const autoBtn = document.getElementById('auto-btn');
+            autoBtn.classList.remove('active');
         }
-        updateMultiplierDisplay();
-    } else {
-        document.getElementById('disp-win-amount').innerText = "0.00 đ";
-    }
 
-    updateBalance();
-}
+        function toggleTurbo() {
+            isTurbo = !isTurbo;
+            const turboBtn = document.getElementById('turbo-btn');
+            if(isTurbo) turboBtn.classList.add('active');
+            else turboBtn.classList.remove('active');
+        }
 
-function updateBalance() {
-    const balanceEl = document.getElementById('balance');
-    if (balanceEl) balanceEl.innerText = balance.toLocaleString('vi-VN');
-}
+        function evaluateWin(betInput) {
+            let matchedSymbols = {};
+            for (let c = 0; c < cols; c++) {
+                const track = document.getElementById(`reel-track-${c}`);
+                if (!track) continue;
+                const allCellsInTrack = track.querySelectorAll('.reel-cell');
+                for (let i = allCellsInTrack.length - rows; i < allCellsInTrack.length; i++) {
+                    if(allCellsInTrack[i]) {
+                        let t = allCellsInTrack[i].dataset.tile;
+                        if(t) matchedSymbols[t] = (matchedSymbols[t] || 0) + 1;
+                    }
+                }
+            }
 
-// Đảm bảo DOM load xong sẽ khởi tạo bàn quay
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGrid);
-} else {
-    initGrid();
-}
-                                  
+            let totalWin = 0;
+            let hasWon = false;
+
+            for (let tile in matchedSymbols) {
+                if (matchedSymbols[tile] >= 3 || tile === "WILD") {
+                    hasWon = true;
+                    let baseMultiplier = matchedSymbols[tile] * 0.4;
+                    totalWin += betInput * baseMultiplier;
+                }
+            }
+
+            let luckFactor = (freeSpinsLeft > 0) ? 2 : 1;
+
+            if (hasWon && totalWin > 0) {
+                let multValue = multipliers[currentMultiplierIndex];
+                totalWin = Math.floor(totalWin * multValue * luckFactor);
+                
+                balance += totalWin;
+
+                document.getElementById('disp-win-amount').innerText = `${totalWin.toLocaleString('vi-VN')} đ`;
+
+                if (currentMultiplierIndex < multipliers.length - 1) {
+                    currentMultiplierIndex++;
+                }
+                updateMultiplierDisplay();
+            } else {
+                document.getElementById('disp-win-amount').innerText = "0.00 đ";
+            }
+
+            updateBalance();
+        }
+
+        function updateBalance() {
+            const balanceEl = document.getElementById('balance');
+            if (balanceEl) balanceEl.innerText = balance.toLocaleString('vi-VN');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initGrid);
+        } else {
+            initGrid();
+        }
+    </script>
+</body>
+</html>

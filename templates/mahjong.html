@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mahjong Ways - Full Mechanics</title>
+    <title>Mahjong Ways - Custom Assets</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -34,7 +34,6 @@
         .mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
         .mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
 
-        /* GRID CONTAINER & HIỆU ỨNG TỐI MÀN HÌNH CHỜ SCATTER */
         .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #15803d; padding: 6px; border-radius: 10px; border: 2px solid #166534; position: relative; transition: filter 0.3s ease; }
         
         .grid-container.dimmed .reel-window:not(.tension-active) {
@@ -44,7 +43,6 @@
 
         .reel-window { height: 260px; overflow: hidden; position: relative; background: #166534; border-radius: 6px; transition: all 0.3s ease; }
         
-        /* CỘT SÁNG NỔI BẬT KHI CHỜ SCATTER */
         .reel-window.tension-active {
             z-index: 10;
             filter: brightness(1.3);
@@ -63,15 +61,22 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 30px; 
             position: relative; 
             box-shadow: inset 0 -3px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.3); 
             flex-shrink: 0; 
             font-weight: bold; 
             transition: transform 0.3s ease, opacity 0.3s ease, border 0.2s ease;
+            padding: 3px;
         }
 
-        /* VIỀN VÀNG RỰC RỠ KHI NỔ THẮNG */
+        .reel-cell img {
+            width: 88%;
+            height: 88%;
+            object-fit: contain;
+            pointer-events: none;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.2));
+        }
+
         .reel-cell.win-gold-frame { 
             border: 3.5px solid #facc15 !important; 
             box-shadow: 0 0 12px #facc15, inset 0 0 8px #facc15 !important; 
@@ -89,16 +94,20 @@
             background: linear-gradient(135deg, #fef08a 0%, #facc15 100%); 
             border: 2px solid #eab308; 
             box-shadow: inset 0 -3px 0 #fde047, 0 0 12px rgba(250, 204, 21, 0.8);
-            padding: 3px;
         }
-        .reel-cell.scatter-cell img { width: 85%; height: 85%; object-fit: contain; }
 
-        .reel-cell.wild-cell { background: linear-gradient(135deg, #fef08a, #eab308); color: #713f12; font-size: 13px; font-weight: 900; border: 2px solid #facc15; }
+        .reel-cell.wild-cell { 
+            background: linear-gradient(135deg, #fef08a, #eab308); 
+            color: #713f12; 
+            font-size: 14px; 
+            font-weight: 900; 
+            border: 2px solid #facc15; 
+        }
 
         .info-banner {
             width: 100%; max-width: 480px; background: linear-gradient(180deg, #991b1b, #450a0a); border: 2px solid #facc15; border-radius: 20px; padding: 6px 15px; text-align: center; color: #fef08a; font-weight: bold; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin: 5px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
-        .banner-scatter-img { height: 22px; width: auto; vertical-align: middle; }
+        .banner-scatter-img { height: 24px; width: auto; vertical-align: middle; }
 
         .stats-bar { display: flex; justify-content: space-between; width: 100%; max-width: 480px; gap: 6px; margin-bottom: 5px; }
         .stat-card { flex: 1; background: rgba(20, 10, 5, 0.85); border: 1px solid #78350f; border-radius: 8px; padding: 4px 8px; text-align: center; }
@@ -144,7 +153,7 @@
     </div>
 
     <div class="info-banner" id="info-banner">
-        3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/freespin.png';"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ
+        3 <img src="/static/assets/freespin.svg" class="banner-scatter-img" alt="Free Spin"> TRỞ LÊN SẼ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ
     </div>
 
     <div class="stats-bar">
@@ -194,20 +203,33 @@
         let autoTimer = null;
         let freeSpinsLeft = 0;
 
-        const tiles = ["🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒"];
+        // Chỉ chứa danh sách quân mạt chược SVG chính xác (đã loại bỏ các file .jpg)
+        const tileAssets = [
+            "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg",
+            "Sou7.svg", "Sou8.svg", "Sou9.svg",
+            "Chun.svg", "Hatsu.svg", "Haku.svg", "Ton.svg"
+        ];
+        
         const scatterTile = "SCATTER";
+        const wildTile = "WILD";
         const rows = 4;
         const cols = 5;
 
-        // Lưu trữ trạng thái ma trận bàn chơi [col][row]
         let gridData = [];
         let currentMultiplierIdx = 0;
         const multipliers = [1, 2, 3, 5];
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        function getScatterHTML() {
-            return `<img src="/static/assets/freespin.svg" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/freespin.png';">`;
+        // Hàm hiển thị hình ảnh đúng đường dẫn freespin.svg cho ô Scatter
+        function getCellContentHTML(tileName) {
+            if (tileName === scatterTile) {
+                return `<img src="/static/assets/freespin.svg" alt="Free Spin">`;
+            }
+            if (tileName === wildTile) {
+                return `WILD`;
+            }
+            return `<img src="/static/assets/${tileName}" alt="${tileName}">`;
         }
 
         function updateMultiplierDisplay() {
@@ -227,7 +249,6 @@
             document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
         }
 
-        // Tạo bàn chơi ban đầu
         function initGrid() {
             const grid = document.getElementById('slot-grid');
             grid.innerHTML = '';
@@ -244,14 +265,14 @@
                 trackDiv.id = `reel-track-${c}`;
 
                 for (let r = 0; r < rows; r++) {
-                    let tile = tiles[Math.floor(Math.random() * tiles.length)];
+                    let tile = tileAssets[Math.floor(Math.random() * tileAssets.length)];
                     colData.push(tile);
 
                     const cell = document.createElement('div');
                     cell.className = 'reel-cell';
                     cell.id = `cell-${c}-${r}`;
-                    cell.innerText = tile;
                     cell.dataset.tile = tile;
+                    cell.innerHTML = getCellContentHTML(tile);
                     trackDiv.appendChild(cell);
                 }
 
@@ -263,7 +284,6 @@
             updateBalance();
         }
 
-        // BẮT ĐẦU QUAY
         async function startSpin() {
             if (isSpinning) return;
 
@@ -293,24 +313,23 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
-            // Lập trình kết quả ngẫu nhiên trước khi quay
             let newMatrix = [];
-            let forceFreeSpin = Math.random() < 0.2; // 20% cơ hội nổ FreeSpin
+            let forceFreeSpin = Math.random() < 0.2;
             
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
                 for (let r = 0; r < rows; r++) {
-                    let tile = tiles[Math.floor(Math.random() * tiles.length)];
-                    // Tạo tỷ lệ Scatter
+                    let tile = tileAssets[Math.floor(Math.random() * tileAssets.length)];
                     if ((forceFreeSpin && c < 3 && r === 0) || Math.random() < 0.08) {
                         tile = scatterTile;
+                    } else if (Math.random() < 0.05) {
+                        tile = wildTile;
                     }
                     colTiles.push(tile);
                 }
                 newMatrix.push(colTiles);
             }
 
-            // TIẾN HÀNH QUAY TỪNG CỘT & HIỆU ỨNG CHỜ SCATTER
             let currentScatters = 0;
             const gridContainer = document.getElementById('slot-grid');
 
@@ -318,33 +337,27 @@
                 const windowEl = document.getElementById(`reel-window-${c}`);
                 const track = document.getElementById(`reel-track-${c}`);
 
-                // NẾU ĐÃ CÓ 2 SCATTER -> KÍCH HOẠT HIỆU ỨNG TỐI MÀN HÌNH & CHỜ QUAY CHẬM
                 let isTension = (currentScatters >= 2);
                 if (isTension) {
                     gridContainer.classList.add('dimmed');
                     windowEl.classList.add('tension-active');
                 }
 
-                // Chuẩn bị các ô quay cuộn
                 let spinHTML = '';
                 for (let i = 0; i < 8; i++) {
-                    let randT = tiles[Math.floor(Math.random() * tiles.length)];
-                    spinHTML += `<div class="reel-cell">${randT}</div>`;
+                    let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
+                    spinHTML += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
                 }
                 for (let r = 0; r < rows; r++) {
                     let finalT = newMatrix[c][r];
-                    if (finalT === scatterTile) {
-                        spinHTML += `<div class="reel-cell scatter-cell" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
-                    } else {
-                        spinHTML += `<div class="reel-cell" data-tile="${finalT}">${finalT}</div>`;
-                    }
+                    let extraClass = (finalT === scatterTile) ? 'scatter-cell' : ((finalT === wildTile) ? 'wild-cell' : '');
+                    spinHTML += `<div class="reel-cell ${extraClass}" data-tile="${finalT}">${getCellContentHTML(finalT)}</div>`;
                 }
 
                 track.innerHTML = spinHTML;
                 track.style.transition = 'none';
                 track.style.transform = 'translate3d(0, 0px, 0)';
 
-                // Thời gian quay: Nếu đang chờ Scatter thì quay chậm hơn (1.2s), bình thường 0.3s
                 let duration = isTension ? 1200 : (isTurbo ? 150 : 350);
 
                 await sleep(20);
@@ -353,7 +366,6 @@
 
                 await sleep(duration);
 
-                // Kiểm tra Scatter ở cột vừa dừng
                 for (let r = 0; r < rows; r++) {
                     if (newMatrix[c][r] === scatterTile) currentScatters++;
                 }
@@ -362,21 +374,17 @@
             }
 
             gridContainer.classList.remove('dimmed');
-
-            // Cập nhật lại gridData
             gridData = newMatrix;
             renderCleanGrid();
 
-            // Kiểm tra kích hoạt Free Spin
             if (currentScatters >= 3 && freeSpinsLeft === 0) {
                 freeSpinsLeft = 12;
                 const badge = document.getElementById('freespin-badge');
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-                document.getElementById('info-banner').innerText = "🎉 BẠN ĐÃ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!";
+                document.getElementById('info-banner').innerHTML = `🎉 BẠN ĐÃ KÍCH HOẠT 12 VÒNG QUAY MIỄN PHÍ!`;
             }
 
-            // TIẾN HÀNH XỬ LÝ NỔ SỦP (CASCADE)
             await processCascade(betTotal);
 
             isSpinning = false;
@@ -390,7 +398,6 @@
             }
         }
 
-        // Vẽ lại bàn chơi sạch gọn sau khi cuộn dừng
         function renderCleanGrid() {
             for (let c = 0; c < cols; c++) {
                 const track = document.getElementById(`reel-track-${c}`);
@@ -399,17 +406,13 @@
                 let html = '';
                 for (let r = 0; r < rows; r++) {
                     let tile = gridData[c][r];
-                    if (tile === scatterTile) {
-                        html += `<div class="reel-cell scatter-cell" id="cell-${c}-${r}" data-tile="${scatterTile}">${getScatterHTML()}</div>`;
-                    } else {
-                        html += `<div class="reel-cell" id="cell-${c}-${r}" data-tile="${tile}">${tile}</div>`;
-                    }
+                    let extraClass = (tile === scatterTile) ? 'scatter-cell' : ((tile === wildTile) ? 'wild-cell' : '');
+                    html += `<div class="reel-cell ${extraClass}" id="cell-${c}-${r}" data-tile="${tile}">${getCellContentHTML(tile)}</div>`;
                 }
                 track.innerHTML = html;
             }
         }
 
-        // CƠ CHẾ NỔ SỦP & VIỀN VÀNG & TẠO Ô MỚI DỒN TỪ TRÊN XUỐNG
         async function processCascade(betTotal) {
             let hasWin = true;
             let totalSpinWin = 0;
@@ -418,22 +421,19 @@
                 let winningCoords = findWinningMatches();
 
                 if (winningCoords.length > 0) {
-                    // 1. Tạo hiệu ứng Viền Vàng xung quanh các ô trúng
                     winningCoords.forEach(coord => {
                         let cell = document.getElementById(`cell-${coord.c}-${coord.r}`);
                         if (cell) cell.classList.add('win-gold-frame');
                     });
 
-                    // Tính tiền thắng đợt này
                     let baseWin = winningCoords.length * (betTotal * 0.3) * multipliers[currentMultiplierIdx];
                     totalSpinWin += baseWin;
                     balance += baseWin;
                     updateBalance();
                     document.getElementById('disp-win-amount').innerText = `${Math.floor(totalSpinWin).toLocaleString('vi-VN')} đ`;
 
-                    await sleep(600); // Tạm dừng để xem viền vàng nổ
+                    await sleep(600);
 
-                    // 2. Làm biến mất các ô thắng
                     winningCoords.forEach(coord => {
                         let cell = document.getElementById(`cell-${coord.c}-${coord.r}`);
                         if (cell) {
@@ -444,31 +444,26 @@
 
                     await sleep(300);
 
-                    // 3. Dồn ô từ trên xuống & Tạo con mới ngẫu nhiên lấp vào
                     for (let c = 0; c < cols; c++) {
                         let colTiles = gridData[c];
                         let newCol = [];
 
-                        // Lọc các ô không nổ
                         for (let r = 0; r < rows; r++) {
                             let isExploded = winningCoords.some(coord => coord.c === c && coord.r === r);
                             if (!isExploded) newCol.push(colTiles[r]);
                         }
 
-                        // Thêm các con mới lên đầu hàng
                         while (newCol.length < rows) {
-                            let newT = tiles[Math.floor(Math.random() * tiles.length)];
+                            let newT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
                             newCol.unshift(newT);
                         }
 
                         gridData[c] = newCol;
                     }
 
-                    // Render lại ma trận mới dồn từ trên xuống
                     renderCleanGrid();
                     await sleep(200);
 
-                    // Tăng số nhân (x1 -> x2 -> x3 -> x5)
                     if (currentMultiplierIdx < multipliers.length - 1) {
                         currentMultiplierIdx++;
                         updateMultiplierDisplay();
@@ -479,12 +474,10 @@
             }
         }
 
-        // TÌM CÁC Ô TRÚNG NỔ (3 con giống nhau trở lên xuất hiện liên tiếp)
         function findWinningMatches() {
             let matched = [];
             let symbolCounts = {};
 
-            // Thống kê số lượng symbol xuất hiện
             for (let c = 0; c < cols; c++) {
                 for (let r = 0; r < rows; r++) {
                     let tile = gridData[c][r];
@@ -494,11 +487,10 @@
                 }
             }
 
-            // Tìm con nào xuất hiện từ 3 ô trở lên trên bàn
             for (let c = 0; c < cols; c++) {
                 for (let r = 0; r < rows; r++) {
                     let tile = gridData[c][r];
-                    if (tile !== scatterTile && symbolCounts[tile] >= 3) {
+                    if (tile !== scatterTile && (symbolCounts[tile] >= 3 || tile === wildTile)) {
                         matched.push({ c, r });
                     }
                 }

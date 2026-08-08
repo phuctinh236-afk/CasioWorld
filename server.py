@@ -136,6 +136,13 @@ def generate_memo():
 def index():
     return render_safe('index.html')
 
+# ROUTE MỞ GAME SUPER ACE DIRECT
+@app.route('/super-ace')
+@app.route('/super_ace')
+def super_ace():
+    balance_val = session.get('balance', 500000)
+    return render_safe('super_ace.html', balance=balance_val)
+
 # ROUTE ĐIỀU HƯỚNG TỪNG GAME CHUẨN
 @app.route('/play/<game_id>')
 def play_game(game_id):
@@ -146,6 +153,8 @@ def play_game(game_id):
         return render_safe('mahjong.html', balance=balance_val)
     elif game_id == 'mahjong_ways_2':
         return render_safe('mahjong_ways_2.html', balance=balance_val)
+    elif game_id in ['super_ace', 'super-ace']:
+        return render_safe('super_ace.html', balance=balance_val)
     
     # Game chưa có file riêng sẽ render trang chung an toàn
     return render_safe(f'{game_id}.html', game_id=game_id, balance=balance_val)
@@ -240,3 +249,4 @@ def catch_all(subpath):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+    

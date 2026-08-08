@@ -28,7 +28,7 @@
 
         .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 20; }
 
-        .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
+        .multiplier-bar { display: flex; justify-style: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
         .mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
         .mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
 
@@ -164,14 +164,14 @@
         .bet-select { background: #18181b; color: #facc15; border: 1px solid #52525b; padding: 6px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         .back-link { color: #a1a1aa; text-decoration: none; font-size: 12px; text-align: center; margin-top: 4px; display: block; }
 
-        /* Pop-up Thông báo Big / Mega / Super Win */
+        /* Pop-up Thông báo Big / Mega Win */
         .win-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.82);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -189,38 +189,39 @@
 
         .win-box {
             text-align: center;
-            transform: scale(0.4);
+            transform: scale(0.3);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
         }
 
         .win-overlay.active .win-box {
             transform: scale(1);
         }
 
-        .win-title {
-            font-size: 42px;
-            font-weight: 900;
-            font-style: italic;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
-            animation: winPulse 0.5s infinite alternate;
+        .win-banner-img {
+            max-width: 320px;
+            width: 85vw;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 25px rgba(250, 204, 21, 0.7));
+            animation: winPulse 0.6s infinite alternate;
         }
 
         .win-amount-text {
-            font-size: 34px;
+            font-size: 36px;
             font-weight: 900;
             color: #fef08a;
-            text-shadow: 0 0 15px #facc15, 0 2px 8px rgba(0,0,0,0.9);
+            margin-top: -15px;
+            text-shadow: 0 0 15px #facc15, 0 3px 10px rgba(0,0,0,0.9);
+            z-index: 10;
         }
 
         @keyframes winPulse {
-            0% { transform: scale(0.92); }
-            100% { transform: scale(1.1); }
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1.06); }
         }
     </style>
 </head>
@@ -245,7 +246,7 @@
     </div>
 
     <div class="info-banner" id="info-banner">
-        3 <img src="static/assets/abcxyz111.jpg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.jpg';"> TRỞ LÊN SẼ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ
+        3 <img src="static/assets/freespin.png" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='static/assets/freespin.png';"> TRỞ LÊN SẼ KÍCH HOẠT VÒNG QUAY MIỄN PHÍ
     </div>
 
     <div class="stats-bar">
@@ -286,10 +287,10 @@
         <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
     </div>
 
-    <!-- Pop-up nổ lớn -->
+    <!-- Pop-up nổ lớn (Chỉ hiển thị ảnh Big Win & Mega Win) -->
     <div class="win-overlay" id="win-overlay">
         <div class="win-box">
-            <div class="win-title" id="win-title">BIG WIN</div>
+            <img class="win-banner-img" id="win-overlay-img" src="" alt="Win Banner">
             <div class="win-amount-text" id="win-overlay-amount">đ0.00</div>
         </div>
     </div>
@@ -318,14 +319,45 @@
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+        // Hàm JS tự động lọc và xoá ô carô trắng đen (fake checkerboard transparent)
+        function cleanCheckerboard(imgEl) {
+            if (!imgEl || !imgEl.complete || imgEl.naturalWidth === 0) return;
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = imgEl.naturalWidth;
+                canvas.height = imgEl.naturalHeight;
+                ctx.drawImage(imgEl, 0, 0);
+
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+
+                // Duyệt từng điểm ảnh, xóa màu xám/trắng trung tính của ô carô
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i+1], b = data[i+2];
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    // Ô carô có màu trung tính (r ≈ g ≈ b), độ bão hòa màu thấp (< 25)
+                    if ((max - min) < 25) {
+                        data[i + 3] = 0; // Đưa độ đục về 0 (Trong suốt)
+                    }
+                }
+
+                ctx.putImageData(imgData, 0, 0);
+                imgEl.src = canvas.toDataURL();
+            } catch (e) {
+                console.log("Xử lý canvas ảnh:", e);
+            }
+        }
+
         function getCellContentHTML(tileName) {
             if (tileName === scatterTile) {
-                return `<img src="static/assets/abcxyz111.jpg" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.jpg';">`;
+                return `<img src="static/assets/freespin.png" alt="Free Spin" onerror="this.onerror=null; this.src='static/assets/freespin.png';">`;
             }
             if (tileName === wildTile) {
                 return `WILD`;
             }
-            return `<img src="static/assets/${tileName}" alt="${tileName}" onerror="this.onerror=null; this.src='/static/assets/${tileName}';">`;
+            return `<img src="static/assets/${tileName}" alt="${tileName}" onerror="this.onerror=null; this.src='static/assets/${tileName}';">`;
         }
 
         function updateMultiplierDisplay() {
@@ -388,25 +420,18 @@
             return html;
         }
 
-        async function showWinOverlay(type, amount) {
+        async function showWinOverlay(imageSrc, amount) {
             const overlay = document.getElementById('win-overlay');
-            const titleEl = document.getElementById('win-title');
+            const imgEl = document.getElementById('win-overlay-img');
             const amountEl = document.getElementById('win-overlay-amount');
 
-            titleEl.innerText = type;
-
-            if (type === 'SUPER WIN') {
-                titleEl.style.color = '#ef4444';
-            } else if (type === 'MEGA WIN') {
-                titleEl.style.color = '#3b82f6';
-            } else {
-                titleEl.style.color = '#facc15';
-            }
-
+            imgEl.onload = function() { cleanCheckerboard(this); };
+            imgEl.src = imageSrc;
             amountEl.innerText = `đ${amount.toFixed(2)}`;
+
             overlay.classList.add('active');
 
-            await sleep(isTurbo ? 1800 : 2800);
+            await sleep(isTurbo ? 2000 : 3200);
             overlay.classList.remove('active');
             await sleep(300);
         }
@@ -439,13 +464,13 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
-            let isFreeSpinTrigger = (Math.random() < 0.10);
+            let isFreeSpinTrigger = (Math.random() < 0.10); // 10% nổ Vòng Quay Miễn Phí
             let targetScatters = 0;
 
             if (isFreeSpinTrigger) {
-                targetScatters = (Math.random() < 0.85) ? 3 : 4;
+                targetScatters = (Math.random() < 0.85) ? 3 : 4; // Max 4 cục
             } else {
-                targetScatters = Math.floor(Math.random() * 3);
+                targetScatters = Math.floor(Math.random() * 3); // Tối đa 2 cục khi không nổ
             }
 
             let newMatrix = [];
@@ -530,30 +555,25 @@
             renderCleanGrid();
 
             if (currentScatters >= 3 && freeSpinsLeft === 0) {
-                if (currentScatters >= 4) {
-                    freeSpinsLeft = 14;
-                } else {
-                    freeSpinsLeft = 10;
-                }
+                freeSpinsLeft = (currentScatters >= 4) ? 14 : 10;
 
                 const badge = document.getElementById('freespin-badge');
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
 
-                const scatterImgHTML = `<img src="static/assets/abcxyz111.jpg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.jpg';">`;
+                const scatterImgHTML = `<img src="static/assets/freespin.png" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='static/assets/freespin.png';">`;
                 document.getElementById('info-banner').innerHTML = `🎉 BẠN ĐÃ KÍCH HOẠT ${freeSpinsLeft} VÒNG QUAY MIỄN PHÍ! ${scatterImgHTML}`;
             }
 
             let finalSpinWin = await processCascade(betTotal);
 
+            // Kiểm tra tổng thắng sau khi nổ xong để bật ảnh Big Win hoặc Mega Win
             if (finalSpinWin >= betTotal * 15) {
-                let winType = "BIG WIN";
-                if (finalSpinWin >= betTotal * 100) {
-                    winType = "SUPER WIN";
-                } else if (finalSpinWin >= betTotal * 40) {
-                    winType = "MEGA WIN";
+                let winImgSrc = "static/assets/bigwin.png";
+                if (finalSpinWin >= betTotal * 40) {
+                    winImgSrc = "static/assets/megawin.png";
                 }
-                await showWinOverlay(winType, finalSpinWin);
+                await showWinOverlay(winImgSrc, finalSpinWin);
             }
 
             isSpinning = false;

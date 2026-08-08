@@ -28,7 +28,7 @@
 
         .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 20; }
 
-        .multiplier-bar { display: flex; justify-style: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
+        .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
         .mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
         .mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
 
@@ -287,7 +287,6 @@
         <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
     </div>
 
-    <!-- Pop-up nổ lớn (Chỉ hiển thị ảnh Big Win & Mega Win) -->
     <div class="win-overlay" id="win-overlay">
         <div class="win-box">
             <img class="win-banner-img" id="win-overlay-img" src="" alt="Win Banner">
@@ -319,7 +318,6 @@
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // Hàm JS tự động lọc và xoá ô carô trắng đen (fake checkerboard transparent)
         function cleanCheckerboard(imgEl) {
             if (!imgEl || !imgEl.complete || imgEl.naturalWidth === 0) return;
             try {
@@ -332,14 +330,12 @@
                 const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imgData.data;
 
-                // Duyệt từng điểm ảnh, xóa màu xám/trắng trung tính của ô carô
                 for (let i = 0; i < data.length; i += 4) {
                     const r = data[i], g = data[i+1], b = data[i+2];
                     const max = Math.max(r, g, b);
                     const min = Math.min(r, g, b);
-                    // Ô carô có màu trung tính (r ≈ g ≈ b), độ bão hòa màu thấp (< 25)
                     if ((max - min) < 25) {
-                        data[i + 3] = 0; // Đưa độ đục về 0 (Trong suốt)
+                        data[i + 3] = 0;
                     }
                 }
 
@@ -464,13 +460,13 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
-            let isFreeSpinTrigger = (Math.random() < 0.10); // 10% nổ Vòng Quay Miễn Phí
+            let isFreeSpinTrigger = (Math.random() < 0.12);
             let targetScatters = 0;
 
             if (isFreeSpinTrigger) {
-                targetScatters = (Math.random() < 0.85) ? 3 : 4; // Max 4 cục
+                targetScatters = (Math.random() < 0.85) ? 3 : 4;
             } else {
-                targetScatters = Math.floor(Math.random() * 3); // Tối đa 2 cục khi không nổ
+                targetScatters = Math.floor(Math.random() * 3);
             }
 
             let newMatrix = [];
@@ -506,15 +502,19 @@
                 const windowEl = document.getElementById(`reel-window-${c}`);
                 const track = document.getElementById(`reel-track-${c}`);
 
-                let isTension = (currentScatters >= 2);
+                // LOGIC HỒI HỘP (TENSION):
+                // Chỉ hồi hộp khi đã có 2 Scatter (đang chờ hũ thứ 3)
+                // HOẶC đã có 3 Scatter NHƯNG targetScatters >= 4 (vòng này trúng 4 hũ, chờ hũ thứ 4)
+                let isTension = (currentScatters === 2) || (currentScatters === 3 && targetScatters >= 4);
 
                 if (isTension) {
                     gridContainer.classList.add('dimmed');
                     windowEl.classList.add('tension-active');
                     track.className = 'reel-track spinning-slow';
-                    await sleep(isTurbo ? 500 : 1200);
+                    await sleep(isTurbo ? 500 : 1100);
                 } else {
-                    await sleep(isTurbo ? 60 : 180);
+                    // Nếu chưa có 2 Scatter hoặc đã ra đủ 3 Scatter (và target chỉ là 3) => Các cột dừng ngay lập tức
+                    await sleep(isTurbo ? 40 : 120);
                 }
 
                 track.className = 'reel-track';
@@ -536,11 +536,12 @@
 
                 void track.offsetWidth;
 
-                track.style.transition = 'transform 240ms cubic-bezier(0.15, 0.85, 0.35, 1.05)';
+                track.style.transition = 'transform 220ms cubic-bezier(0.15, 0.85, 0.35, 1.05)';
                 track.style.transform = 'translate3d(0, 0px, 0)';
 
-                await sleep(240);
+                await sleep(220);
 
+                // Đếm Scatter sau khi cột vừa dừng
                 for (let r = 0; r < rows; r++) {
                     if (newMatrix[c][r] === scatterTile) {
                         currentScatters++;
@@ -567,7 +568,6 @@
 
             let finalSpinWin = await processCascade(betTotal);
 
-            // Kiểm tra tổng thắng sau khi nổ xong để bật ảnh Big Win hoặc Mega Win
             if (finalSpinWin >= betTotal * 15) {
                 let winImgSrc = "static/assets/bigwin.png";
                 if (finalSpinWin >= betTotal * 40) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mahjong Ways - Custom Assets</title>
+    <title>Mahjong Ways - TX68 Game</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -64,7 +64,6 @@
         .reel-track.spinning { animation: reelSpinLoop 0.3s linear infinite; }
         .reel-track.spinning-slow { animation: reelSpinLoop 0.9s linear infinite; }
 
-        /* Tạo khối quân bài mạt chược màu trắng ngà 3D như ảnh 2 */
         .reel-cell { 
             background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 85%, #cbd5e1 100%); 
             color: #0f172a; 
@@ -145,20 +144,8 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        .stat-icon {
-            font-size: 14px;
-            opacity: 0.85;
-            display: flex;
-            align-items: center;
-        }
-
-        .stat-value { 
-            font-size: 14px; 
-            font-weight: bold; 
-            color: #38bdf8; 
-            white-space: nowrap;
-        }
-        
+        .stat-icon { font-size: 14px; opacity: 0.85; display: flex; align-items: center; }
+        .stat-value { font-size: 14px; font-weight: bold; color: #38bdf8; white-space: nowrap; }
         .stat-value.win { color: #38bdf8; }
 
         .control-panel { width: 100%; max-width: 480px; background: rgba(20, 10, 5, 0.95); padding: 12px; border-radius: 16px; border: 1px solid #78350f; display: flex; flex-direction: column; gap: 8px; }
@@ -176,6 +163,65 @@
 
         .bet-select { background: #18181b; color: #facc15; border: 1px solid #52525b; padding: 6px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         .back-link { color: #a1a1aa; text-decoration: none; font-size: 12px; text-align: center; margin-top: 4px; display: block; }
+
+        /* Pop-up Thông báo Big / Mega / Super Win */
+        .win-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .win-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .win-box {
+            text-align: center;
+            transform: scale(0.4);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .win-overlay.active .win-box {
+            transform: scale(1);
+        }
+
+        .win-title {
+            font-size: 42px;
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+            animation: winPulse 0.5s infinite alternate;
+        }
+
+        .win-amount-text {
+            font-size: 34px;
+            font-weight: 900;
+            color: #fef08a;
+            text-shadow: 0 0 15px #facc15, 0 2px 8px rgba(0,0,0,0.9);
+        }
+
+        @keyframes winPulse {
+            0% { transform: scale(0.92); }
+            100% { transform: scale(1.1); }
+        }
     </style>
 </head>
 <body>
@@ -238,6 +284,14 @@
         </div>
         
         <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
+    </div>
+
+    <!-- Pop-up nổ lớn -->
+    <div class="win-overlay" id="win-overlay">
+        <div class="win-box">
+            <div class="win-title" id="win-title">BIG WIN</div>
+            <div class="win-amount-text" id="win-overlay-amount">đ0.00</div>
+        </div>
     </div>
         <script>
         let balance = 5000;
@@ -334,6 +388,29 @@
             return html;
         }
 
+        async function showWinOverlay(type, amount) {
+            const overlay = document.getElementById('win-overlay');
+            const titleEl = document.getElementById('win-title');
+            const amountEl = document.getElementById('win-overlay-amount');
+
+            titleEl.innerText = type;
+
+            if (type === 'SUPER WIN') {
+                titleEl.style.color = '#ef4444';
+            } else if (type === 'MEGA WIN') {
+                titleEl.style.color = '#3b82f6';
+            } else {
+                titleEl.style.color = '#facc15';
+            }
+
+            amountEl.innerText = `đ${amount.toFixed(2)}`;
+            overlay.classList.add('active');
+
+            await sleep(isTurbo ? 1800 : 2800);
+            overlay.classList.remove('active');
+            await sleep(300);
+        }
+
         async function startSpin() {
             if (isSpinning) return;
 
@@ -362,21 +439,31 @@
             currentMultiplierIdx = 0;
             updateMultiplierDisplay();
 
+            let isFreeSpinTrigger = (Math.random() < 0.10);
+            let targetScatters = 0;
+
+            if (isFreeSpinTrigger) {
+                targetScatters = (Math.random() < 0.85) ? 3 : 4;
+            } else {
+                targetScatters = Math.floor(Math.random() * 3);
+            }
+
             let newMatrix = [];
-            let forceFreeSpin = Math.random() < 0.15; // Giảm tỉ lệ nổ Scatter xuống 15%
-            
             for (let c = 0; c < cols; c++) {
                 let colTiles = [];
                 for (let r = 0; r < rows; r++) {
                     let tile = tileAssets[Math.floor(Math.random() * tileAssets.length)];
-                    if ((forceFreeSpin && c < 3 && r === 0) || Math.random() < 0.04) {
-                        tile = scatterTile;
-                    } else if (Math.random() < 0.03) {
-                        tile = wildTile;
-                    }
+                    if (Math.random() < 0.03) tile = wildTile;
                     colTiles.push(tile);
                 }
                 newMatrix.push(colTiles);
+            }
+
+            let availableCols = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < targetScatters; i++) {
+                let c = availableCols[i];
+                let r = Math.floor(Math.random() * rows);
+                newMatrix[c][r] = scatterTile;
             }
 
             const gridContainer = document.getElementById('slot-grid');
@@ -443,14 +530,31 @@
             renderCleanGrid();
 
             if (currentScatters >= 3 && freeSpinsLeft === 0) {
-                freeSpinsLeft = 10;
+                if (currentScatters >= 4) {
+                    freeSpinsLeft = 14;
+                } else {
+                    freeSpinsLeft = 10;
+                }
+
                 const badge = document.getElementById('freespin-badge');
                 badge.style.display = 'block';
                 badge.innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
-                document.getElementById('info-banner').innerText = "🎉 BẠN ĐÃ KÍCH HOẠT 10 VÒNG QUAY MIỄN PHÍ!";
+
+                const scatterImgHTML = `<img src="static/assets/abcxyz111.jpg" class="banner-scatter-img" alt="Free Spin" onerror="this.onerror=null; this.src='/static/assets/abcxyz111.jpg';">`;
+                document.getElementById('info-banner').innerHTML = `🎉 BẠN ĐÃ KÍCH HOẠT ${freeSpinsLeft} VÒNG QUAY MIỄN PHÍ! ${scatterImgHTML}`;
             }
 
-            await processCascade(betTotal);
+            let finalSpinWin = await processCascade(betTotal);
+
+            if (finalSpinWin >= betTotal * 15) {
+                let winType = "BIG WIN";
+                if (finalSpinWin >= betTotal * 100) {
+                    winType = "SUPER WIN";
+                } else if (finalSpinWin >= betTotal * 40) {
+                    winType = "MEGA WIN";
+                }
+                await showWinOverlay(winType, finalSpinWin);
+            }
 
             isSpinning = false;
             spinBtn.disabled = false;
@@ -478,7 +582,6 @@
             }
         }
 
-        /* Thuật toán tìm đường thắng chuẩn từ Trái sang Phải (Cột 0 -> Cột 4) */
         function findWinningMatches() {
             let matched = [];
             let seenKeys = new Set();
@@ -490,11 +593,10 @@
                     if (hasSymbol) {
                         connectedCols.push(c);
                     } else {
-                        break; // Phải liên tục từ cột 0
+                        break;
                     }
                 }
 
-                // Cần liên kết từ 3 cột trở lên
                 if (connectedCols.length >= 3) {
                     for (let c of connectedCols) {
                         for (let r = 0; r < rows; r++) {
@@ -527,7 +629,6 @@
                         if (cell) cell.classList.add('win-gold-frame');
                     });
 
-                    // Công thức trả thưởng thực tế: Tối đa ~0.2x đến 2x tiền cược mỗi nhịp nổ
                     let stepWin = (winningCoords.length * 0.08 * betTotal) * multipliers[currentMultiplierIdx];
                     totalSpinWin += stepWin;
                     balance += stepWin;
@@ -574,6 +675,8 @@
                     hasWin = false;
                 }
             }
+
+            return totalSpinWin;
         }
 
         function toggleAutoPlay() {

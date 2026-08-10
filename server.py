@@ -1,6 +1,7 @@
 import os
 import random
 import string
+import sqlite3
 import traceback
 import subprocess
 from datetime import datetime
@@ -24,6 +25,70 @@ app.config['DEBUG'] = True
 payment_orders = {}
 error_logs = []
 
+# =========================================================
+# KHO TRUY VẤN VÀ KHỞI TẠO CƠ SỞ DỮ LIỆU (SQLITE DB)
+# =========================================================
+DB_NAME = 'database.db'
+
+def get_db_connection():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Bảng 1: Quản lý người dùng
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            balance REAL DEFAULT 500000,
+            role TEXT DEFAULT 'user'
+        )
+    ''')
+    
+    # Bảng 2: Quản lý đơn nạp tiền
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS deposits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            amount REAL NOT NULL,
+            code TEXT UNIQUE NOT NULL,
+            status TEXT DEFAULT 'PENDING',
+            created_at TEXT NOT NULL
+        )
+    ''')
+    
+    # Bảng 3: Giám sát trò chơi (Realtime Game Logs)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS game_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            game_name TEXT NOT NULL,
+            bet_amount REAL DEFAULT 0,
+            win_amount REAL DEFAULT 0,
+            is_jackpot INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'Đang cược',
+            created_at TEXT NOT NULL
+        )
+    ''')
+    
+    # Khởi tạo sẵn tài khoản Admin/Owner mặc định
+    cursor.execute("SELECT * FROM users WHERE username = 'admin'")
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO users (username, password, balance, role) VALUES ('admin', 'admin123', 99999999, 'owner')")
+    
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# =========================================================
+# BỘ XỬ LÝ LỖI & MẪU GIAO DIỆN DỰ PHÒNG
+# =========================================================
 def log_error(err_msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     error_logs.insert(0, {"time": timestamp, "detail": err_msg})
@@ -119,44 +184,299 @@ def handle_exception(e):
 
 @app.context_processor
 def inject_defaults():
-    balance_val = session.get('balance', 500000)
+    username = session.get('username', 'GUEST')
+    
+    # Lấy số dư từ DB nếu đã đăng nhập
+    conn = get_db_connection()
+    user_row = conn.execute("SELECT balance, role FROM users WHERE username = ?", (username,)).fetchone()
+    conn.close()
+    
+    balance_val = user_row['balance'] if user_row else session.get('balance', 500000)
+    user_role = user_row['role'] if user_row else 'user'
+    
     user_data = {
-        'id': 8386888, 'user_id': 8386888, 'username': session.get('username', 'GUEST'),
+        'id': 8386888, 'user_id': 8386888, 'username': username,
         'points': balance_val, 'money': balance_val, 'vip': 1, 'vip_level': 1,
         'balance': balance_val, 'phone': '09******88', 'bank_name': 'TECHCOMBANK',
-        'bank_account': '8992362013', 'account_name': 'LỶ KIM HẰNG'
+        'bank_account': '8992362013', 'account_name': 'LỶ KIM HẰNG', 'role': user_role
     }
-    return dict(user=user_data, current_user=user_data, username=user_data['username'], points=balance_val, balance=balance_val, money=balance_val, vip=1, vip_level=1)
+    return dict(user=user_data, current_user=user_data, username=username, points=balance_val, balance=balance_val, money=balance_val, vip=1, vip_level=1, role=user_role)
 
 def generate_memo():
     return f"chuyen tien TX68{''.join(random.choices(string.ascii_uppercase + string.digits, k=7))}"
+
+# =========================================================
+# HỆ THỐNG PANEL ADMIN CÁC ROUTE & API (CONTROL PANEL)
+# =========================================================
+
+# 1. Giao diện Admin Control Panel
+@app.route('/admin')
+@app.route('/admin/dashboard')
+def admin_panel():
+    username = session.get('username')
+    conn = get_db_connection()
+    user = conn.execute("SELECT role FROM users WHERE username = ?", (username,)).fetchone()
+    conn.close()
+
+    # Kiểm tra quyền hạn truy cập Admin
+    if not user or user['role'] not in ['owner', 'admin']:
+        return f"""
+        <div style="background:#0f172a; color:#f87171; text-align:center; padding:50px; font-family:sans-serif;">
+            <h2>🚫 Quyền truy cập bị từ chối!</h2>
+            <p style="color:#94a3b8;">Bạn cần đăng nhập bằng tài khoản Admin/Owner để vào trang này.</p>
+            <a href="/login" style="background:#cca352; color:#000; padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:bold;">Đăng Nhập Quản Trị</a>
+        </div>
+        """, 403
+
+    return f"""
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TX68 - ADMIN CONTROL PANEL</title>
+        <style>
+            * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }}
+            body {{ background: #090d16; color: #f8fafc; padding: 20px; }}
+            .header {{ display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 15px 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }}
+            h1 {{ color: #cca352; font-size: 20px; }}
+            .badge {{ background: #ef4444; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }}
+            .section {{ background: #131b2e; padding: 20px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 25px; }}
+            h2 {{ color: #38bdf8; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 8px; }}
+            table {{ width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }}
+            th, td {{ padding: 12px; border-bottom: 1px solid #1e293b; }}
+            th {{ background: #1e293b; color: #94a3b8; }}
+            .status-pending {{ color: #f59e0b; font-weight: bold; }}
+            .status-success {{ color: #10b981; font-weight: bold; }}
+            .status-fail {{ color: #ef4444; font-weight: bold; }}
+            .jackpot-alert {{ color: #f59e0b; font-weight: bold; animation: pulse 1s infinite; }}
+            @keyframes pulse {{ 50% {{ opacity: 0.4; }} }}
+            .btn {{ padding: 6px 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; margin-right: 5px; }}
+            .btn-approve {{ background: #10b981; color: #fff; }}
+            .btn-reject {{ background: #ef4444; color: #fff; }}
+            .form-input {{ padding: 8px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; width: 180px; margin-right: 10px; }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>🀄 BẢNG QUẢN TRỊ TỔNG TX68</h1>
+            <div>Tài khoản: <b>{username}</b> <span class="role-badge badge">OWNER</span></div>
+        </div>
+
+        <!-- SECTION 1: QUẢN LÝ NẠP TIỀN -->
+        <div class="section">
+            <h2>💵 QUẢN LÝ ĐƠN NẠP TIỀN (THỜI GIAN REALTIME)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã GD</th>
+                        <th>Người Nạp</th>
+                        <th>Số Tiền</th>
+                        <th>Thời Gian</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="deposit-rows">
+                    <tr><td colspan="6" style="text-align:center;">Đang tải dữ liệu đơn nạp...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 2: GIÁM SÁT TRÒ CHƠI -->
+        <div class="section">
+            <h2>🎰 GIÁM SÁT NGƯỜI CHƠI (GAME, CƯỢC, THẮNG/THUA, NỔ HŨ)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Thời Gian</th>
+                        <th>Tài Khoản</th>
+                        <th>Tựa Game</th>
+                        <th>Tiền Cược</th>
+                        <th>Tiền Thắng</th>
+                        <th>Nổ Hũ?</th>
+                        <th>Trạng Thái</th>
+                    </tr>
+                </thead>
+                <tbody id="game-rows">
+                    <tr><td colspan="7" style="text-align:center;">Đang tải danh sách cược...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 3: PHÂN QUYỀN / CỘNG TIỀN NGƯỜI DÙNG -->
+        <div class="section">
+            <h2>👤 QUẢN LÝ NGƯỜI DÙNG & CỘNG TIỀN</h2>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="target-user" placeholder="Tên tài khoản" class="form-input">
+                <input type="number" id="mod-amount" placeholder="Số tiền cộng (+)/trừ (-)" class="form-input">
+                <button class="btn btn-approve" onclick="modifyBalance()">Xác Nhận Thay Đổi Số Dư</button>
+            </div>
+        </div>
+
+        <script>
+            async function fetchDeposits() {{
+                const res = await fetch('/admin/api/deposits');
+                const data = await res.json();
+                let html = '';
+                if(data.length === 0) {{
+                    html = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Chưa có đơn nạp nào.</td></tr>';
+                }} else {{
+                    data.forEach(item => {{
+                        let statusClass = item.status === 'SUCCESS' ? 'status-success' : (item.status === 'FAILED' ? 'status-fail' : 'status-pending');
+                        let actions = item.status === 'PENDING' ? 
+                            `<button class="btn btn-approve" onclick="updateDeposit('${{item.code}}', 'SUCCESS')">Duyệt</button>
+                             <button class="btn btn-reject" onclick="updateDeposit('${{item.code}}', 'FAILED')">Hủy</button>` : 'Đã xử lý';
+                        
+                        html += `<tr>
+                            <td><code>${{item.code}}</code></td>
+                            <td><b>${{item.username}}</b></td>
+                            <td style="color:#10b981; font-weight:bold;">${{Number(item.amount).toLocaleString()}} VNĐ</td>
+                            <td>${{item.created_at}}</td>
+                            <td class="${{statusClass}}">${{item.status}}</td>
+                            <td>${{actions}}</td>
+                        </tr>`;
+                    }});
+                }}
+                document.getElementById('deposit-rows').innerHTML = html;
+            }}
+
+            async function updateDeposit(code, status) {{
+                await fetch('/admin/api/deposit/update', {{
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{ code, status }})
+                }});
+                fetchDeposits();
+            }}
+
+            async function fetchGameLogs() {{
+                const res = await fetch('/admin/api/gamelogs');
+                const data = await res.json();
+                let html = '';
+                if(data.length === 0) {{
+                    html = '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Chưa có dữ liệu cược.</td></tr>';
+                }} else {{
+                    data.forEach(item => {{
+                        let isJp = item.is_jackpot === 1 ? '<span class="jackpot-alert">🔥 NỔ HŨ 🔥</span>' : 'Bình thường';
+                        let winColor = item.win_amount > 0 ? '#10b981' : '#ef4444';
+                        html += `<tr>
+                            <td>${{item.created_at}}</td>
+                            <td><b>${{item.username}}</b></td>
+                            <td style="color:#38bdf8;">${{item.game_name}}</td>
+                            <td>${{Number(item.bet_amount).toLocaleString()}}</td>
+                            <td style="color:${{winColor}}; font-weight:bold;">${{Number(item.win_amount).toLocaleString()}}</td>
+                            <td>${{isJp}}</td>
+                            <td>${{item.status}}</td>
+                        </tr>`;
+                    }});
+                }}
+                document.getElementById('game-rows').innerHTML = html;
+            }}
+
+            async function modifyBalance() {{
+                const username = document.getElementById('target-user').value;
+                const amount = document.getElementById('mod-amount').value;
+                if(!username || !amount) return alert("Vui lòng nhập đủ thông tin!");
+                
+                const res = await fetch('/admin/api/user/balance', {{
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{ username, amount: parseFloat(amount) }})
+                }});
+                const data = await res.json();
+                alert(data.message);
+            }}
+
+            // Auto Refresh mỗi 3 giây
+            setInterval(() => {{
+                fetchDeposits();
+                fetchGameLogs();
+            }}, 3000);
+
+            fetchDeposits();
+            fetchGameLogs();
+        </script>
+    </body>
+    </html>
+    """
+
+# 2. APIs Admin cho dữ liệu Nạp tiền, Cược game & Cộng tiền
+@app.route('/admin/api/deposits')
+def api_get_deposits():
+    conn = get_db_connection()
+    deposits = conn.execute("SELECT * FROM deposits ORDER BY id DESC LIMIT 50").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in deposits])
+
+@app.route('/admin/api/deposit/update', methods=['POST'])
+def api_update_deposit():
+    data = request.json
+    code = data.get('code')
+    status = data.get('status')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    dep = cursor.execute("SELECT username, amount, status FROM deposits WHERE code = ?", (code,)).fetchone()
+    
+    if dep and dep['status'] == 'PENDING':
+        cursor.execute("UPDATE deposits SET status = ? WHERE code = ?", (status, code))
+        if status == 'SUCCESS':
+            # Cộng tiền vào tài khoản người chơi
+            cursor.execute("UPDATE users SET balance = balance + ? WHERE username = ?", (dep['amount'], dep['username']))
+        conn.commit()
+    conn.close()
+    return jsonify({"success": True})
+
+@app.route('/admin/api/gamelogs')
+def api_get_gamelogs():
+    conn = get_db_connection()
+    logs = conn.execute("SELECT * FROM game_logs ORDER BY id DESC LIMIT 50").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in logs])
+
+@app.route('/admin/api/user/balance', methods=['POST'])
+def api_modify_user_balance():
+    data = request.json
+    username = data.get('username')
+    amount = data.get('amount', 0)
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    user = cursor.execute("SELECT balance FROM users WHERE username = ?", (username,)).fetchone()
+    if not user:
+        conn.close()
+        return jsonify({"message": "Tài khoản không tồn tại!"}), 400
+        
+    cursor.execute("UPDATE users SET balance = balance + ? WHERE username = ?", (amount, username))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": f"Đã chỉnh sửa số dư của {username} thành công!"})
+
+# 3. API để các Tựa Game (Super Ace, Mahjong# =========================================================
+# ROUTE GAME VÀ ROUTE NGƯỜI DÙNG CHÍNH
+# =========================================================
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_safe('index.html')
 
-# ROUTE MỞ GAME SUPER ACE DIRECT
 @app.route('/super-ace')
 @app.route('/super_ace')
 def super_ace():
     balance_val = session.get('balance', 500000)
     return render_safe('super_ace.html', balance=balance_val)
 
-# ROUTE ĐIỀU HƯỚNG TỪNG GAME CHUẨN
 @app.route('/play/<game_id>')
 def play_game(game_id):
     balance_val = session.get('balance', 500000)
-    
-    # Phân loại mở đúng giao diện game
     if game_id in ['mahjong', 'mahjong_ways']:
         return render_safe('mahjong.html', balance=balance_val)
     elif game_id == 'mahjong_ways_2':
         return render_safe('mahjong_ways_2.html', balance=balance_val)
     elif game_id in ['super_ace', 'super-ace']:
         return render_safe('super_ace.html', balance=balance_val)
-    
-    # Game chưa có file riêng sẽ render trang chung an toàn
     return render_safe(f'{game_id}.html', game_id=game_id, balance=balance_val)
 
 @app.route('/profile')
@@ -217,7 +537,19 @@ def deposit():
 def payment():
     amount_vnd = request.args.get('amount', 50000, type=int)
     memo_code = generate_memo()
-    payment_orders[memo_code] = {"amount_vnd": amount_vnd, "points": amount_vnd / 1000, "status": "PENDING"}
+    username = session.get('username', 'GUEST')
+    time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Lưu đơn nạp vào Database để Admin duyệt
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO deposits (username, amount, code, status, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (username, amount_vnd, memo_code, 'PENDING', time_str))
+    conn.commit()
+    conn.close()
+
     bank_info = {
         "bank_name": "Techcombank", "account_no": "8992362013",
         "account_name": "LỶ KIM HẰNG", "amount": amount_vnd,
@@ -230,7 +562,27 @@ def payment():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        session['username'] = request.form.get('username', 'User')
+        user_input = request.form.get('username', 'User')
+        pass_input = request.form.get('password', '123456')
+        
+        conn = get_db_connection()
+        user = conn.execute("SELECT * FROM users WHERE username = ?", (user_input,)).fetchone()
+        
+        if not user:
+            # Tạo tài khoản mới nếu chưa tồn tại
+            conn.execute("INSERT INTO users (username, password, balance, role) VALUES (?, ?, 500000, 'user')", (user_input, pass_input))
+            conn.commit()
+            user_role = 'user'
+        else:
+            user_role = user['role']
+        conn.close()
+
+        session['username'] = user_input
+        
+        # Nếu là Admin/Owner đăng nhập thì chuyển hướng thẳng vào Admin Panel
+        if user_role in ['owner', 'admin']:
+            return redirect(url_for('admin_panel'))
+            
         return redirect(url_for('index'))
     return render_safe('login.html')
 

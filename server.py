@@ -453,174 +453,315 @@ def api_modify_user_balance():
     conn.close()
     return jsonify({"message": f"Đã chỉnh sửa số dư của {username} thành công!"})
 
-# 3. API để các Tựa Game (Super Ace, Mahjong# 3. API để các Tựa Game (Super Ace, Mahjong Ways, Slot...) ghi log & cập nhật số dư
-@app.route('/api/game/play', methods=['POST'])
-def api_game_play():
-    data = request.json or {}
-    username = session.get('username') or data.get('username')
-    game_name = data.get('game_name', 'Slot Game')
-    bet_amount = float(data.get('bet_amount', 0))
-    win_amount = float(data.get('win_amount', 0))
-    is_jackpot = 1 if data.get('is_jackpot') else 0
-
-    if not username:
-        return jsonify({"success": False, "message": "Chưa đăng nhập!"}), 401
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Kiểm tra số dư người chơi
-    user = cursor.execute("SELECT balance FROM users WHERE username = ?", (username,)).fetchone()
-    if not user or user['balance'] < bet_amount:
-        conn.close()
-        return jsonify({"success": False, "message": "Số dư không đủ!"}), 400
-
-    # Tính số dư mới: trừ cược, cộng thắng
-    new_balance = user['balance'] - bet_amount + win_amount
-    cursor.execute("UPDATE users SET balance = ? WHERE username = ?", (new_balance, username))
-
-    # Ghi log lịch sử cược
-    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    status = 'Nổ Hũ' if is_jackpot else ('Thắng' if win_amount > bet_amount else 'Thua')
-    cursor.execute('''
-        INSERT INTO game_logs (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at))
-
-    conn.commit()
-    conn.close()
-
-    session['balance'] = new_balance
-    return jsonify({"success": True, "new_balance": new_balance})
-
-
-# =========================================================
-# 4. API XUẤT DỮ LIỆU DÀNH RIÊNG CHO APP ADMIN TÁCH BIỆT
+# 3. API để các Tựa Game (Super Ace, Mahjong# =========================================================
+# 3. API DÀNH CHO CÁC TỰA GAME (SUPER ACE, MAHJONG, TÀI XỈU...)
 # =========================================================
 
-@app.route('/api/admin/app/users', methods=['GET'])
-def app_get_users():
-    conn = get_db_connection()
-    users = conn.execute("SELECT id, username, password, balance, role FROM users ORDER BY id DESC").fetchall()
-    conn.close()
-    return jsonify([dict(u) for u in users])
+# API Ghi nhận lịch sử cược / nổ hũ Realtime từ Game vào Database
+@app.route('/api/game/log', methods=['POST'])
+def api_game_log():
+    try:
+        data = request.json or {}
+        username = data.get('username') or session.get('username', 'GUEST')
+        game_name = data.get('game_name', 'Trò chơi')
+        bet_amount = float(data.get('bet_amount', 0))
+        win_amount = float(data.get('win_amount', 0))
+        is_jackpot = 1 if data.get('is_jackpot') else 0
+        status = data.get('status', 'Hoàn tất')
+        created_at = datetime.now().strftime("%H:%M:%S - %d/%m/%Y")
 
-@app.route('/api/admin/app/deposits', methods=['GET'])
-def app_get_deposits():
-    conn = get_db_connection()
-    deposits = conn.execute("SELECT * FROM deposits ORDER BY id DESC").fetchall()
-    conn.close()
-    return jsonify([dict(d) for d in deposits])
-
-@app.route('/api/admin/app/winloss', methods=['GET'])
-def app_get_winloss():
-    conn = get_db_connection()
-    logs = conn.execute("SELECT * FROM game_logs ORDER BY id DESC LIMIT 100").fetchall()
-    conn.close()
-    return jsonify([dict(l) for l in logs])
-
-
-# =========================================================
-# 5. CÁC ROUTE CHÍNH (TRANG CHỦ, ĐĂNG NHẬP, ĐĂNG KÝ, NẠP TIỀN, GAME)
-# =========================================================
-
-@app.route('/')
-def index():
-    return render_safe('index.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        data = request.form or request.json or {}
-        username = data.get('username')
-        password = data.get('password')
-        
-        conn = get_db_connection()
-        user = conn.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password)).fetchone()
-        conn.close()
-        
-        if user:
-            session['username'] = user['username']
-            session['balance'] = user['balance']
-            session['role'] = user['role']
-            if request.is_json:
-                return jsonify({"success": True, "redirect": "/"})
-            return redirect(url_for('index'))
-        else:
-            if request.is_json:
-                return jsonify({"success": False, "message": "Sai tài khoản hoặc mật khẩu!"}), 400
-            return render_safe('login.html', error="Sai tài khoản hoặc mật khẩu!")
-    return render_safe('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        data = request.form or request.json or {}
-        username = data.get('username')
-        password = data.get('password')
-        
-        if not username or not password:
-            return jsonify({"success": False, "message": "Vui lòng nhập đầy đủ thông tin!"}), 400
+        if username != 'GUEST':
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO game_logs (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at))
             
-        conn = get_db_connection()
-        try:
-            conn.execute("INSERT INTO users (username, password, balance) VALUES (?, ?, 500000)", (username, password))
+            # Cập nhật số dư người chơi ngay lập tức
+            net_change = win_amount - bet_amount
+            cursor.execute("UPDATE users SET balance = balance + ? WHERE username = ?", (net_change, username))
+            
             conn.commit()
             conn.close()
-            
-            session['username'] = username
-            session['balance'] = 500000
-            session['role'] = 'user'
-            if request.is_json:
-                return jsonify({"success": True, "redirect": "/"})
-            return redirect(url_for('index'))
-        except sqlite3.IntegrityError:
-            conn.close()
-            if request.is_json:
-                return jsonify({"success": False, "message": "Tài khoản đã tồn tại!"}), 400
-            return render_safe('register.html', error="Tài khoản đã tồn tại!")
-    return render_safe('register.html')
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
+        return jsonify({"success": True, "message": "Đã lưu lịch sử cược"})
+    except Exception as e:
+        log_error(f"Lỗi API Game Log: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/recharge', methods=['GET', 'POST'])
-def recharge():
-    if request.method == 'POST':
-        username = session.get('username')
-        if not username:
-            return redirect(url_for('login'))
-            
-        amount = float(request.form.get('amount', 0))
-        if amount < 10000:
-            return render_safe('recharge.html', error="Số tiền nạp tối thiểu là 10.000 VNĐ")
-            
-        code = generate_memo()
-        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        conn = get_db_connection()
-        conn.execute("INSERT INTO deposits (username, amount, code, created_at) VALUES (?, ?, ?, ?)",
-                     (username, amount, code, created_at))
-        conn.commit()
-        conn.close()
-        
-        return render_safe('pay.html', amount=amount, code=code)
-    return render_safe('recharge.html')
 
-# Route mở trang Admin App nếu dùng chung Domain
+# =========================================================
+# 4. TRANG BẢNG QUẢN TRỊ APP DÀNH CHO WEBVIEW ĐIỆN THOẠI (/admin-app)
+# =========================================================
+
 @app.route('/admin-app')
 def admin_app_page():
-    return render_safe('admin_app.html')
+    return f"""
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Admin TX68 App</title>
+        <style>
+            * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
+            body {{ background: #0b1120; color: #f8fafc; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }}
 
-# Route tự động render các trang Game (.html)
-@app.route('/game/<path:page_name>')
-def game_page(page_name):
-    if not page_name.endswith('.html'):
-        page_name += '.html'
-    return render_safe(page_name)
+            /* Header Topbar */
+            .topbar {{ height: 50px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; flex-shrink: 0; }}
+            .topbar h1 {{ font-size: 16px; color: #fff; font-weight: 600; }}
+            .star-icon {{ color: #22c55e; font-size: 20px; }}
 
+            /* Body Layout */
+            .app-container {{ display: flex; flex: 1; overflow: hidden; }}
+            
+            /* Sidebar Navigation */
+            .sidebar {{ width: 220px; background: #0f172a; border-right: 1px solid #1e293b; padding: 15px 10px; display: flex; flex-direction: column; flex-shrink: 0; }}
+            .sidebar-header {{ font-size: 11px; color: #475569; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 12px; padding-left: 8px; }}
+            .nav-btn {{ display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; color: #94a3b8; font-size: 13px; text-decoration: none; font-weight: 500; cursor: pointer; margin-bottom: 4px; }}
+            .nav-btn.active {{ background: #1e293b; color: #f8fafc; font-weight: 600; }}
+
+            /* Main Content Screen */
+            .content {{ flex: 1; padding: 15px; overflow-y: auto; background: #0b1120; }}
+            .card {{ background: #131c2e; border-radius: 8px; border: 1px solid #1e2d4a; padding: 12px; margin-bottom: 15px; }}
+            .card-title {{ font-size: 14px; font-weight: bold; color: #cca352; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }}
+
+            /* Tables */
+            table {{ width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }}
+            th, td {{ padding: 8px 6px; border-bottom: 1px solid #1e2d4a; }}
+            th {{ color: #64748b; font-weight: 600; font-size: 11px; background: #0f172a; }}
+
+            /* Status Badges */
+            .badge {{ padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; }}
+            .badge-success {{ background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }}
+            .badge-pending {{ background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid #eab308; }}
+            .badge-failed {{ background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }}
+
+            .action-btn {{ padding: 4px 8px; border-radius: 4px; border: none; font-size: 10px; font-weight: bold; cursor: pointer; margin-right: 2px; }}
+            .btn-ok {{ background: #22c55e; color: #000; }}
+            .btn-no {{ background: #ef4444; color: #fff; }}
+            
+            input {{ width: 100%; padding: 8px; background: #0f172a; border: 1px solid #1e2d4a; border-radius: 6px; color: #fff; font-size: 12px; margin-bottom: 8px; outline: none; }}
+            button.submit-btn {{ width: 100%; padding: 9px; background: #cca352; border: none; border-radius: 6px; font-weight: bold; color: #000; font-size: 12px; cursor: pointer; }}
+        </style>
+    </head>
+    <body>
+
+        <div class="topbar">
+            <h1>Admin TX68</h1>
+            <span class="star-icon">★</span>
+        </div>
+
+        <div class="app-container">
+            <!-- Sidebar Navigation Menu -->
+            <div class="sidebar">
+                <div class="sidebar-header">TX68 MANAGEMENT</div>
+                <div class="nav-btn active" onclick="showTab('tab-home', this)">🏠 Trang Chủ (Online)</div>
+                <div class="nav-btn" onclick="showTab('tab-deposits', this)">💳 Lịch Sử Nạp / Rút</div>
+                <div class="nav-btn" onclick="showTab('tab-gamelogs', this)">📊 Lịch Sử Thắng / Thua</div>
+                <div class="nav-btn" onclick="showTab('tab-balance', this)">⚙️ Cộng / Trừ Số Dư</div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="content">
+
+                <!-- 1. TRANG CHỦ ONLINE -->
+                <div id="tab-home">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>🟢 Người Dùng Hoạt Động Realtime</span>
+                            <span id="online-count" style="color:#22c55e;">0 Onl</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tài khoản</th>
+                                    <th>Số dư</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table">
+                                <tr><td colspan="3" style="text-align:center;">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. LỊCH SỬ NẠP / RÚT -->
+                <div id="tab-deposits" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">💳 Quản Lý Đơn Nạp / Rút</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mã GD</th>
+                                    <th>User</th>
+                                    <th>Số tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Duyệt</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deposits-table">
+                                <tr><td colspan="5" style="text-align:center;">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. LỊCH SỬ THẮNG / THUA -->
+                <div id="tab-gamelogs" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">📊 Nhật Ký Đặt Cược</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Game</th>
+                                    <th>Cược</th>
+                                    <th>Thắng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table">
+                                <tr><td colspan="4" style="text-align:center;">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. CỘNG / TRỪ SỐ DƯ -->
+                <div id="tab-balance" style="display:none;">
+                    <div class="card">
+                        <div class="card-title">⚙️ Điều Chỉnh Số Dư</div>
+                        <input type="text" id="target-username" placeholder="Nhập Tên Tài Khoản">
+                        <input type="number" id="target-amount" placeholder="Nhập số tiền (+Cộng / -Trừ)">
+                        <button class="submit-btn" onclick="executeBalanceChange()">XÁC NHẬN THỰC HIỆN</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            function showTab(tabId, btn) {{
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                document.getElementById('tab-home').style.display = 'none';
+                document.getElementById('tab-deposits').style.display = 'none';
+                document.getElementById('tab-gamelogs').style.display = 'none';
+                document.getElementById('tab-balance').style.display = 'none';
+
+                document.getElementById(tabId).style.display = 'block';
+            }}
+
+            async function loadHomeData() {{
+                try {{
+                    const res = await fetch('/admin/api/app/users');
+                    const data = await res.json();
+                    document.getElementById('online-count').innerText = data.length + ' Tk';
+                    let html = '';
+                    data.forEach(u => {{
+                        html += `<tr>
+                            <td><b>${{u.username}}</b></td>
+                            <td style="color:#22c55e;">${{Number(u.balance).toLocaleString()}}đ</td>
+                            <td><span class="badge badge-success">Online</span></td>
+                        </tr>`;
+                    }});
+                    document.getElementById('users-table').innerHTML = html || '<tr><td colspan="3">Chưa có dữ liệu</td></tr>';
+                }} catch(e) {{}}
+            }}
+
+            async function loadDepositsData() {{
+                try {{
+                    const res = await fetch('/admin/api/deposits');
+                    const data = await res.json();
+                    let html = '';
+                    data.forEach(d => {{
+                        let stClass = d.status === 'SUCCESS' ? 'badge-success' : (d.status === 'FAILED' ? 'badge-failed' : 'badge-pending');
+                        let btns = d.status === 'PENDING' ? `
+                            <button class="action-btn btn-ok" onclick="updateDep('${{d.code}}', 'SUCCESS')">✓</button>
+                            <button class="action-btn btn-no" onclick="updateDep('${{d.code}}', 'FAILED')">✕</button>
+                        ` : '-';
+
+                        html += `<tr>
+                            <td><code>${{d.code}}</code></td>
+                            <td><b>${{d.username}}</b></td>
+                            <td style="color:#22c55e;">${{Number(d.amount).toLocaleString()}}đ</td>
+                            <td><span class="badge ${{stClass}}">${{d.status}}</span></td>
+                            <td>${{btns}}</td>
+                        </tr>`;
+                    }});
+                    document.getElementById('deposits-table').innerHTML = html || '<tr><td colspan="5">Không có đơn nạp</td></tr>';
+                }} catch(e) {{}}
+            }}
+
+            async function updateDep(code, status) {{
+                await fetch('/admin/api/deposit/update', {{
+                    method: 'POST',
+                    headers: {{'Content-Type': 'application/json'}},
+                    body: JSON.stringify({{ code, status }})
+                }});
+                loadDepositsData();
+            }}
+
+            async function loadGameLogs() {{
+                try {{
+                    const res = await fetch('/admin/api/gamelogs');
+                    const data = await res.json();
+                    let html = '';
+                    data.forEach(l => {{
+                        let winColor = l.win_amount > 0 ? '#22c55e' : '#ef4444';
+                        html += `<tr>
+                            <td><b>${{l.username}}</b></td>
+                            <td style="color:#cca352;">${{l.game_name}}</td>
+                            <td>${{Number(l.bet_amount).toLocaleString()}}</td>
+                            <td style="color:${{winColor}};">${{Number(l.win_amount).toLocaleString()}}</td>
+                        </tr>`;
+                    }});
+                    document.getElementById('logs-table').innerHTML = html || '<tr><td colspan="4">Chưa có lịch sử cược</td></tr>';
+                }} catch(e) {{}}
+            }}
+
+            async function executeBalanceChange() {{
+                const username = document.getElementById('target-username').value;
+                const amount = document.getElementById('target-amount').value;
+                if(!username || !amount) return alert("Vui lòng điền đủ thông tin!");
+
+                const res = await fetch('/admin/api/user/balance', {{
+                    method: 'POST',
+                    headers: {{'Content-Type': 'application/json'}},
+                    body: JSON.stringify({{ username, amount: parseFloat(amount) }})
+                }});
+                const result = await res.json();
+                alert(result.message);
+            }}
+
+            // Refresh định kỳ
+            setInterval(() => {{
+                loadHomeData();
+                loadDepositsData();
+                loadGameLogs();
+            }}, 3000);
+
+            loadHomeData();
+            loadDepositsData();
+            loadGameLogs();
+        </script>
+    </body>
+    </html>
+    """
+
+# API phụ phục vụ danh sách người dùng cho App Admin
+@app.route('/admin/api/app/users')
+def api_app_get_users():
+    conn = get_db_connection()
+    users = conn.execute("SELECT id, username, balance, role FROM users ORDER BY id DESC LIMIT 50").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in users])
+
+
+# Khởi chạy server nếu chạy trực tiếp
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

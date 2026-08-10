@@ -453,141 +453,132 @@ def api_modify_user_balance():
     conn.close()
     return jsonify({"message": f"Đã chỉnh sửa số dư của {username} thành công!"})
 
-# 3. API để các Tựa Game (Super Ace, Mahjong# =========================================================
-# ROUTE GAME VÀ ROUTE NGƯỜI DÙNG CHÍNH
-# =========================================================
+# 3. API để các Tựa Game (Super Ace, Mahjong# 3. API để các Tựa Game (Super Ace, Mahjong Ways, Slot...) ghi log & cập nhật số dư
+@app.route('/api/game/play', methods=['POST'])
+def api_game_play():
+    data = request.json or {}
+    username = session.get('username') or data.get('username')
+    game_name = data.get('game_name', 'Slot Game')
+    bet_amount = float(data.get('bet_amount', 0))
+    win_amount = float(data.get('win_amount', 0))
+    is_jackpot = 1 if data.get('is_jackpot') else 0
 
-@app.route('/')
-@app.route('/index')
-def index():
-    return render_safe('index.html')
+    if not username:
+        return jsonify({"success": False, "message": "Chưa đăng nhập!"}), 401
 
-@app.route('/super-ace')
-@app.route('/super_ace')
-def super_ace():
-    balance_val = session.get('balance', 500000)
-    return render_safe('super_ace.html', balance=balance_val)
-
-@app.route('/play/<game_id>')
-def play_game(game_id):
-    balance_val = session.get('balance', 500000)
-    if game_id in ['mahjong', 'mahjong_ways']:
-        return render_safe('mahjong.html', balance=balance_val)
-    elif game_id == 'mahjong_ways_2':
-        return render_safe('mahjong_ways_2.html', balance=balance_val)
-    elif game_id in ['super_ace', 'super-ace']:
-        return render_safe('super_ace.html', balance=balance_val)
-    return render_safe(f'{game_id}.html', game_id=game_id, balance=balance_val)
-
-@app.route('/profile')
-def profile():
-    return render_safe('profile.html')
-
-@app.route('/promotions')
-@app.route('/khuyen_mai')
-@app.route('/khuyenmai')
-def promotions():
-    return render_safe('promotions.html')
-
-@app.route('/vip')
-@app.route('/member')
-@app.route('/thanh_vien')
-@app.route('/thanhvien')
-def vip():
-    return render_safe('vip.html')
-
-@app.route('/cskh')
-def cskh():
-    return render_safe('cskh.html')
-
-@app.route('/withdraw')
-def withdraw():
-    return render_safe('withdraw.html')
-
-@app.route('/activity')
-def activity():
-    return render_safe('activity.html')
-
-@app.route('/mahjong')
-def mahjong():
-    balance_val = session.get('balance', 500000)
-    return render_safe('mahjong.html', balance=balance_val)
-
-@app.route('/mahjong-ways')
-def mahjong_ways():
-    balance_val = session.get('balance', 500000)
-    return render_safe('mahjong_ways.html', balance=balance_val)
-
-@app.route('/mahjong-ways-2')
-def mahjong_ways_2():
-    balance_val = session.get('balance', 500000)
-    return render_safe('mahjong_ways_2.html', balance=balance_val)
-
-@app.route('/deposit', methods=['GET', 'POST'])
-def deposit():
-    if request.method == 'POST':
-        try:
-            amt = float(request.form.get('amount', 50))
-        except ValueError:
-            amt = 50
-        return redirect(url_for('payment', amount=int(amt * 1000)))
-    return render_safe('deposit.html')
-
-@app.route('/payment')
-def payment():
-    amount_vnd = request.args.get('amount', 50000, type=int)
-    memo_code = generate_memo()
-    username = session.get('username', 'GUEST')
-    time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # Lưu đơn nạp vào Database để Admin duyệt
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Kiểm tra số dư người chơi
+    user = cursor.execute("SELECT balance FROM users WHERE username = ?", (username,)).fetchone()
+    if not user or user['balance'] < bet_amount:
+        conn.close()
+        return jsonify({"success": False, "message": "Số dư không đủ!"}), 400
+
+    # Tính số dư mới: trừ cược, cộng thắng
+    new_balance = user['balance'] - bet_amount + win_amount
+    cursor.execute("UPDATE users SET balance = ? WHERE username = ?", (new_balance, username))
+
+    # Ghi log lịch sử cược
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    status = 'Nổ Hũ' if is_jackpot else ('Thắng' if win_amount > bet_amount else 'Thua')
     cursor.execute('''
-        INSERT INTO deposits (username, amount, code, status, created_at)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (username, amount_vnd, memo_code, 'PENDING', time_str))
+        INSERT INTO game_logs (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at))
+
     conn.commit()
     conn.close()
 
-    bank_info = {
-        "bank_name": "Techcombank", "account_no": "8992362013",
-        "account_name": "LỶ KIM HẰNG", "amount": amount_vnd,
-        "amount_str": "{:,}".format(amount_vnd).replace(",", ".") + " VND",
-        "memo": memo_code
-    }
-    qr_url = f"https://img.vietqr.io/image/TCB-8992362013-qr_only.png?amount={amount_vnd}&addInfo={memo_code}"
-    return render_safe('payment.html', bank=bank_info, qr_url=qr_url)
+    session['balance'] = new_balance
+    return jsonify({"success": True, "new_balance": new_balance})
+
+
+# =========================================================
+# 4. API XUẤT DỮ LIỆU DÀNH RIÊNG CHO APP ADMIN TÁCH BIỆT
+# =========================================================
+
+@app.route('/api/admin/app/users', methods=['GET'])
+def app_get_users():
+    conn = get_db_connection()
+    users = conn.execute("SELECT id, username, password, balance, role FROM users ORDER BY id DESC").fetchall()
+    conn.close()
+    return jsonify([dict(u) for u in users])
+
+@app.route('/api/admin/app/deposits', methods=['GET'])
+def app_get_deposits():
+    conn = get_db_connection()
+    deposits = conn.execute("SELECT * FROM deposits ORDER BY id DESC").fetchall()
+    conn.close()
+    return jsonify([dict(d) for d in deposits])
+
+@app.route('/api/admin/app/winloss', methods=['GET'])
+def app_get_winloss():
+    conn = get_db_connection()
+    logs = conn.execute("SELECT * FROM game_logs ORDER BY id DESC LIMIT 100").fetchall()
+    conn.close()
+    return jsonify([dict(l) for l in logs])
+
+
+# =========================================================
+# 5. CÁC ROUTE CHÍNH (TRANG CHỦ, ĐĂNG NHẬP, ĐĂNG KÝ, NẠP TIỀN, GAME)
+# =========================================================
+
+@app.route('/')
+def index():
+    return render_safe('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_input = request.form.get('username', 'User')
-        pass_input = request.form.get('password', '123456')
+        data = request.form or request.json or {}
+        username = data.get('username')
+        password = data.get('password')
         
         conn = get_db_connection()
-        user = conn.execute("SELECT * FROM users WHERE username = ?", (user_input,)).fetchone()
-        
-        if not user:
-            # Tạo tài khoản mới nếu chưa tồn tại
-            conn.execute("INSERT INTO users (username, password, balance, role) VALUES (?, ?, 500000, 'user')", (user_input, pass_input))
-            conn.commit()
-            user_role = 'user'
-        else:
-            user_role = user['role']
+        user = conn.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password)).fetchone()
         conn.close()
-
-        session['username'] = user_input
         
-        # Nếu là Admin/Owner đăng nhập thì chuyển hướng thẳng vào Admin Panel
-        if user_role in ['owner', 'admin']:
-            return redirect(url_for('admin_panel'))
-            
-        return redirect(url_for('index'))
+        if user:
+            session['username'] = user['username']
+            session['balance'] = user['balance']
+            session['role'] = user['role']
+            if request.is_json:
+                return jsonify({"success": True, "redirect": "/"})
+            return redirect(url_for('index'))
+        else:
+            if request.is_json:
+                return jsonify({"success": False, "message": "Sai tài khoản hoặc mật khẩu!"}), 400
+            return render_safe('login.html', error="Sai tài khoản hoặc mật khẩu!")
     return render_safe('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        data = request.form or request.json or {}
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            return jsonify({"success": False, "message": "Vui lòng nhập đầy đủ thông tin!"}), 400
+            
+        conn = get_db_connection()
+        try:
+            conn.execute("INSERT INTO users (username, password, balance) VALUES (?, ?, 500000)", (username, password))
+            conn.commit()
+            conn.close()
+            
+            session['username'] = username
+            session['balance'] = 500000
+            session['role'] = 'user'
+            if request.is_json:
+                return jsonify({"success": True, "redirect": "/"})
+            return redirect(url_for('index'))
+        except sqlite3.IntegrityError:
+            conn.close()
+            if request.is_json:
+                return jsonify({"success": False, "message": "Tài khoản đã tồn tại!"}), 400
+            return render_safe('register.html', error="Tài khoản đã tồn tại!")
     return render_safe('register.html')
 
 @app.route('/logout')
@@ -595,10 +586,42 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-@app.route('/<path:subpath>')
-def catch_all(subpath):
-    return redirect(url_for('index'))
+@app.route('/recharge', methods=['GET', 'POST'])
+def recharge():
+    if request.method == 'POST':
+        username = session.get('username')
+        if not username:
+            return redirect(url_for('login'))
+            
+        amount = float(request.form.get('amount', 0))
+        if amount < 10000:
+            return render_safe('recharge.html', error="Số tiền nạp tối thiểu là 10.000 VNĐ")
+            
+        code = generate_memo()
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        conn = get_db_connection()
+        conn.execute("INSERT INTO deposits (username, amount, code, created_at) VALUES (?, ?, ?, ?)",
+                     (username, amount, code, created_at))
+        conn.commit()
+        conn.close()
+        
+        return render_safe('pay.html', amount=amount, code=code)
+    return render_safe('recharge.html')
+
+# Route mở trang Admin App nếu dùng chung Domain
+@app.route('/admin-app')
+def admin_app_page():
+    return render_safe('admin_app.html')
+
+# Route tự động render các trang Game (.html)
+@app.route('/game/<path:page_name>')
+def game_page(page_name):
+    if not page_name.endswith('.html'):
+        page_name += '.html'
+    return render_safe(page_name)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
     

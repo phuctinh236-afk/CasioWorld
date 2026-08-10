@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>CasioWorld - Admin Control Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; }
+        h2 { color: #f39c12; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; background: #1e1e1e; }
+        th, td { padding: 12px; border: 1px solid #333; text-align: center; }
+        th { background: #2c3e50; }
+        .success { color: #2ecc71; font-weight: bold; }
+        .pending { color: #f1c40f; font-weight: bold; }
+        .jackpot { color: #e74c3c; font-weight: bold; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+        button { padding: 6px 12px; background: #27ae60; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
+        button.reject { background: #c0392b; }
+    </style>
+</head>
+<body>
+
+    <h2>📊 HỆ THỐNG QUẢN LÝ TÀI CHÍNH & NGƯỜI CHƠI (ADMIN PANEL)</h2>
+
+    <h3>1. Quản lý Nạp Tiền (Người nạp, Số tiền, Mã giao dịch, Trạng thái)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tài khoản</th>
+                <th>Số tiền nạp</th>
+                <th>Mã giao dịch</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="depositTable">
+            <!-- Dữ liệu load tự động bằng JavaScript -->
+        </tbody>
+    </table>
+
+    <h3>2. Giám sát Trò Chơi Trực Tuyến (Đang chơi gì, Mất/Thắng, Nổ hũ)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Thời gian</th>
+                <th>Người chơi</th>
+                <th>Game đang chơi</th>
+                <th>Tiền cược</th>
+                <th>Tiền thắng/thua</th>
+                <th>Trạng thái Nổ Hũ</th>
+            </tr>
+        </thead>
+        <tbody id="gameTable">
+            <!-- Dữ liệu load tự động bằng JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Tải danh sách nạp tiền
+        async function loadDeposits() {
+            const res = await fetch('/admin/deposits');
+            const data = await res.json();
+            let html = '';
+            data.forEach(item => {
+                html += `<tr>
+                    <td>${item.id}</td>
+                    <td><b>${item.username}</b></td>
+                    <td style="color: #2ecc71; font-weight:bold;">${item.amount.toLocaleString()} đ</td>
+                    <td><code>${item.code}</code></td>
+                    <td>${item.time}</td>
+                    <td class="${item.status === 'Thành công' ? 'success' : 'pending'}">${item.status}</td>
+                    <td>
+                        <button onclick="updateStatus(${item.id}, 'Thành công')">Duyệt</button>
+                        <button class="reject" onclick="updateStatus(${item.id}, 'Thất bại')">Hủy</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('depositTable').innerHTML = html;
+        }
+
+        // Duyệt hoặc từ chối nạp tiền
+        async function updateStatus(id, status) {
+            await fetch(`/admin/deposit/update/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            loadDeposits();
+        }
+
+        // Tải danh sách người chơi đang cược / nổ hũ
+        async function loadLiveGames() {
+            const res = await fetch('/admin/live-games');
+            const data = await res.json();
+            let html = '';
+            data.forEach(item => {
+                let jpText = item.is_jackpot === 1 ? '<span class="jackpot">🔥 NỔ HŨ 🔥</span>' : 'Bình thường';
+                let profitColor = item.win_amount > 0 ? '#2ecc71' : '#e74c3c';
+                html += `<tr>
+                    <td>${item.time}</td>
+                    <td><b>${item.username}</b></td>
+                    <td><span style="color: #3498db; font-weight:bold;">${item.game_name}</span></td>
+                    <td>${item.bet_amount.toLocaleString()} đ</td>
+                    <td style="color: ${profitColor}; font-weight:bold;">${item.win_amount.toLocaleString()} đ</td>
+                    <td>${jpText}</td>
+                </tr>`;
+            });
+            document.getElementById('gameTable').innerHTML = html;
+        }
+
+        // Tự động làm mới dữ liệu mỗi 3 giây để xem realtime
+        setInterval(() => {
+            loadDeposits();
+            loadLiveGames();
+        }, 3000);
+
+        loadDeposits();
+        loadLiveGames();
+    </script>
+</body>
+</html>

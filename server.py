@@ -125,6 +125,39 @@ def render_safe(template_name, **kwargs):
         </body>
         </html>
         """
+        # =========================================================
+# ROUTE TRANG CHỦ & ROUTE NỀN TẢNG
+# =========================================================
+
+@app.route('/')
+def index():
+    return render_safe('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        conn = get_db_connection()
+        user = conn.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password)).fetchone()
+        conn.close()
+        
+        if user:
+            session['username'] = user['username']
+            session['role'] = user['role']
+            session['balance'] = user['balance']
+            if user['role'] in ['admin', 'owner']:
+                return redirect('/admin')
+            return redirect('/')
+        else:
+            return render_safe('login.html', error="Sai tài khoản hoặc mật khẩu!")
+            
+    return render_safe('login.html')
+
+@app.route('/play/<game_name>')
+def play_game(game_name):
+    username = session.get('username', request.args.get('username', 'GUEST'))
+    return redirect(url_for('static', filename=f'games/{game_name}/index.html', username=username))
 
 @app.route('/ktraloibug')
 def ktraloibug():
@@ -167,7 +200,7 @@ def ktraloibug():
 @app.errorhandler(404)
 def not_found_error(error):
     log_error(f"Lỗi 404 - Không tìm thấy: {request.path}")
-    return redirect(url_for('index'))
+    return redirect('/')
 
 @app.errorhandler(500)
 @app.errorhandler(Exception)
@@ -186,7 +219,6 @@ def handle_exception(e):
 def inject_defaults():
     username = session.get('username', 'GUEST')
     
-    # Lấy số dư từ DB nếu đã đăng nhập
     conn = get_db_connection()
     user_row = conn.execute("SELECT balance, role FROM users WHERE username = ?", (username,)).fetchone()
     conn.close()
@@ -209,7 +241,6 @@ def generate_memo():
 # HỆ THỐNG PANEL ADMIN CÁC ROUTE & API (CONTROL PANEL)
 # =========================================================
 
-# 1. Giao diện Admin Control Panel
 @app.route('/admin')
 @app.route('/admin/dashboard')
 def admin_panel():
@@ -218,7 +249,6 @@ def admin_panel():
     user = conn.execute("SELECT role FROM users WHERE username = ?", (username,)).fetchone()
     conn.close()
 
-    # Kiểm tra quyền hạn truy cập Admin
     if not user or user['role'] not in ['owner', 'admin']:
         return f"""
         <div style="background:#0f172a; color:#f87171; text-align:center; padding:50px; font-family:sans-serif;">
@@ -263,7 +293,6 @@ def admin_panel():
             <div>Tài khoản: <b>{username}</b> <span class="role-badge badge">OWNER</span></div>
         </div>
 
-        <!-- SECTION 1: QUẢN LÝ NẠP TIỀN -->
         <div class="section">
             <h2>💵 QUẢN LÝ ĐƠN NẠP TIỀN (THỜI GIAN REALTIME)</h2>
             <table>
@@ -283,7 +312,6 @@ def admin_panel():
             </table>
         </div>
 
-        <!-- SECTION 2: GIÁM SÁT TRÒ CHƠI -->
         <div class="section">
             <h2>🎰 GIÁM SÁT NGƯỜI CHƠI (GAME, CƯỢC, THẮNG/THUA, NỔ HŨ)</h2>
             <table>
@@ -304,7 +332,6 @@ def admin_panel():
             </table>
         </div>
 
-        <!-- SECTION 3: PHÂN QUYỀN / CỘNG TIỀN NGƯỜI DÙNG -->
         <div class="section">
             <h2>👤 QUẢN LÝ NGƯỜI DÙNG & CỘNG TIỀN</h2>
             <div style="margin-bottom: 15px;">
@@ -388,7 +415,6 @@ def admin_panel():
                 alert(data.message);
             }}
 
-            // Auto Refresh mỗi 3 giây
             setInterval(() => {{
                 fetchDeposits();
                 fetchGameLogs();
@@ -400,9 +426,7 @@ def admin_panel():
     </body>
     </html>
     """
-
-# 2. APIs Admin cho dữ liệu Nạp tiền, Cược game & Cộng tiền
-@app.route('/admin/api/deposits')
+    @app.route('/admin/api/deposits')
 def api_get_deposits():
     conn = get_db_connection()
     deposits = conn.execute("SELECT * FROM deposits ORDER BY id DESC LIMIT 50").fetchall()
@@ -411,7 +435,7 @@ def api_get_deposits():
 
 @app.route('/admin/api/deposit/update', methods=['POST'])
 def api_update_deposit():
-    data = request.json
+    data = request.json or {}
     code = data.get('code')
     status = data.get('status')
     
@@ -422,7 +446,6 @@ def api_update_deposit():
     if dep and dep['status'] == 'PENDING':
         cursor.execute("UPDATE deposits SET status = ? WHERE code = ?", (status, code))
         if status == 'SUCCESS':
-            # Cộng tiền vào tài khoản người chơi
             cursor.execute("UPDATE users SET balance = balance + ? WHERE username = ?", (dep['amount'], dep['username']))
         conn.commit()
     conn.close()
@@ -437,7 +460,7 @@ def api_get_gamelogs():
 
 @app.route('/admin/api/user/balance', methods=['POST'])
 def api_modify_user_balance():
-    data = request.json
+    data = request.json or {}
     username = data.get('username')
     amount = data.get('amount', 0)
     
@@ -453,11 +476,6 @@ def api_modify_user_balance():
     conn.close()
     return jsonify({"message": f"Đã chỉnh sửa số dư của {username} thành công!"})
 
-# 3. API để các Tựa Game (Super Ace, Mahjong# =========================================================
-# 3. API DÀNH CHO CÁC TỰA GAME (SUPER ACE, MAHJONG, TÀI XỈU...)
-# =========================================================
-
-# API Ghi nhận lịch sử cược / nổ hũ Realtime từ Game vào Database
 @app.route('/api/game/log', methods=['POST'])
 def api_game_log():
     try:
@@ -478,7 +496,6 @@ def api_game_log():
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (username, game_name, bet_amount, win_amount, is_jackpot, status, created_at))
             
-            # Cập nhật số dư người chơi ngay lập tức
             net_change = win_amount - bet_amount
             cursor.execute("UPDATE users SET balance = balance + ? WHERE username = ?", (net_change, username))
             
@@ -490,9 +507,8 @@ def api_game_log():
         log_error(f"Lỗi API Game Log: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
 
-
 # =========================================================
-# 4. TRANG BẢNG QUẢN TRỊ APP DÀNH CHO WEBVIEW ĐIỆN THOẠI (/admin-app)
+# GIAO DIỆN APP QUẢN TRỊ MOBILE WEBVIEW (/admin-app)
 # =========================================================
 
 @app.route('/admin-app')
@@ -507,54 +523,38 @@ def admin_app_page():
         <style>
             * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
             body {{ background: #0b1120; color: #f8fafc; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }}
-
-            /* Header Topbar */
             .topbar {{ height: 50px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; flex-shrink: 0; }}
             .topbar h1 {{ font-size: 16px; color: #fff; font-weight: 600; }}
             .star-icon {{ color: #22c55e; font-size: 20px; }}
-
-            /* Body Layout */
             .app-container {{ display: flex; flex: 1; overflow: hidden; }}
-            
-            /* Sidebar Navigation */
             .sidebar {{ width: 220px; background: #0f172a; border-right: 1px solid #1e293b; padding: 15px 10px; display: flex; flex-direction: column; flex-shrink: 0; }}
             .sidebar-header {{ font-size: 11px; color: #475569; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 12px; padding-left: 8px; }}
             .nav-btn {{ display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; color: #94a3b8; font-size: 13px; text-decoration: none; font-weight: 500; cursor: pointer; margin-bottom: 4px; }}
             .nav-btn.active {{ background: #1e293b; color: #f8fafc; font-weight: 600; }}
-
-            /* Main Content Screen */
             .content {{ flex: 1; padding: 15px; overflow-y: auto; background: #0b1120; }}
             .card {{ background: #131c2e; border-radius: 8px; border: 1px solid #1e2d4a; padding: 12px; margin-bottom: 15px; }}
             .card-title {{ font-size: 14px; font-weight: bold; color: #cca352; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }}
-
-            /* Tables */
             table {{ width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }}
             th, td {{ padding: 8px 6px; border-bottom: 1px solid #1e2d4a; }}
             th {{ color: #64748b; font-weight: 600; font-size: 11px; background: #0f172a; }}
-
-            /* Status Badges */
             .badge {{ padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; }}
             .badge-success {{ background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }}
             .badge-pending {{ background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid #eab308; }}
             .badge-failed {{ background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }}
-
             .action-btn {{ padding: 4px 8px; border-radius: 4px; border: none; font-size: 10px; font-weight: bold; cursor: pointer; margin-right: 2px; }}
             .btn-ok {{ background: #22c55e; color: #000; }}
             .btn-no {{ background: #ef4444; color: #fff; }}
-            
             input {{ width: 100%; padding: 8px; background: #0f172a; border: 1px solid #1e2d4a; border-radius: 6px; color: #fff; font-size: 12px; margin-bottom: 8px; outline: none; }}
             button.submit-btn {{ width: 100%; padding: 9px; background: #cca352; border: none; border-radius: 6px; font-weight: bold; color: #000; font-size: 12px; cursor: pointer; }}
         </style>
     </head>
     <body>
-
         <div class="topbar">
             <h1>Admin TX68</h1>
             <span class="star-icon">★</span>
         </div>
 
         <div class="app-container">
-            <!-- Sidebar Navigation Menu -->
             <div class="sidebar">
                 <div class="sidebar-header">TX68 MANAGEMENT</div>
                 <div class="nav-btn active" onclick="showTab('tab-home', this)">🏠 Trang Chủ (Online)</div>
@@ -563,10 +563,7 @@ def admin_app_page():
                 <div class="nav-btn" onclick="showTab('tab-balance', this)">⚙️ Cộng / Trừ Số Dư</div>
             </div>
 
-            <!-- Tab Content -->
             <div class="content">
-
-                <!-- 1. TRANG CHỦ ONLINE -->
                 <div id="tab-home">
                     <div class="card">
                         <div class="card-title">
@@ -588,7 +585,6 @@ def admin_app_page():
                     </div>
                 </div>
 
-                <!-- 2. LỊCH SỬ NẠP / RÚT -->
                 <div id="tab-deposits" style="display:none;">
                     <div class="card">
                         <div class="card-title">💳 Quản Lý Đơn Nạp / Rút</div>
@@ -609,7 +605,6 @@ def admin_app_page():
                     </div>
                 </div>
 
-                <!-- 3. LỊCH SỬ THẮNG / THUA -->
                 <div id="tab-gamelogs" style="display:none;">
                     <div class="card">
                         <div class="card-title">📊 Nhật Ký Đặt Cược</div>
@@ -629,7 +624,6 @@ def admin_app_page():
                     </div>
                 </div>
 
-                <!-- 4. CỘNG / TRỪ SỐ DƯ -->
                 <div id="tab-balance" style="display:none;">
                     <div class="card">
                         <div class="card-title">⚙️ Điều Chỉnh Số Dư</div>
@@ -638,7 +632,6 @@ def admin_app_page():
                         <button class="submit-btn" onclick="executeBalanceChange()">XÁC NHẬN THỰC HIỆN</button>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -737,7 +730,6 @@ def admin_app_page():
                 alert(result.message);
             }}
 
-            // Refresh định kỳ
             setInterval(() => {{
                 loadHomeData();
                 loadDepositsData();
@@ -752,7 +744,6 @@ def admin_app_page():
     </html>
     """
 
-# API phụ phục vụ danh sách người dùng cho App Admin
 @app.route('/admin/api/app/users')
 def api_app_get_users():
     conn = get_db_connection()
@@ -760,8 +751,6 @@ def api_app_get_users():
     conn.close()
     return jsonify([dict(row) for row in users])
 
-
-# Khởi chạy server nếu chạy trực tiếp
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

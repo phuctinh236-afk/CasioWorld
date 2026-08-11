@@ -484,4 +484,65 @@ def admin_panel():
         </script>
     </body>
     </html>
-    """
+    """@app.route('/admin/api/deposits')
+def api_get_deposits():
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM deposits ORDER BY id DESC LIMIT 100").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in rows])
+
+@app.route('/admin/api/deposit/update', methods=['POST'])
+def api_update_deposit():
+    data = request.get_json()
+    code = data.get('code')
+    status = data.get('status')
+    
+    conn = get_db_connection()
+    deposit = conn.execute("SELECT * FROM deposits WHERE code = ?", (code,)).fetchone()
+    
+    if deposit and deposit['status'] == 'PENDING':
+        conn.execute("UPDATE deposits SET status = ? WHERE code = ?", (status, code))
+        
+        if status == 'SUCCESS':
+            conn.execute("UPDATE users SET balance = balance + ? WHERE username = ?", 
+                        (deposit['amount'], deposit['username']))
+        
+        conn.commit()
+    conn.close()
+    return jsonify({"success": True})
+
+@app.route('/admin/api/gamelogs')
+def api_get_gamelogs():
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM game_logs ORDER BY id DESC LIMIT 100").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in rows])
+
+@app.route('/admin/api/user/balance', methods=['POST'])
+def api_modify_balance():
+    data = request.get_json()
+    username = data.get('username')
+    amount = data.get('amount')
+    
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+    
+    if not user:
+        conn.close()
+        return jsonify({"message": "Không tìm thấy tài khoản!"})
+    
+    conn.execute("UPDATE users SET balance = balance + ? WHERE username = ?", (amount, username))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": f"Đã cập nhật số dư cho {username} thành công!"})
+
+@app.route('/admin/api/app/users')
+def api_app_get_users():
+    conn = get_db_connection()
+    users = conn.execute("SELECT id, username, balance, role FROM users ORDER BY id DESC LIMIT 50").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in users])
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

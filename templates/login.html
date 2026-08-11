@@ -3,39 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập - Mega Casino</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Đăng Nhập - TX68</title>
     <style>
-        .form-container { padding: 40px 20px; text-align: center; }
-        .input-box { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: none; background: #212537; color: white; }
-        .btn-submit { background: linear-gradient(180deg, #fd9d24, #eb7a0b); color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
-        .error-msg { color: #ff6b6b; margin-bottom: 15px; font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white; display: flex; align-items: center; justify-content: center; }
+        .box { width: 90%; max-width: 380px; background: #0f172a; border-radius: 16px; padding: 30px 20px; border: 1px solid #334155; }
+        h2 { text-align: center; color: #fbbf24; margin-bottom: 25px; font-size: 22px; }
+        input { width: 100%; padding: 14px 16px; margin-bottom: 14px; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 16px; }
+        input:focus { outline: none; border-color: #fbbf24; }
+        button { width: 100%; padding: 15px; background: linear-gradient(180deg, #f59e0b, #d97706); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        button:active { transform: scale(0.98); }
+        .error { background: #7f1d1d; color: #fecaca; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px; }
+        .back { display: block; text-align: center; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+        .register { display: block; text-align: center; margin-top: 12px; color: #fbbf24; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="header">
-            <a href="/" style="color: #ebd08d; text-decoration: none; font-size: 20px;">⬅ Trở về</a>
-            <div class="logo">ĐĂNG NHẬP</div>
-            <div style="width: 50px;"></div>
-        </header>
-        <div class="form-container">
-            <h2 style="color: #ebd08d; margin-bottom: 30px;">MEGA CASINO WORLD</h2>
+    <div class="box">
+        <h2>TX68 - ĐĂNG NHẬP</h2>
 
-            {% if error %}
-            <div class="error-msg">{{ error }}</div>
-            {% endif %}
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
 
-            <form method="POST" action="{{ url_for('login') }}">
-                <input type="text" name="username" class="input-box" placeholder="Tên đăng nhập" required>
-                <input type="password" name="password" class="input-box" placeholder="Mật khẩu" required>
-                <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
-            </form>
+        <form method="POST" action="/login">
+            <input type="text" name="username" placeholder="Tên đăng nhập" required autocomplete="username">
+            <input type="password" name="password" placeholder="Mật khẩu" required autocomplete="current-password">
+            <button type="submit">ĐĂNG NHẬP</button>
+        </form>
 
-            <p style="margin-top: 20px;">
-                <a href="/register" style="color: #d7ad66; text-decoration: none;">Chưa có tài khoản? Đăng ký ngay</a>
-            </p>
-        </div>
+        <a href="/register" class="register">Chưa có tài khoản? Đăng ký ngay</a>
+        <a href="/" class="back">← Quay lại trang chủ</a>
     </div>
 </body>
 </html>

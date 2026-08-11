@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahjong Ways 2 - CasioWorld</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #064e3b; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px; }
+        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; background: #022c22; padding: 10px 15px; border-radius: 12px; border: 1px solid #059669; }
+        .balance-box { font-size: 14px; color: #a7f3d0; }
+        .balance-box span { display: block; font-size: 18px; font-weight: bold; color: #fbbf24; }
+        .game-title { font-size: 18px; font-weight: bold; color: #34d399; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        
+        .slot-machine { width: 100%; max-width: 500px; background: linear-gradient(135deg, #065f46, #022c22); border: 4px solid #10b981; border-radius: 16px; padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 15px 0; }
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .reel-cell { background: #ecfdf5; border-radius: 8px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .reel-cell img { width: 100%; height: 100%; object-fit: contain; }
+
+        .control-panel { width: 100%; max-width: 500px; background: #022c22; padding: 15px; border-radius: 12px; border: 1px solid #059669; display: flex; flex-direction: column; gap: 10px; }
+        .win-display { text-align: center; font-size: 16px; color: #fbbf24; font-weight: bold; min-height: 24px; }
+        .actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .bet-control { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #a7f3d0; }
+        .bet-control select { background: #064e3b; color: #fff; border: 1px solid #059669; padding: 8px; border-radius: 6px; font-weight: bold; }
+        .spin-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); transition: 0.2s; flex-grow: 1; text-align: center; }
+        .spin-btn:active { transform: scale(0.95); }
+        .back-link { color: #a7f3d0; text-decoration: none; font-size: 13px; text-align: center; margin-top: 5px; }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="game-title">🀄 Mahjong Ways 2</div>
+        <div class="balance-box">Số dư: <span id="balance">{{ "{:,.0f}".format(balance).replace(",", ".") }}</span> VNĐ</div>
+    </div>
+
+    <div class="slot-machine">
+        <div class="grid-container" id="slot-grid"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="win-display" id="win-text">Sẵn sàng săn thưởng lớn!</div>
+        <div class="actions">
+            <div class="bet-control">
+                <span>Cược:</span>
+                <select id="bet-amount">
+                    <option value="1000">1,000</option>
+                    <option value="5000" selected>5,000</option>
+                    <option value="10000">10,000</option>
+                    <option value="50000">50,000</option>
+                </select>
+            </div>
+            <button class="spin-btn" id="spin-btn" onclick="startSpin()">QUAY V2</button>
+        </div>
+        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
+    </div>
+
+    <script>
+        // Lấy số dư từ Flask truyền vào JS
+        let balance = {{ balance }};
+
+        const tiles = [
+            "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg", "Man6.svg", "Man7.svg", "Man8.svg", "Man9.svg",
+            "Pin1.svg", "Pin2.svg", "Pin3.svg", "Pin4.svg", "Pin5.svg", "Pin6.svg", "Pin7.svg", "Pin8.svg", "Pin9.svg",
+            "Sou1.svg", "Sou2.svg", "Sou3.svg", "Sou4.svg", "Sou5.svg", "Sou6.svg", "Sou7.svg", "Sou8.svg", "Sou9.svg",
+            "Ton.svg", "Nan.svg", "Shaa.svg", "Pei.svg",
+            "Haku.svg", "Hatsu.svg", "Chun.svg"
+        ];
+
+        const rows = 4;
+        const cols = 5;
+        const totalCells = rows * cols;
+
+        function initGrid() {
+            const grid = document.getElementById('slot-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < totalCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'reel-cell';
+                const img = document.createElement('img');
+                const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                img.src = `/static/assets/${randomTile}`;
+                cell.appendChild(img);
+                grid.appendChild(cell);
+            }
+        }
+
+        function startSpin() {
+            const betInput = parseInt(document.getElementById('bet-amount').value);
+            if (balance < betInput) {
+                alert("Số dư không đủ để đặt cược!");
+                return;
+            }
+
+            balance -= betInput;
+            updateBalance();
+            document.getElementById('win-text').innerText = "";
+            document.getElementById('spin-btn').disabled = true;
+
+            let spinInterval = setInterval(() => {
+                const imgs = document.querySelectorAll('.reel-cell img');
+                imgs.forEach(img => {
+                    const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                    img.src = `/static/assets/${randomTile}`;
+                });
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                const imgs = document.querySelectorAll('.reel-cell img');
+                imgs.forEach(img => {
+                    const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+                    img.src = `/static/assets/${randomTile}`;
+                });
+
+                let winChance = Math.random();
+                let winAmount = 0;
+                if (winChance < 0.45) {
+                    winAmount = betInput * (Math.floor(Math.random() * 8) + 2);
+                    balance += winAmount;
+                    document.getElementById('win-text').innerHTML = `🌟 NỔ HŨ V2: +${winAmount.toLocaleString()} VNĐ!`;
+                } else {
+                    document.getElementById('win-text').innerHTML = `Thử vận may lần nữa nhé!`;
+                }
+
+                updateBalance();
+                document.getElementById('spin-btn').disabled = false;
+            }, 800);
+        }
+
+        function updateBalance() {
+            document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
+        }
+
+        window.onload = initGrid;
+    </script>
+</body>
+</html>

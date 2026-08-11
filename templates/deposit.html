@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TX68 - Nạp & Rút Tiền</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #131521;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: #131521;
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        .header {
+            padding: 12px 15px;
+            background-color: #171a29;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #24293f;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .sub-header-bar {
+            background-color: #171a29;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #24293f;
+        }
+        .back-action-btn {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+        .brand-name-text {
+            font-size: 13px;
+            font-weight: bold;
+            color: #cca352;
+            letter-spacing: 0.5px;
+        }
+        .cskh-top-btn {
+            background: none;
+            border: none;
+            color: #cca352;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+
+        /* Top Action Tabs (Nạp tiền / Rút tiền) */
+        .action-tabs-container {
+            padding: 12px 15px;
+            background-color: #131521;
+            display: flex;
+            gap: 10px;
+        }
+        .action-tab-btn {
+            flex: 1;
+            background-color: #212537;
+            border: 1px solid #303650;
+            color: #9fa5b9;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .action-tab-btn.active {
+            background: linear-gradient(135deg, #cca352, #9a7522);
+            border-color: #cca352;
+            color: #131521;
+        }
+
+        .section-box {
+            background-color: #171a29;
+            margin: 0 15px 12px 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #24293f;
+        }
+        .section-title {
+            font-size: 12px;
+            color: #cca352;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dropdown-box {
+            background-color: #212537;
+            border: 1px solid #303650;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Payment Methods Grid */
+        .pay-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .pay-item {
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 8px;
+            padding: 12px 6px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: #fff;
+        }
+        .pay-item.active {
+            border-color: #cca352;
+            background-color: #2b2f45;
+            color: #cca352;
+        }
+        .pay-icon {
+            font-size: 18px;
+        }
+
+        /* Cổng nạp Grid */
+        .gateway-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .gateway-item {
+            background-color: #212537;
+            border: 1px solid #303650;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .gateway-item.active {
+            background: linear-gradient(135deg, #cca352, #9a7522);
+            border-color: #cca352;
+            color: #131521;
+            font-weight: bold;
+        }
+
+        /* Số tiền Nạp Grid */
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .amount-btn {
+            background-color: #212537;
+            border: 1px solid #303650;
+            color: #fff;
+            padding: 10px 4px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+        }
+        .amount-btn:hover {
+            border-color: #cca352;
+            color: #cca352;
+        }
+        .amount-input-box {
+            background-color: #212537;
+            border: 1px solid #303650;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .amount-input-box input {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+        .amount-input-box input::placeholder {
+            color: #6b7280;
+        }
+
+        .submit-main-btn {
+            width: calc(100% - 30px);
+            margin: 10px 15px 20px 15px;
+            padding: 14px;
+            background: linear-gradient(135deg, #cca352, #9a7522);
+            border: none;
+            border-radius: 8px;
+            color: #131521;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .alert {
+            margin: 10px 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .alert.success { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+        .alert.error { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #171a29;
+            border-top: 1px solid #24293f;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #7a83a0;
+            font-size: 10px;
+            gap: 3px;
+        }
+        .nav-item.active {
+            color: #cca352;
+        }
+        .nav-icon {
+            font-size: 20px;
+        }
+        .form-panel { display: none; }
+        .form-panel.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header chính -->
+        <div class="header">
+            <div class="header-left">
+                <a href="{{ url_for('index') }}" class="close-btn">✕</a>
+                <div class="header-title">TX68</div>
+            </div>
+            <div class="header-right">
+                <span>⌄</span>
+                <span>⋮</span>
+            </div>
+        </div>
+
+        <!-- Sub Header Bar -->
+        <div class="sub-header-bar">
+            <a href="{{ url_for('index') }}" class="back-action-btn"><span>‹</span> Lại</a>
+            <div class="brand-name-text">TX68 OFFICIAL</div>
+            <a href="{{ url_for('cskh') }}" class="cskh-top-btn">💬 CSKH</a>
+        </div>
+
+        <!-- Tabs Nạp / Rút -->
+        <div class="action-tabs-container">
+            <button type="button" class="action-tab-btn active" id="tabDepositBtn" onclick="switchMainTab('deposit')">Nạp tiền</button>
+            <button type="button" class="action-tab-btn" id="tabWithdrawBtn" onclick="switchMainTab('withdraw')">Rút tiền</button>
+        </div>
+
+        {% if message %}
+        <div class="alert {{ msg_type }}">{{ message }}</div>
+        {% endif %}
+
+        <!-- FORM NẠP TIỀN -->
+        <form method="POST" class="form-panel active" id="depositPanel">
+            <input type="hidden" name="action" value="deposit">
+            
+            <div class="section-box">
+                <div class="section-title"><span>🎁</span> Khuyến mãi</div>
+                <div class="dropdown-box">
+                    <span>Nạp Tiền Thông Thường</span>
+                    <span>▼</span>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-title"><span>💳</span> Phương thức thanh toán</div>
+                <div class="pay-grid">
+                    <div class="pay-item active">
+                        <span class="pay-icon">🏦</span>
+                        <span>Ngân hàng</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="pay-icon">📱</span>
+                        <span>MOMOPAY</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="pay-icon">💛</span>
+                        <span>ZaloPay</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="pay-icon">🔴</span>
+                        <span>ViettelPay</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="pay-icon">💎</span>
+                        <span>USDT</span>
+                    </div>
+                    <div class="pay-item">
+                        <span class="pay-icon">🎫</span>
+                        <span>Thẻ Cào</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-title"><span>⚙️</span> Cổng nạp</div>
+                <div class="gateway-grid">
+                    <div class="gateway-item active">HN-Pay1</div>
+                    <div class="gateway-item">O-Pay</div>
+                    <div class="gateway-item">D-Pay</div>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-title"><span>💵</span> Số tiền Nạp (1 = 1K)</div>
+                <div class="amount-grid">
+                    <button type="button" class="amount-btn" onclick="setAmount(100)">100</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(200)">200</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(500)">500</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(1000)">1.000</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(2000)">2.000</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(5000)">5.000</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(10000)">10.000</button>
+                    <button type="button" class="amount-btn" onclick="setAmount(50000)">50.000</button>
+                </div>
+                <div class="amount-input-box">
+                    <input type="number" name="amount" id="amountInput" placeholder="Nhập số tiền..." min="10" required>
+                    <span style="font-size: 12px; color: #9fa5b9;">Điểm</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-main-btn">Gửi</button>
+        </form>
+
+        <!-- FORM RÚT TIỀN -->
+        <form method="POST" class="form-panel" id="withdrawPanel">
+            <input type="hidden" name="action" value="withdraw">
+
+            <div class="section-box">
+                <div class="section-title"><span>🏦</span> Thông tin tài khoản nhận tiền</div>
+                <div class="dropdown-box" style="margin-bottom: 10px;">
+                    <span>Ngân hàng: Vietcombank - 0123456789</span>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-title"><span>💸</span> Số tiền Rút (VND)</div>
+                <div class="amount-input-box">
+                    <input type="number" name="amount" placeholder="Nhập số tiền muốn rút..." min="50000" required>
+                    <span style="font-size: 12px; color: #9fa5b9;">VNĐ</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-main-btn" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff;">Xác Nhận Rút Tiền</button>
+        </form>
+
+        <!-- Thanh điều hướng dưới -->
+        <nav class="bottom-nav">
+            <a href="{{ url_for('index') }}" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Trang chủ</span>
+            </a>
+            <a href="{{ url_for('promotions') }}" class="nav-item">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
+            </a>
+            <a href="{{ url_for('deposit') }}" class="nav-item active">
+                <div class="nav-icon">💳</div>
+                <span>Nạp tiền</span>
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Tài khoản</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        function switchMainTab(type) {
+            const depositBtn = document.getElementById('tabDepositBtn');
+            const withdrawBtn = document.getElementById('tabWithdrawBtn');
+            const depositPanel = document.getElementById('depositPanel');
+            const withdrawPanel = document.getElementById('withdrawPanel');
+
+            if (type === 'deposit') {
+                depositBtn.classList.add('active');
+                withdrawBtn.classList.remove('active');
+                depositPanel.classList.add('active');
+                withdrawPanel.classList.remove('active');
+            } else {
+                withdrawBtn.classList.add('active');
+                depositBtn.classList.remove('active');
+                withdrawPanel.classList.add('active');
+                depositPanel.classList.remove('active');
+            }
+        }
+
+        function setAmount(val) {
+            document.getElementById('amountInput').value = val;
+        }
+    </script>
+</body>
+                </html>
+                

@@ -128,85 +128,86 @@
     <!-- KHU VỰC CHỨA GAME DẠNG TAB -->
     <div class="game-content-container">
 
-        <!-- 1. TAB HOT (20 Game) -->
+        <!-- 1. TAB HOT -->
         <div class="tab-content active" id="tab-hot">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='mahjong') }}" class="game-item-card">
+                <!-- ĐÃ SỬA LINK ĐÚNG -->
+                <a href="{{ url_for('mahjong') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Mahjong Ways</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='mahjong_ways_2') }}" class="game-item-card">
+                <a href="{{ url_for('mahjong_ways_2') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/mahjong_ways_2.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Mahjong Ways 2</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='dragon_gems') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/dragon_gems.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Dragon Gems 500</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='mithai_madness') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/mithai_madness.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Mithai Madness</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='fortune_garuda') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/fortune_garuda.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Fortune Ganesha</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='ncvip_super') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/ncvip_super.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">NCVIP Super Elements</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='ultra_ace') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/ultra_ace.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Ultra Ace</span>
                 </a>
 
-                <!-- LINK SUPER ACE CẬP NHẬT TỚI ROUTE SUPER_ACE -->
+                <!-- SUPER ACE ĐÃ ĐÚNG -->
                 <a href="{{ url_for('super_ace') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/super_ace.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Super Ace</span>
                 </a>
 
-                <a href="{{ url_for('play_game', game_id='ncvip_gates') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/ncvip_gates.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Gates of Olympus</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='nc_bountiful') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/bountiful_birds.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">NC Bountiful</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='treasures_aztec') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/treasures_aztec.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Treasures of Aztec</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='wild_bounty') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/wild_bounty.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Wild Bounty Showdown</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='dragon_gems_wheel') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/dragon_gems_wheel.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Dragon Gems Wheel</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='pinata_wins') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/pinata_wins.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Pinata Wins</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Jackpot Fishing</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='super_niu') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/super_niubi.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Super Niu Niu</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='lucky_neko') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/lucky_neko.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Lucky Neko</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='chinese_new_year') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/chinese_new_year.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Chinese New Year</span>
                 </a>
-                <a href="{{ url_for('play_game', game_id='chicken_drop') }}" class="game-item-card">
+                <a href="{{ url_for('play_game') }}" class="game-item-card">
                     <img src="{{ url_for('static', filename='assets/chicken_dash.jpg') }}" onerror="this.onerror=null; this.src='';">
                     <span class="game-name">Chicken Drop</span>
                 </a>
@@ -216,45 +217,45 @@
         <!-- Các Tab danh mục phụ -->
         <div class="tab-content" id="tab-daga" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='daga_ws151') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/daga_ws151.jpg') }}"></a>
-                <a href="{{ url_for('play_game', game_id='daga_thomo') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/daga_thomo.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/daga_ws151.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/daga_thomo.jpg') }}"></a>
             </div>
         </div>
 
         <div class="tab-content" id="tab-slots" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='mahjong') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}"></a>
+                <a href="{{ url_for('mahjong') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/mahjong_ways.jpg') }}"></a>
                 <a href="{{ url_for('super_ace') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/super_ace.jpg') }}"></a>
             </div>
         </div>
 
         <div class="tab-content" id="tab-casino" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='baccarat') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/baccarat.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/baccarat.jpg') }}"></a>
             </div>
         </div>
 
         <div class="tab-content" id="tab-gamebai" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='tongits_go') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/tongits_go.jpg') }}"></a>
             </div>
         </div>
 
         <div class="tab-content" id="tab-banca" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='jackpot_fishing') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/jackpot_fishing.jpg') }}"></a>
             </div>
         </div>
 
         <div class="tab-content" id="tab-xoso" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='xo_so_3m') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/xo_so_3m.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/xo_so_3m.jpg') }}"></a>
             </div>
         </div>
 
         <div class="tab-content" id="tab-thethao" style="display:none;">
             <div class="game-grid-hot">
-                <a href="{{ url_for('play_game', game_id='saba_sports') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/saba_sports.jpg') }}"></a>
+                <a href="{{ url_for('play_game') }}" class="game-item-card"><img src="{{ url_for('static', filename='assets/saba_sports.jpg') }}"></a>
             </div>
         </div>
 
@@ -319,5 +320,4 @@
         }
     </script>
 </body>
-    </html>
-                    
+                    </html>

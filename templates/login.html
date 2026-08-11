@@ -8,7 +8,8 @@
     <style>
         .form-container { padding: 40px 20px; text-align: center; }
         .input-box { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: none; background: #212537; color: white; }
-        .btn-submit { background: linear-gradient(180deg, #fd9d24, #eb7a0b); color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .btn-submit { background: linear-gradient(180deg, #fd9d24, #eb7a0b); color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .error-msg { color: #ff6b6b; margin-bottom: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -20,10 +21,20 @@
         </header>
         <div class="form-container">
             <h2 style="color: #ebd08d; margin-bottom: 30px;">MEGA CASINO WORLD</h2>
-            <input type="text" class="input-box" placeholder="Tên đăng nhập">
-            <input type="password" class="input-box" placeholder="Mật khẩu">
-            <button class="btn-submit">ĐĂNG NHẬP</button>
-            <p style="margin-top: 20px;"><a href="/register" style="color: #d7ad66; text-decoration: none;">Chưa có tài khoản? Đăng ký ngay</a></p>
+
+            {% if error %}
+            <div class="error-msg">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('login') }}">
+                <input type="text" name="username" class="input-box" placeholder="Tên đăng nhập" required>
+                <input type="password" name="password" class="input-box" placeholder="Mật khẩu" required>
+                <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
+            </form>
+
+            <p style="margin-top: 20px;">
+                <a href="/register" style="color: #d7ad66; text-decoration: none;">Chưa có tài khoản? Đăng ký ngay</a>
+            </p>
         </div>
     </div>
 </body>

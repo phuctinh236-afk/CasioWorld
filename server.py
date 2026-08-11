@@ -39,7 +39,6 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Bảng 1: Quản lý người dùng
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +49,6 @@ def init_db():
         )
     ''')
     
-    # Bảng 2: Quản lý đơn nạp tiền
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS deposits (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,7 +60,6 @@ def init_db():
         )
     ''')
     
-    # Bảng 3: Giám sát trò chơi (Realtime Game Logs)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS game_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,7 +73,6 @@ def init_db():
         )
     ''')
     
-    # Khởi tạo sẵn tài khoản Admin/Owner mặc định
     cursor.execute("SELECT * FROM users WHERE username = 'admin'")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password, balance, role) VALUES ('admin', 'admin123', 99999999, 'owner')")
@@ -175,6 +171,11 @@ def register():
                 return render_safe('register.html', error="Tài khoản đã tồn tại!")
     return render_safe('register.html')
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
 @app.route('/play/<game_name>')
 def play_game_by_name(game_name):
     username = session.get('username', request.args.get('username', 'GUEST'))
@@ -184,7 +185,6 @@ def play_game_by_name(game_name):
 def play_game():
     return redirect('/')
 
-# --- BỔ SUNG CÁC ROUTE KHUYẾN MÃI, TÀI KHOẢN, CSKH ---
 @app.route('/promotions')
 def promotions():
     return render_safe('promotions.html')
@@ -221,7 +221,6 @@ def vip():
 def vip_details():
     return render_safe('vip_details.html')
 
-# --- BỔ SUNG CÁC ROUTE SLOT GAME HTML ---
 @app.route('/mahjong')
 def mahjong():
     return render_safe('mahjong.html')
@@ -233,7 +232,7 @@ def mahjong_ways_2():
 @app.route('/super_ace')
 def super_ace():
     return render_safe('super_ace.html')# =========================================================
-# HỆ THỐNG DỰ PHÒNG & GIÁM SÁT (ĐÃ XÓA FAVICON)
+# HỆ THỐNG DỰ PHÒNG & GIÁM SÁT
 # =========================================================
 
 @app.route('/ktraloibug')
@@ -276,10 +275,11 @@ def ktraloibug():
 
 @app.errorhandler(404)
 def not_found_error(error):
-    # Bỏ qua log favicon để không làm bẩn trang giám sát
-    if request.path == '/favicon.ico':
+    path = request.path
+    # Bỏ qua favicon + ảnh missing để log sạch
+    if path == '/favicon.ico' or path.endswith(('.jpg', '.jpeg', '.png', '.webp', '.svg', '.ico', '.gif')):
         return '', 204
-    log_error(f"Lỗi 404 - Không tìm thấy: {request.path}")
+    log_error(f"Lỗi 404 - Không tìm thấy: {path}")
     return redirect('/')
 
 @app.errorhandler(500)

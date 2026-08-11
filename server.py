@@ -175,6 +175,11 @@ def profile():
 def deposit():
     return render_safe('deposit.html')
 
+# [FIX LỖI BuildError url_for('withdraw')]
+@app.route('/withdraw')
+def withdraw():
+    return render_safe('withdraw.html')
+
 # [FIX LỖI 404 /favicon.ico]
 @app.route('/favicon.ico')
 def favicon():
@@ -531,7 +536,7 @@ def api_game_log():
     except Exception as e:
         log_error(f"Lỗi API Game Log: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-        # =========================================================
+    # =========================================================
 # GIAO DIỆN APP QUẢN TRỊ MOBILE WEBVIEW (/admin-app)
 # =========================================================
 

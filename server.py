@@ -170,6 +170,11 @@ def play_game():
 def profile():
     return render_safe('profile.html')
 
+# [FIX LỖI BuildError url_for('deposit')]
+@app.route('/deposit')
+def deposit():
+    return render_safe('deposit.html')
+
 # [FIX LỖI 404 /favicon.ico]
 @app.route('/favicon.ico')
 def favicon():
@@ -526,7 +531,7 @@ def api_game_log():
     except Exception as e:
         log_error(f"Lỗi API Game Log: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-    # =========================================================
+        # =========================================================
 # GIAO DIỆN APP QUẢN TRỊ MOBILE WEBVIEW (/admin-app)
 # =========================================================
 
@@ -637,7 +642,7 @@ def admin_app_page():
                                 </tr>
                             </thead>
                             <tbody id="logs-table">
-                                <tr><td colspan="4" style="text-align:center;">Đang tải...</td></tr>
+                                <tr><td colspan="4" style="text-align:center;">Chưa có lịch sử cược</td></tr>
                             </tbody>
                         </table>
                     </div>

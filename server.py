@@ -5,7 +5,7 @@ import sqlite3
 import traceback
 import subprocess
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, session, jsonify
+from flask import Flask, render_template, request, redirect, session, jsonify, url_for, send_from_directory
 from jinja2 import TemplateNotFound
 
 # =========================================================
@@ -125,7 +125,8 @@ def render_safe(template_name, **kwargs):
         </body>
         </html>
         """
-        # =========================================================
+
+# =========================================================
 # ROUTE TRANG CHỦ & ROUTE NỀN TẢNG
 # =========================================================
 
@@ -155,9 +156,28 @@ def login():
     return render_safe('login.html')
 
 @app.route('/play/<game_name>')
-def play_game(game_name):
+def play_game_by_name(game_name):
     username = session.get('username', request.args.get('username', 'GUEST'))
     return redirect(f"/static/games/{game_name}/index.html?username={username}")
+
+# [FIX] Route play_game dự phòng cho template Jinja
+@app.route('/play_game')
+def play_game():
+    return redirect('/')
+
+# [FIX LỖI BuildError url_for('profile')]
+@app.route('/profile')
+def profile():
+    return render_safe('profile.html')
+
+# [FIX LỖI 404 /favicon.ico]
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
 
 @app.route('/ktraloibug')
 def ktraloibug():
@@ -236,8 +256,7 @@ def inject_defaults():
 
 def generate_memo():
     return f"chuyen tien TX68{''.join(random.choices(string.ascii_uppercase + string.digits, k=7))}"
-
-# =========================================================
+    # =========================================================
 # HỆ THỐNG PANEL ADMIN CÁC ROUTE & API (CONTROL PANEL)
 # =========================================================
 
@@ -426,6 +445,7 @@ def admin_panel():
     </body>
     </html>
     """
+
 @app.route('/admin/api/deposits')
 def api_get_deposits():
     conn = get_db_connection()
@@ -506,8 +526,7 @@ def api_game_log():
     except Exception as e:
         log_error(f"Lỗi API Game Log: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-
-# =========================================================
+    # =========================================================
 # GIAO DIỆN APP QUẢN TRỊ MOBILE WEBVIEW (/admin-app)
 # =========================================================
 

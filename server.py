@@ -125,9 +125,8 @@ def render_safe(template_name, **kwargs):
         </body>
         </html>
         """
-
-# =========================================================
-# ROUTE TRANG CHỦ & ROUTE NỀN TẢNG
+        # =========================================================
+# ROUTE TRANG CHỦ & ROUTE NỀN TẢNG (ĐÃ BỔ SUNG ĐẦY ĐỦ)
 # =========================================================
 
 @app.route('/')
@@ -155,32 +154,86 @@ def login():
             
     return render_safe('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username and password:
+            conn = get_db_connection()
+            try:
+                conn.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+                conn.commit()
+                session['username'] = username
+                session['role'] = 'user'
+                session['balance'] = 500000
+                conn.close()
+                return redirect('/')
+            except sqlite3.IntegrityError:
+                conn.close()
+                return render_safe('register.html', error="Tài khoản đã tồn tại!")
+    return render_safe('register.html')
+
 @app.route('/play/<game_name>')
 def play_game_by_name(game_name):
     username = session.get('username', request.args.get('username', 'GUEST'))
     return redirect(f"/static/games/{game_name}/index.html?username={username}")
 
-# [FIX] Route play_game dự phòng cho template Jinja
 @app.route('/play_game')
 def play_game():
     return redirect('/')
 
-# [FIX LỖI BuildError url_for('profile')]
+# --- BỔ SUNG CÁC ROUTE KHUYẾN MÃI, TÀI KHOẢN, CSKH ---
+@app.route('/promotions')
+def promotions():
+    return render_safe('promotions.html')
+
+@app.route('/cskh')
+def cskh():
+    return render_safe('cskh.html')
+
 @app.route('/profile')
 def profile():
     return render_safe('profile.html')
 
-# [FIX LỖI BuildError url_for('deposit')]
 @app.route('/deposit')
 def deposit():
     return render_safe('deposit.html')
 
-# [FIX LỖI BuildError url_for('withdraw')]
 @app.route('/withdraw')
 def withdraw():
     return render_safe('withdraw.html')
 
-# [FIX LỖI 404 /favicon.ico]
+@app.route('/mailbox')
+def mailbox():
+    return render_safe('mailbox.html')
+
+@app.route('/payment')
+def payment():
+    return render_safe('payment.html')
+
+@app.route('/vip')
+def vip():
+    return render_safe('vip.html')
+
+@app.route('/vip_details')
+def vip_details():
+    return render_safe('vip_details.html')
+
+# --- BỔ SUNG CÁC ROUTE SLOT GAME HTML ---
+@app.route('/mahjong')
+def mahjong():
+    return render_safe('mahjong.html')
+
+@app.route('/mahjong_ways_2')
+def mahjong_ways_2():
+    return render_safe('mahjong_ways_2.html')
+
+@app.route('/super_ace')
+def super_ace():
+    return render_safe('super_ace.html')
+
+# --- HỆ THỐNG DỰ PHÒNG & GIÁM SÁT ---
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(
@@ -266,7 +319,8 @@ def inject_defaults():
 
 def generate_memo():
     return f"chuyen tien TX68{''.join(random.choices(string.ascii_uppercase + string.digits, k=7))}"
-    # =========================================================
+
+# =========================================================
 # HỆ THỐNG PANEL ADMIN CÁC ROUTE & API (CONTROL PANEL)
 # =========================================================
 
@@ -536,7 +590,7 @@ def api_game_log():
     except Exception as e:
         log_error(f"Lỗi API Game Log: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-    # =========================================================
+# =========================================================
 # GIAO DIỆN APP QUẢN TRỊ MOBILE WEBVIEW (/admin-app)
 # =========================================================
 

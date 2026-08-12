@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>{{ game_name }} - TX68</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:#0a0e17;color:#fff;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:8px 8px 20px;
+}
+.top{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.back{color:#94a3b8;text-decoration:none;font-size:13px;padding:8px 12px;background:#1e293b;border-radius:8px;border:1px solid #334155}
+.title{font-size:14px;font-weight:bold;color:{{ accent }};text-align:center;flex:1;padding:0 6px}
+.banner{width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:2px solid {{ accent }};margin-bottom:8px;background:#111;max-height:90px}
+.banner img{width:100%;height:90px;object-fit:cover;display:block}
+.stats{width:100%;max-width:420px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.stat{background:#131c2e;border:1px solid #263653;border-radius:8px;padding:8px 6px;text-align:center}
+.stat label{display:block;font-size:10px;color:#94a3b8;margin-bottom:2px}
+.stat b{font-size:13px;color:{{ accent }}}
+.stat b.win{color:#22c55e}
+.free-badge{display:none;background:linear-gradient(90deg,#7c3aed,#db2777);color:#fff;font-weight:bold;font-size:12px;padding:6px 14px;border-radius:20px;margin-bottom:8px}
+.machine{width:100%;max-width:420px;background:linear-gradient(160deg,#1a1520,#0d1117);border:3px solid {{ accent }};border-radius:16px;padding:8px;box-shadow:0 0 24px {{ accent }}44;margin-bottom:8px}
+.mult-row{display:flex;justify-content:center;gap:6px;margin-bottom:6px}
+.mult{font-size:11px;font-weight:bold;padding:3px 10px;border-radius:6px;background:#1e293b;color:#64748b;border:1px solid #334155}
+.mult.on{background:{{ accent }};color:#000;border-color:{{ accent }}}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:4px;aspect-ratio:5/4}
+.cell{background:#0b1120;border:1.5px solid #334155;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,5vw,28px);transition:transform .12s,background .2s;user-select:none}
+.cell.spinning{animation:shake .12s infinite}
+.cell.win{background:{{ accent }}33;border-color:{{ accent }};transform:scale(1.05);box-shadow:0 0 10px {{ accent }}88}
+.cell.scatter-cell{border-color:#a855f7;background:rgba(168,85,247,.15)}
+@keyframes shake{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.hint{text-align:center;font-size:11px;color:#94a3b8;margin:6px 0 2px;min-height:16px}
+.controls{width:100%;max-width:420px;background:#131c2e;border:1px solid #263653;border-radius:14px;padding:12px}
+.bet-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.bet-row label{font-size:12px;color:#94a3b8}
+.bet-row input{flex:1;max-width:140px;background:#0b1120;color:{{ accent }};border:1px solid #334155;border-radius:8px;padding:10px;font-size:15px;font-weight:bold;text-align:center}
+.btn-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.btn-side{flex:1;padding:12px 8px;border:1px solid #334155;border-radius:10px;background:#1e293b;color:#e2e8f0;font-weight:bold;font-size:12px;cursor:pointer}
+.btn-side.on{background:{{ accent }};color:#000;border-color:{{ accent }}}
+.spin-btn{width:72px;height:72px;border-radius:50%;border:3px solid {{ accent }};background:radial-gradient(circle at 30% 30%,#fff2,{{ accent }});color:#000;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 4px 18px {{ accent }}66}
+.spin-btn:disabled{opacity:.5;cursor:not-allowed}
+.spin-btn.rotating{animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.win-text{text-align:center;font-weight:bold;font-size:15px;color:#22c55e;min-height:22px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="top">
+  <a class="back" href="/">← Về</a>
+  <div class="title">{{ game_name }}</div>
+  <div style="width:60px"></div>
+</div>
+<div class="banner"><img src="{{ game_image }}" alt="{{ game_name }}" onerror="this.parentElement.style.display='none'"></div>
+<div class="stats">
+  <div class="stat"><label>Casino</label><b id="bal">0</b></div>
+  <div class="stat"><label>Cược</label><b id="betDisp">10</b></div>
+  <div class="stat"><label>Thắng</label><b class="win" id="winDisp">0</b></div>
+</div>
+<div class="free-badge" id="freeBadge">MIỄN PHÍ: 0</div>
+<div class="machine">
+  <div class="mult-row">
+    <span class="mult on" id="m0">x1</span>
+    <span class="mult" id="m1">x2</span>
+    <span class="mult" id="m2">x3</span>
+    <span class="mult" id="m3">x5</span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="hint" id="hint">3+ Scatter kích hoạt vòng quay miễn phí</div>
+</div>
+<div class="controls">
+  <div class="bet-row">
+    <label>Mức cược</label>
+    <input type="number" id="bet" min="1" step="1" value="10" oninput="syncBet()">
+  </div>
+  <div class="btn-row">
+    <button class="btn-side" id="turboBtn" onclick="toggleTurbo()">TURBO</button>
+    <button class="spin-btn" id="spinBtn" onclick="startSpin()">C</button>
+    <button class="btn-side" id="autoBtn" onclick="toggleAuto()">AUTO</button>
+  </div>
+  <div class="win-text" id="winText"></div>
+</div>
+<script>
+const GAME_NAME = {{ game_name | tojson }};
+const SYMBOLS = {{ symbols | tojson }};
+const SCATTER = "✦";
+const COLS = 5, ROWS = 4;
+const MULTS = [1, 2, 3, 5];
+let balance = {{ balance | int }};
+let isSpinning = false, isTurbo = false, isAuto = false;
+let freeSpins = 0, multIdx = 0, autoTimer = null;
+let luckRate = 50, scatterLeft = 0;
+(async function(){
+  try{ const r=await fetch('/api/me/luck'); const d=await r.json(); luckRate=d.luck_rate||50; scatterLeft=d.scatter_next||0; }catch(e){}
+})();
+function fmt(n){ return Number(n||0).toLocaleString('vi-VN'); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function updateUI(){
+  document.getElementById('bal').innerText = fmt(balance);
+  document.getElementById('betDisp').innerText = fmt(parseInt(document.getElementById('bet').value)||10);
+  document.getElementById('freeBadge').style.display = freeSpins>0?'block':'none';
+  document.getElementById('freeBadge').innerText = 'MIỄN PHÍ: '+freeSpins;
+  for(let i=0;i<4;i++) document.getElementById('m'+i).classList.toggle('on', i===multIdx);
+}
+function syncBet(){ updateUI(); }
+function buildGrid(){
+  const g=document.getElementById('grid'); g.innerHTML='';
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=document.createElement('div');
+    cell.className='cell'; cell.id='c'+r+'_'+c;
+    const s=pickSymbol(); cell.innerText=s;
+    if(s===SCATTER) cell.classList.add('scatter-cell');
+    g.appendChild(cell);
+  }
+}
+function pickSymbol(){ if(Math.random()<0.08) return SCATTER; return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]; }
+function toggleTurbo(){ isTurbo=!isTurbo; document.getElementById('turboBtn').classList.toggle('on',isTurbo); }
+function toggleAuto(){ isAuto=!isAuto; document.getElementById('autoBtn').classList.toggle('on',isAuto); if(isAuto&&!isSpinning) startSpin(); if(!isAuto&&autoTimer){clearTimeout(autoTimer);autoTimer=null;} }
+async function serverBet(amount){
+  try{
+    const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:Math.round(amount),game:GAME_NAME})});
+    const data=await res.json();
+    if(!res.ok){alert(data.message||'Không đủ Casino');return false;}
+    balance=data.balance;updateUI();return true;
+  }catch(e){alert('Lỗi kết nối');return false;}
+}
+async function serverWin(amount){
+  amount=Math.round(Number(amount)||0); if(amount<=0) return false;
+  try{
+    const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,game:GAME_NAME})});
+    const data=await res.json();
+    if(res.ok){balance=data.balance;updateUI();return true;} return false;
+  }catch(e){return false;}
+}
+async function startSpin(){
+  if(isSpinning) return;
+  const bet=parseInt(document.getElementById('bet').value)||10;
+  if(bet<1){alert('Cược tối thiểu 1');return;}
+  const useFree=freeSpins>0;
+  if(!useFree && balance<bet){alert('Không đủ Casino!');isAuto=false;document.getElementById('autoBtn').classList.remove('on');return;}
+  isSpinning=true;
+  const btn=document.getElementById('spinBtn');
+  btn.disabled=true; btn.classList.add('rotating');
+  document.getElementById('winDisp').innerText='0';
+  document.getElementById('winText').innerText='';
+  multIdx=0; updateUI();
+  if(!useFree){
+    const ok=await serverBet(bet);
+    if(!ok){isSpinning=false;btn.disabled=false;btn.classList.remove('rotating');isAuto=false;document.getElementById('autoBtn').classList.remove('on');return;}
+  } else { freeSpins--; updateUI(); }
+  const cells=document.querySelectorAll('.cell');
+  cells.forEach(c=>{c.classList.add('spinning');c.classList.remove('win','scatter-cell');});
+  const ticks=isTurbo?6:14;
+  for(let t=0;t<ticks;t++){
+    cells.forEach(c=>{const s=pickSymbol();c.innerText=s;c.classList.toggle('scatter-cell',s===SCATTER);});
+    await sleep(isTurbo?40:70);
+  }
+  cells.forEach(c=>c.classList.remove('spinning'));
+  let board=[], scatterCount=0;
+  const forceScatter=scatterLeft>0||(Math.random()*100<luckRate*0.12);
+  for(let r=0;r<ROWS;r++){
+    board[r]=[];
+    for(let c=0;c<COLS;c++){
+      let s=pickSymbol();
+      if(Math.random()*100<luckRate*0.35 && c>0 && board[r][c-1]!==SCATTER) s=board[r][c-1];
+      board[r][c]=s; if(s===SCATTER) scatterCount++;
+    }
+  }
+  if(forceScatter && scatterCount<3){
+    const spots=[]; for(let i=0;i<ROWS*COLS;i++) spots.push(i);
+    spots.sort(()=>Math.random()-0.5);
+    for(let k=0;k<3;k++){ const idx=spots[k]; board[Math.floor(idx/COLS)][idx%COLS]=SCATTER; }
+    scatterCount=0; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(board[r][c]===SCATTER) scatterCount++;
+    if(scatterLeft>0){ try{await fetch('/api/me/scatter/consume',{method:'POST'});scatterLeft=Math.max(0,scatterLeft-1);}catch(e){} }
+  }
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const el=document.getElementById('c'+r+'_'+c);
+    el.innerText=board[r][c];
+    el.classList.toggle('scatter-cell', board[r][c]===SCATTER);
+  }
+  let totalWin=0; const counts={}; const winSyms=new Set();
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const s=board[r][c]; if(s===SCATTER) continue; counts[s]=(counts[s]||0)+1; }
+  for(const [s,n] of Object.entries(counts)){
+    if(n>=5){
+      let pay=bet*(n>=10?5:n>=8?3:n>=6?2:1);
+      pay=Math.round(pay*MULTS[multIdx]);
+      if(luckRate>70) pay=Math.round(pay*(1+(luckRate-50)/100));
+      totalWin+=pay; winSyms.add(s);
+      if(multIdx<MULTS.length-1) multIdx++;
+    }
+  }
+  if(winSyms.size){
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(winSyms.has(board[r][c])) document.getElementById('c'+r+'_'+c).classList.add('win');
+    await sleep(isTurbo?200:450);
+  }
+  if(totalWin>0){
+    await serverWin(totalWin);
+    document.getElementById('winDisp').innerText=fmt(totalWin);
+    document.getElementById('winText').innerText='THANG +'+fmt(totalWin);
+  } else document.getElementById('winText').innerText='Thu lai!';
+  if(scatterCount>=3){
+    const add=scatterCount>=5?15:scatterCount>=4?12:10;
+    freeSpins+=add;
+    document.getElementById('hint').innerText=scatterCount+' Scatter -> +'+add+' vong mien phi!';
+    updateUI();
+  } else document.getElementById('hint').innerText='3+ Scatter kich hoat vong quay mien phi';
+  updateUI();
+  isSpinning=false; btn.disabled=false; btn.classList.remove('rotating');
+  if(isAuto||freeSpins>0) autoTimer=setTimeout(startSpin, isTurbo?350:700);
+}
+buildGrid(); updateUI();
+</script>
+</body>
+</html>

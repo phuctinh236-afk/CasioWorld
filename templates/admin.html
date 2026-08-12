@@ -2,234 +2,877 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin TX68</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TX68 Admin Panel</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #0b1120; color: #fff; display: flex; height: 100vh; overflow: hidden; }
-
-        /* Màn hình Đăng Nhập */
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0b1120; display: flex; align-items: center; justify-content: center; z-index: 999;
-        }
-        .login-box {
-            background: #172136; padding: 30px; border-radius: 10px; width: 90%; max-width: 360px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center;
-        }
-        .login-box h2 { color: #f3a838; margin-bottom: 20px; font-size: 20px; }
-        .login-box input {
-            width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 6px;
-            border: 1px solid #2a3859; background: #0b1120; color: #fff; outline: none;
-        }
-        .login-box button {
-            width: 100%; padding: 12px; border: none; border-radius: 6px;
-            background: #f3a838; color: #000; font-weight: bold; cursor: pointer;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
 
-        /* Layout Admin */
-        #admin-app { display: none; width: 100%; height: 100vh; }
-        .sidebar { width: 250px; background: #131c2e; border-right: 1px solid #1e2d4a; padding: 15px; flex-shrink: 0; }
-        .sidebar-title { font-size: 11px; color: #64748b; font-weight: bold; margin: 15px 0 10px 10px; letter-spacing: 1px; }
-        .nav-item {
-            display: flex; align-items: center; padding: 12px 15px; color: #94a3b8; text-decoration: none;
-            border-radius: 6px; margin-bottom: 5px; cursor: pointer; font-size: 14px;
+        body {
+            background: #0b1120;
+            color: white;
+            min-height: 100vh;
         }
-        .nav-item:hover, .nav-item.active { background: #1e2d4a; color: #fff; font-weight: bold; }
-        
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; background: #0b1120; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        /* Table Style */
-        .card { background: #131c2e; padding: 15px; border-radius: 8px; border: 1px solid #1e2d4a; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #1e2d4a; }
-        th { background: #172136; color: #94a3b8; }
 
-        /* Badge Trạng Thái */
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
-        .badge-success { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
-        .badge-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid #eab308; }
-        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        .header {
+            height: 65px;
+            background: #131c2e;
+            border-bottom: 1px solid #263653;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
 
-        .btn-sm { padding: 4px 8px; font-size: 11px; border: none; border-radius: 4px; cursor: pointer; margin-right: 4px; }
-        .btn-approve { background: #22c55e; color: #000; }
-        .btn-reject { background: #ef4444; color: #fff; }
-    </style>
-</head>
-<body>
+        .logo {
+            color: #f3a838;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-    <!-- Màn hình Đăng Nhập -->
-    <div id="login-screen">
-        <div class="login-box">
-            <h2>ĐĂNG NHẬP ADMIN TX68</h2>
-            <input type="text" id="login-user" placeholder="Tên tài khoản" value="owner_tx68">
-            <input type="password" id="login-pass" placeholder="Mật khẩu" value="masterpassword123">
-            <button onclick="handleLogin()">ĐĂNG NHẬP</button>
-        </div>
-    </div>
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            font-size: 13px;
+        }
 
-    <!-- Màn hình Giao diện Chính -->
-    <div id="admin-app">
-        <div class="sidebar">
-            <h3 style="color:#f3a838; padding: 10px;">ADMIN TX68</h3>
-            <div class="sidebar-title">TX68 MANAGEMENT</div>
-            <div class="nav-item active" onclick="switchTab('dashboard')">🏠 Trang Chủ</div>
-            <div class="nav-item" onclick="switchTab('transactions')">💳 Lịch Sử Nạp / Rút</div>
-            <div class="nav-item" onclick="alert('Tính năng đang cập nhật')">📊 Lịch Sử Thắng / Thua</div>
-            <div class="nav-item" onclick="alert('Tính năng đang cập nhật')">🔑 Tài Khoản & Mật Khẩu</div>
-            <div class="nav-item" onclick="alert('Tính năng đang cập nhật')">⚙️ Cộng / Trừ Số Dư</div>
-            <div class="nav-item" style="color:#ef4444; margin-top:30px;" onclick="handleLogout()">🚪 Đăng xuất</div>
-        </div>
+        .role {
+            background: rgba(168,85,247,.15);
+            color: #c084fc;
+            border: 1px solid #a855f7;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: bold;
+        }
 
-        <div class="main-content">
-            <!-- Tab Trang Chủ -->
-            <div id="tab-dashboard">
-                <h2>🏠 Trang Chủ - Người Chơi Trực Tuyến</h2>
-                <div style="margin: 15px 0;" id="stats-box">Đang tải...</div>
-                <div class="card">
-                    <h3>Danh sách người dùng đang Online</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Mã ID</th>
-                                <th>Tài khoản</th>
-                                <th>Game đang chơi</th>
-                                <th>Trạng thái</th>
-                                <th>Hoạt động cuối</th>
-                            </tr>
-                        </thead>
-                        <tbody id="online-list"></tbody>
-                    </table>
-                </div>
-            </div>
+        .logout {
+            background: #ef4444;
+            color: white;
+            border: 0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-            <!-- Tab Lịch Sử Nạp / Rút -->
-            <div id="tab-transactions" style="display:none;">
-                <h2>💳 Lịch Sử Nạp / Rút Tiền</h2>
-                <div class="card" style="margin-top: 15px;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Mã GD</th>
-                                <th>Tài khoản</th>
-                                <th>Loại</th>
-                                <th>Số tiền</th>
-                                <th>Thời gian</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tx-list"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+        .container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: auto;
+        }
 
-    <script>
-        const API_URL = '';
-        let token = localStorage.getItem('admin_token');
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-        window.onload = () => {
-            if (token) showAdminApp();
-        };
+        .home-btn {
+            background: #1e293b;
+            color: white;
+            border: 1px solid #334155;
+            padding: 10px 15px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-size: 13px;
+        }
 
-        async function handleLogin() {
-            const username = document.getElementById('login-user').value;
-            const password = document.getElementById('login-pass').value;
+        .stats {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
+        .stat {
+            background: #131c2e;
+            border: 1px solid #263653;
+            border-radius: 10px;
+            padding: 20px;
+        }
 
-            if (res.ok) {
-                token = data.token;
-                localStorage.setItem('admin_token', token);
-                showAdminApp();
-            } else {
-                alert(data.message);
+        .stat-title {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #f3a838;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .card {
+            background: #131c2e;
+            border: 1px solid #263653;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            color: #38bdf8;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .search {
+            width: 100%;
+            background: #0b1120;
+            border: 1px solid #334155;
+            color: white;
+            padding: 11px;
+            border-radius: 6px;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 11px;
+            text-align: left;
+            border-bottom: 1px solid #263653;
+        }
+
+        th {
+            background: #172136;
+            color: #94a3b8;
+        }
+
+        .fc {
+            color: #f3a838;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge-user {
+            background: rgba(56,189,248,.15);
+            color: #38bdf8;
+        }
+
+        .badge-admin {
+            background: rgba(168,85,247,.15);
+            color: #c084fc;
+        }
+
+        .amount-box {
+            display: flex;
+            gap: 5px;
+        }
+
+        .amount {
+            width: 100px;
+            padding: 7px;
+            background: #0b1120;
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 5px;
+        }
+
+        .btn {
+            padding: 7px 10px;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-add {
+            background: #22c55e;
+            color: #000;
+        }
+
+        .btn-sub {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 20px;
+        }
+
+        @media(max-width: 700px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 0 10px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 10px;
             }
         }
+    </style>
+</head>
 
-        function handleLogout() {
-            localStorage.removeItem('admin_token');
-            location.reload();
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        🎮 TX68 ADMIN
+    </div>
+
+    <div class="header-right">
+
+        <span>
+            👤 {{ username }}
+        </span>
+
+        <span class="role">
+            {{ role|upper }}
+        </span>
+
+        <button
+            class="logout"
+            onclick="logout()"
+        >
+            Đăng xuất
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="top-buttons">
+
+        <a
+            class="home-btn"
+            href="/"
+        >
+            🏠 Trang chủ
+        </a>
+
+        <button
+            class="home-btn"
+            onclick="loadAll()"
+        >
+            🔄 Làm mới
+        </button>
+
+    </div>
+
+
+    <!-- THỐNG KÊ -->
+
+    <section class="stats">
+
+        <div class="stat">
+
+            <div class="stat-title">
+                👥 Tổng người chơi
+            </div>
+
+            <div
+                class="stat-value"
+                id="totalUsers"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                🟢 Đang hoạt động
+            </div>
+
+            <div
+                class="stat-value"
+                id="activeUsers"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                🪙 Tổng FC
+            </div>
+
+            <div
+                class="stat-value"
+                id="totalFC"
+            >
+                0
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- NGƯỜI CHƠI -->
+
+    <section class="card">
+
+        <h2 class="card-title">
+            👥 QUẢN LÝ NGƯỜI CHƠI
+        </h2>
+
+        <input
+            class="search"
+            id="search"
+            type="text"
+            placeholder="🔎 Tìm tài khoản..."
+            oninput="filterUsers()"
+        >
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Tài khoản</th>
+                        <th>FC</th>
+                        <th>Quyền</th>
+                        <th>Cộng / Trừ FC</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="userRows">
+
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            Đang tải...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- LỊCH SỬ -->
+
+    <section class="card">
+
+        <h2 class="card-title">
+            📜 LỊCH SỬ HOẠT ĐỘNG
+        </h2>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Tài khoản</th>
+                        <th>Hoạt động</th>
+                        <th>FC</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="logRows">
+
+                    <tr>
+                        <td
+                            colspan="4"
+                            class="empty"
+                        >
+                            Đang tải...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+let users = [];
+
+
+/* =========================
+   LOAD USERS
+========================= */
+
+async function loadUsers() {
+
+    try {
+
+        const response =
+            await fetch("/admin/api/users");
+
+        if (!response.ok) {
+
+            if (response.status === 401) {
+                window.location.href = "/admin/login";
+                return;
+            }
+
+            throw new Error("API error");
         }
 
-        function showAdminApp() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-app').style.display = 'flex';
-            loadDashboard();
-            loadTransactions();
+        const data =
+            await response.json();
+
+        users =
+            data.users || [];
+
+        document.getElementById("totalUsers")
+            .textContent =
+            Number(data.total_users || 0)
+            .toLocaleString();
+
+        document.getElementById("activeUsers")
+            .textContent =
+            Number(data.active_users || 0)
+            .toLocaleString();
+
+        document.getElementById("totalFC")
+            .textContent =
+            Number(data.total_fc || 0)
+            .toLocaleString();
+
+        renderUsers(users);
+
+    } catch (error) {
+
+        document.getElementById("userRows")
+            .innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty">
+                        Không thể tải danh sách người chơi.
+                    </td>
+                </tr>
+            `;
+
+        console.error(error);
+    }
+}
+
+
+/* =========================
+   RENDER USERS
+========================= */
+
+function renderUsers(list) {
+
+    const tbody =
+        document.getElementById("userRows");
+
+    if (!list.length) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="empty">
+                    Không tìm thấy người chơi.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    tbody.innerHTML =
+        list.map(user => {
+
+            const role =
+                user.role === "owner" ||
+                user.role === "admin"
+                ? `<span class="badge badge-admin">
+                    ${escapeHtml(user.role.toUpperCase())}
+                   </span>`
+                : `<span class="badge badge-user">
+                    USER
+                   </span>`;
+
+            return `
+                <tr>
+
+                    <td>
+                        #${user.id}
+                    </td>
+
+                    <td>
+                        <b>
+                            ${escapeHtml(user.username)}
+                        </b>
+                    </td>
+
+                    <td class="fc">
+                        🪙
+                        ${Number(user.fc || 0)
+                            .toLocaleString()}
+                    </td>
+
+                    <td>
+                        ${role}
+                    </td>
+
+                    <td>
+
+                        <div class="amount-box">
+
+                            <input
+                                class="amount"
+                                id="amount-${user.id}"
+                                type="number"
+                                min="1"
+                                placeholder="FC"
+                            >
+
+                            <button
+                                class="btn btn-add"
+                                onclick="changeFC(
+                                    ${user.id},
+                                    1
+                                )"
+                            >
+                                +
+                            </button>
+
+                            <button
+                                class="btn btn-sub"
+                                onclick="changeFC(
+                                    ${user.id},
+                                    -1
+                                )"
+                            >
+                                -
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function filterUsers() {
+
+    const query =
+        document.getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const result =
+        users.filter(user =>
+            String(user.username)
+                .toLowerCase()
+                .includes(query)
+        );
+
+    renderUsers(result);
+}
+
+
+/* =========================
+   CHANGE FC
+========================= */
+
+async function changeFC(
+    userId,
+    direction
+) {
+
+    const input =
+        document.getElementById(
+            "amount-" + userId
+        );
+
+    const amount =
+        Number(input.value);
+
+    if (!amount || amount <= 0) {
+
+        alert("Nhập số FC hợp lệ.");
+
+        return;
+    }
+
+    const finalAmount =
+        amount * direction;
+
+    try {
+
+        const response =
+            await fetch(
+                "/admin/api/user/fc",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        user_id: userId,
+                        amount: finalAmount
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Không thể cập nhật FC."
+            );
+
+            return;
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('tab-dashboard').style.display = tabName === 'dashboard' ? 'block' : 'none';
-            document.getElementById('tab-transactions').style.display = tabName === 'transactions' ? 'block' : 'none';
+        alert(
+            data.message ||
+            "Đã cập nhật FC."
+        );
+
+        input.value = "";
+
+        loadAll();
+
+    } catch (error) {
+
+        alert(
+            "Không thể kết nối máy chủ."
+        );
+
+        console.error(error);
+    }
+}
+
+
+/* =========================
+   LOAD LOGS
+========================= */
+
+async function loadLogs() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/admin/api/logs"
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Không tải được log"
+            );
         }
 
-        async function loadDashboard() {
-            const res = await fetch('/api/dashboard', { headers: { 'Authorization': 'Bearer ' + token } });
-            if(!res.ok) return;
-            const data = await res.json();
+        const data =
+            await response.json();
 
-            document.getElementById('stats-box').innerHTML = `<b>Tổng số người chơi online:</b> <span style="color:#22c55e; font-size:18px;">${data.totalOnline}</span>`;
-            
-            let html = '';
-            data.users.forEach(u => {
-                html += `<tr>
-                    <td>#${u.id}</td>
-                    <td><b>${u.username}</b></td>
-                    <td><span style="color:#f3a838;">${u.game}</span></td>
-                    <td><span class="badge badge-success">${u.status}</span></td>
-                    <td>${u.last_active}</td>
-                </tr>`;
-            });
-            document.getElementById('online-list').innerHTML = html;
+        const tbody =
+            document.getElementById(
+                "logRows"
+            );
+
+        if (!data.length) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="4"
+                        class="empty"
+                    >
+                        Chưa có lịch sử.
+                    </td>
+                </tr>
+            `;
+
+            return;
         }
 
-        async function loadTransactions() {
-            const res = await fetch('/api/transactions', { headers: { 'Authorization': 'Bearer ' + token } });
-            if(!res.ok) return;
-            const data = await res.json();
+        tbody.innerHTML =
+            data.map(item => `
 
-            let html = '';
-            data.forEach(t => {
-                let badgeClass = t.status === 'Thành công' ? 'badge-success' : (t.status === 'Đang chờ' ? 'badge-pending' : 'badge-danger');
-                let actionBtns = t.status === 'Đang chờ' ? `
-                    <button class="btn-sm btn-approve" onclick="updateTx('${t.id}', 'Thành công')">Duyệt</button>
-                    <button class="btn-sm btn-reject" onclick="updateTx('${t.id}', 'Thất bại')">Hủy</button>
-                ` : '-';
+                <tr>
 
-                html += `<tr>
-                    <td><b>${t.id}</b></td>
-                    <td>${t.username}</td>
-                    <td>${t.type}</td>
-                    <td><b>${t.amount.toLocaleString()}đ</b></td>
-                    <td>${t.time}</td>
-                    <td><span class="badge ${badgeClass}">${t.status}</span></td>
-                    <td>${actionBtns}</td>
-                </tr>`;
-            });
-            document.getElementById('tx-list').innerHTML = html;
-        }
+                    <td>
+                        ${escapeHtml(
+                            item.created_at || ""
+                        )}
+                    </td>
 
-        async function updateTx(id, status) {
-            await fetch('/api/transactions/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ id, status })
-            });
-            loadTransactions();
-        }
-    </script>
+                    <td>
+                        <b>
+                            ${escapeHtml(
+                                item.username || ""
+                            )}
+                        </b>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            item.action || ""
+                        )}
+                    </td>
+
+                    <td class="fc">
+                        ${Number(
+                            item.amount || 0
+                        ).toLocaleString()}
+                    </td>
+
+                </tr>
+
+            `).join("");
+
+    } catch (error) {
+
+        document.getElementById("logRows")
+            .innerHTML = `
+                <tr>
+                    <td
+                        colspan="4"
+                        class="empty"
+                    >
+                        Chưa thể tải lịch sử.
+                    </td>
+                </tr>
+            `;
+
+        console.error(error);
+    }
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout() {
+
+    try {
+
+        await fetch(
+            "/admin/logout",
+            {
+                method: "POST"
+            }
+        );
+
+    } finally {
+
+        window.location.href =
+            "/admin/login";
+    }
+}
+
+
+/* =========================
+   SECURITY
+========================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =========================
+   LOAD ALL
+========================= */
+
+function loadAll() {
+
+    loadUsers();
+    loadLogs();
+}
+
+
+loadAll();
+
+setInterval(
+    loadAll,
+    10000
+);
+
+</script>
+
 </body>
-                                                </html>
-                                                
+    </html>

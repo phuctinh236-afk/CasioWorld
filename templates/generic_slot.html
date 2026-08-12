@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ game_name }} - TX68</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body {
+            background: #0b1120;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            padding-bottom: 30px;
+        }
+        .top-bar {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .back-btn {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: #1e293b;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .game-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #f3a838;
+            text-align: center;
+            flex: 1;
+        }
+        .banner {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            border: 2px solid #334155;
+            background: #131c2e;
+        }
+        .banner img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        .balance-box {
+            width: 100%;
+            max-width: 420px;
+            background: #131c2e;
+            border: 1px solid #263653;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .balance-box span { color: #94a3b8; font-size: 13px; }
+        .balance-box b { color: #f3a838; font-size: 18px; }
+        .slot-frame {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(145deg, #1a2332, #0f172a);
+            border: 3px solid #f3a838;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 0 30px rgba(243,168,56,.2);
+        }
+        .reels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .reel {
+            background: #0b1120;
+            border-radius: 10px;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            border: 2px solid #334155;
+            transition: transform .1s;
+        }
+        .reel.spinning {
+            animation: shake .15s infinite;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .win-text {
+            text-align: center;
+            min-height: 28px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #22c55e;
+            margin: 10px 0 4px;
+        }
+        .controls {
+            width: 100%;
+            max-width: 420px;
+            background: #131c2e;
+            border: 1px solid #263653;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .bet-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+        .bet-row label { color: #94a3b8; font-size: 13px; }
+        .bet-row select {
+            background: #0b1120;
+            color: #fff;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-weight: bold;
+            flex: 1;
+            max-width: 160px;
+        }
+        .spin-btn {
+            width: 100%;
+            padding: 16px;
+            border: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f3a838, #e67e22);
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(243,168,56,.4);
+        }
+        .spin-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+        .spin-btn:active:not(:disabled) {
+            transform: scale(.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="/" class="back-btn">← Về</a>
+        <div class="game-title">{{ game_name }}</div>
+        <div style="width:60px"></div>
+    </div>
+
+    <div class="banner">
+        <img src="{{ game_image }}" alt="{{ game_name }}" onerror="this.style.display='none'">
+    </div>
+
+    <div class="balance-box">
+        <span>Casino</span>
+        <b id="balance">{{ "{:,}".format(balance) }}</b>
+    </div>
+
+    <div class="slot-frame">
+        <div class="reels" id="reels">
+            <div class="reel" id="r0">🍒</div>
+            <div class="reel" id="r1">🍋</div>
+            <div class="reel" id="r2">⭐</div>
+        </div>
+        <div class="win-text" id="winText"></div>
+    </div>
+
+    <div class="controls">
+        <div class="bet-row">
+            <label>Mức cược</label>
+            <select id="bet">
+                <option value="10">10</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1.000</option>
+                <option value="5000">5.000</option>
+            </select>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="doSpin()">QUAY</button>
+    </div>
+
+    <script>
+        let balance = {{ balance | int }};
+        const GAME_NAME = {{ game_name | tojson }};
+        const symbols = ['🍒','🍋','🍊','⭐','💎','7️⃣','🔔','🍇'];
+
+        function updateBalance() {
+            document.getElementById('balance').innerText = Number(balance).toLocaleString('vi-VN');
+        }
+
+        async function serverBet(amount) {
+            try {
+                const res = await fetch('/api/game/play', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: amount, game: GAME_NAME })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Không đủ Casino');
+                    return false;
+                }
+                balance = data.balance;
+                updateBalance();
+                return true;
+            } catch (e) {
+                alert('Lỗi kết nối');
+                return false;
+            }
+        }
+
+        async function serverWin(amount) {
+            if (amount <= 0) return;
+            try {
+                const res = await fetch('/api/game/win', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: amount, game: GAME_NAME })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    balance = data.balance;
+                    updateBalance();
+                }
+            } catch (e) {}
+        }
+
+        async function doSpin() {
+            const bet = parseInt(document.getElementById('bet').value) || 50;
+            if (balance < bet) {
+                alert('Không đủ Casino!');
+                return;
+            }
+
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            document.getElementById('winText').innerText = '';
+
+            const ok = await serverBet(bet);
+            if (!ok) {
+                btn.disabled = false;
+                return;
+            }
+
+            const reels = [0,1,2].map(i => document.getElementById('r'+i));
+            reels.forEach(r => r.classList.add('spinning'));
+
+            let ticks = 0;
+            const spinInterval = setInterval(() => {
+                reels.forEach(r => {
+                    r.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                });
+                ticks++;
+                if (ticks > 12) {
+                    clearInterval(spinInterval);
+                    finishSpin(bet, reels);
+                }
+            }, 80);
+        }
+
+        async function finishSpin(bet, reels) {
+            reels.forEach(r => r.classList.remove('spinning'));
+
+            const result = [
+                symbols[Math.floor(Math.random() * symbols.length)],
+                symbols[Math.floor(Math.random() * symbols.length)],
+                symbols[Math.floor(Math.random() * symbols.length)]
+            ];
+            reels.forEach((r, i) => r.innerText = result[i]);
+
+            let win = 0;
+            // 3 giống nhau
+            if (result[0] === result[1] && result[1] === result[2]) {
+                if (result[0] === '7️⃣') win = bet * 20;
+                else if (result[0] === '💎') win = bet * 15;
+                else if (result[0] === '⭐') win = bet * 10;
+                else win = bet * 5;
+            }
+            // 2 giống nhau
+            else if (result[0] === result[1] || result[1] === result[2] || result[0] === result[2]) {
+                win = bet * 2;
+            }
+
+            if (win > 0) {
+                await serverWin(win);
+                document.getElementById('winText').innerText = '🎉 THẮNG +' + win.toLocaleString('vi-VN') + '!';
+            } else {
+                document.getElementById('winText').innerText = 'Thử lại nhé!';
+                document.getElementById('winText').style.color = '#94a3b8';
+                setTimeout(() => {
+                    document.getElementById('winText').style.color = '#22c55e';
+                }, 1500);
+            }
+
+            document.getElementById('spinBtn').disabled = false;
+        }
+
+        updateBalance();
+    </script>
+</body>
+</html>

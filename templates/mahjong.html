@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahjong Ways - TX68 Game</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { 
+            background: #0d0502; 
+            color: #fff; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 8px;
+            padding: 10px; 
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .header { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(5px); padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; }
+        .game-title { font-size: 16px; font-weight: bold; color: #f8fafc; }
+
+        .slot-machine { width: 100%; max-width: 480px; background: linear-gradient(135deg, #50130a, #2a0503); border: 3px solid #b45309; border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); margin: 2px 0; position: relative; }
+
+        .freespin-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 2px solid #fef08a; box-shadow: 0 0 10px #ef4444; display: none; z-index: 20; }
+
+        .multiplier-bar { display: flex; justify-content: space-around; background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 6px; margin-bottom: 8px; border: 1px solid #854d0e; }
+        .mult-item { font-size: 18px; font-weight: 900; color: #ca8a04; padding: 2px 12px; border-radius: 6px; transition: 0.3s; font-style: italic; }
+        .mult-item.active { color: #fef08a; text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; transform: scale(1.25); }
+
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #15803d; padding: 6px; border-radius: 10px; border: 2px solid #166534; position: relative; transition: filter 0.3s ease; }
+        
+        .grid-container.dimmed .reel-window:not(.tension-active) {
+            filter: brightness(0.35);
+            opacity: 0.65;
+        }
+
+        .reel-window { height: 260px; overflow: hidden; position: relative; background: #166534; border-radius: 6px; transition: all 0.3s ease; }
+        
+        .reel-window.tension-active {
+            z-index: 10;
+            filter: brightness(1.3);
+            opacity: 1 !important;
+            box-shadow: 0 0 15px #facc15, inset 0 0 10px #facc15;
+            border: 2px solid #fde047;
+            animation: tensionPulse 0.6s infinite alternate;
+        }
+
+        @keyframes tensionPulse {
+            0% { border-color: #fde047; box-shadow: 0 0 10px #facc15; }
+            100% { border-color: #ef4444; box-shadow: 0 0 20px #ef4444; }
+        }
+
+        @keyframes reelSpinLoop {
+            0% { transform: translate3d(0, -520px, 0); }
+            100% { transform: translate3d(0, 0px, 0); }
+        }
+
+        .reel-track { display: flex; flex-direction: column; gap: 4px; position: absolute; width: 100%; top: 0; left: 0; }
+        .reel-track.spinning { animation: reelSpinLoop 0.3s linear infinite; }
+        .reel-track.spinning-slow { animation: reelSpinLoop 0.9s linear infinite; }
+
+        .reel-cell { 
+            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 85%, #cbd5e1 100%); 
+            color: #0f172a; 
+            border-radius: 8px; 
+            height: 61px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            box-shadow: inset 0 -3px 0 #94a3b8, 0 3px 4px rgba(0,0,0,0.35); 
+            flex-shrink: 0; 
+            font-weight: bold; 
+            transition: transform 0.25s ease, opacity 0.25s ease, border 0.2s ease;
+            padding: 3px;
+            border: 1px solid #e2e8f0;
+        }
+
+        @keyframes dropDown {
+            0% { transform: translateY(-50px); opacity: 0.3; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .reel-cell.drop-anim {
+            animation: dropDown 0.32s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .reel-cell img {
+            width: 88%;
+            height: 88%;
+            object-fit: contain;
+            pointer-events: none;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.15));
+        }
+
+        .reel-cell.win-gold-frame { 
+            border: 3.5px solid #facc15 !important; 
+            box-shadow: 0 0 12px #facc15, inset 0 0 8px #facc15 !important; 
+            background: linear-gradient(180deg, #fef9c3 0%, #fef08a 100%) !important;
+            animation: pulseFrame 0.35s infinite alternate;
+            z-index: 5;
+        }
+
+        @keyframes pulseFrame {
+            0% { transform: scale(0.96); }
+            100% { transform: scale(1.04); }
+        }
+
+        .reel-cell.scatter-cell { 
+            background: linear-gradient(180deg, #fef08a 0%, #facc15 100%); 
+            border: 2px solid #eab308; 
+            box-shadow: inset 0 -3px 0 #ca8a04, 0 0 10px rgba(250, 204, 21, 0.6);
+        }
+
+        .reel-cell.wild-cell { 
+            background: linear-gradient(180deg, #fef08a, #eab308); 
+            color: #713f12; 
+            font-size: 14px; 
+            font-weight: 900; 
+            border: 2px solid #facc15; 
+        }
+
+        .info-banner {
+            width: 100%; max-width: 480px; background: linear-gradient(180deg, #991b1b, #450a0a); border: 2px solid #facc15; border-radius: 20px; padding: 6px 15px; text-align: center; color: #fef08a; font-weight: bold; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin: 2px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .banner-scatter-img { height: 26px; width: auto; vertical-align: middle; border-radius: 4px; }
+
+        .stats-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%; 
+            max-width: 480px; 
+            gap: 8px; 
+            margin: 4px 0 2px 0; 
+        } 
+        
+        .stat-card { 
+            flex: 1; 
+            background: rgba(30, 20, 15, 0.75); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            border-radius: 10px; 
+            padding: 8px 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .stat-icon { font-size: 14px; opacity: 0.85; display: flex; align-items: center; }
+        .stat-value { font-size: 14px; font-weight: bold; color: #38bdf8; white-space: nowrap; }
+        .stat-value.win { color: #38bdf8; }
+
+        .control-panel { width: 100%; max-width: 480px; background: rgba(20, 10, 5, 0.95); padding: 12px; border-radius: 16px; border: 1px solid #78350f; display: flex; flex-direction: column; gap: 8px; }
+        .actions { display: flex; justify-content: space-around; align-items: center; gap: 8px; }
+
+        .btn-circle { width: 45px; height: 45px; border-radius: 50%; background: #27272a; border: 1px solid #52525b; color: #e4e4e7; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-circle.active { background: #dc2626; color: #fff; border-color: #f87171; }
+
+        @keyframes spinRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .spin-btn { width: 72px; height: 72px; background: radial-gradient(circle, #facc15 0%, #ca8a04 70%, #854d0e 100%); border: 3px solid #fef08a; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+        .spin-icon { width: 38px; height: 38px; border: 4px solid #713f12; border-top-color: transparent; border-radius: 50%; }
+        .spin-btn.rotating .spin-icon { animation: spinRotate 0.6s linear infinite; }
+        .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .bet-select { background: #18181b; color: #facc15; border: 1px solid #52525b; padding: 6px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+        .back-link { color: #a1a1aa; text-decoration: none; font-size: 12px; text-align: center; margin-top: 4px; display: block; }
+
+        .win-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .win-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .win-box {
+            text-align: center;
+            transform: scale(0.3);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .win-overlay.active .win-box {
+            transform: scale(1);
+        }
+
+        .win-banner-img {
+            max-width: 330px;
+            width: 88vw;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 25px rgba(250, 204, 21, 0.8));
+            animation: winPulse 0.6s infinite alternate;
+        }
+
+        .win-amount-text {
+            font-size: 36px;
+            font-weight: 900;
+            color: #fef08a;
+            margin-top: -15px;
+            text-shadow: 0 0 15px #facc15, 0 3px 10px rgba(0,0,0,0.9);
+            z-index: 10;
+        }
+
+        @keyframes winPulse {
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1.06); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="game-title">🀄 Mahjong Ways</div>
+        <div style="color: #94a3b8; font-size: 12px;">TX68-GAME</div>
+    </div>
+
+    <div class="slot-machine">
+        <div class="freespin-badge" id="freespin-badge">MIỄN PHÍ: 10</div>
+        
+        <div class="multiplier-bar">
+            <div class="mult-item active" id="mult-1">x1</div>
+            <div class="mult-item" id="mult-2">x2</div>
+            <div class="mult-item" id="mult-3">x3</div>
+            <div class="mult-item" id="mult-5">x5</div>
+        </div>
+
+        <div class="grid-container" id="slot-grid"></div>
+    </div>
+
+    <div class="info-banner" id="info-banner">
+        3 <img src="/static/assets/scatter.png" class="banner-scatter-img" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/scatter.png';"> TRỞ LÊN SẼ KÍCH HOẠT VÒNG QUAY MIỄN PHÍ
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-card">
+            <span class="stat-icon">💼</span>
+            <span class="stat-value" id="disp-balance">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">💲</span>
+            <span class="stat-value" id="disp-bet-total">10</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-value win" id="disp-win-amount">0</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="actions">
+            <select class="bet-select" id="bet-amount" onchange="updateBetDisplay()">
+                <option value="10" selected>10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1.000</option>
+                <option value="5000">5.000</option>
+            </select>
+
+            <button class="btn-circle" id="turbo-btn" onclick="toggleTurbo()">TURBO</button>
+            
+            <button class="spin-btn" id="spin-btn" onclick="startSpin()">
+                <div class="spin-icon"></div>
+            </button>
+            
+            <button class="btn-circle" id="auto-btn" onclick="toggleAutoPlay()">AUTO</button>
+        </div>
+        
+        <a href="/" class="back-link">← Quay lại trang chủ TX68</a>
+    </div>
+
+    <div class="win-overlay" id="win-overlay">
+        <div class="win-box">
+            <img class="win-banner-img" id="win-overlay-img" src="" alt="Win Banner">
+            <div class="win-amount-text" id="win-overlay-amount">Casino 0.00</div>
+        </div>
+    </div>
+        <script>
+        let balance = {{ balance | int if balance is defined else 0 }};
+        let isSpinning = false;
+        let isAutoPlaying = false;
+        let isTurbo = false;
+        let autoTimer = null;
+        let freeSpinsLeft = 0;
+        const GAME_NAME = 'Mahjong Ways';
+
+        async function serverBet(amount) {
+            try {
+                const res = await fetch('/api/game/play', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: Math.round(amount), game: GAME_NAME })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Không đủ Casino');
+                    return false;
+                }
+                balance = data.balance;
+                updateBalanceDisplay();
+                return true;
+            } catch (e) {
+                alert('Lỗi kết nối máy chủ');
+                return false;
+            }
+        }
+
+        async function serverWin(amount) {
+            amount = Math.round(amount);
+            if (amount <= 0) return;
+            try {
+                const res = await fetch('/api/game/win', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: amount, game: GAME_NAME })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    balance = data.balance;
+                    updateBalanceDisplay();
+                }
+            } catch (e) {}
+        }
+
+        function updateBalanceDisplay() {
+            const el = document.getElementById('disp-balance');
+            if (el) el.innerText = Number(balance).toLocaleString('vi-VN');
+        }
+
+        const tileAssets = [
+            "Man1.svg", "Man2.svg", "Man3.svg", "Man4.svg", "Man5.svg",
+            "Sou7.svg", "Sou8.svg", "Sou9.svg",
+            "Chun.svg", "Hatsu.svg", "Haku.svg", "Ton.svg"
+        ];
+        
+        const scatterTile = "SCATTER";
+        const wildTile = "WILD";
+        const rows = 4;
+        const cols = 5;
+
+        let gridData = [];
+        let currentMultiplierIdx = 0;
+        const multipliers = [1, 2, 3, 5];
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function cleanCheckerboard(imgEl) {
+            if (!imgEl || !imgEl.complete || imgEl.naturalWidth === 0) return;
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = imgEl.naturalWidth;
+                canvas.height = imgEl.naturalHeight;
+                ctx.drawImage(imgEl, 0, 0);
+
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i+1], b = data[i+2];
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    if ((max - min) < 25) {
+                        data[i + 3] = 0;
+                    }
+                }
+
+                ctx.putImageData(imgData, 0, 0);
+                imgEl.src = canvas.toDataURL();
+            } catch (e) {
+                console.log("Xử lý canvas ảnh:", e);
+            }
+        }
+
+        function getCellContentHTML(tileName) {
+            if (tileName === scatterTile) {
+                return `<img src="/static/assets/scatter.png" alt="Scatter" onerror="this.onerror=null; this.src='/static/assets/scatter.png';">`;
+            }
+            if (tileName === wildTile) {
+                return `WILD`;
+            }
+            return `<img src="/static/assets/${tileName}" alt="${tileName}" onerror="this.onerror=null; this.src='/static/assets/${tileName}';">`;
+        }
+
+        function updateMultiplierDisplay() {
+            document.querySelectorAll('.mult-item').forEach((el, idx) => {
+                if (idx === currentMultiplierIdx) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
+
+        function updateBetDisplay() {
+            let val = parseInt(document.getElementById('bet-amount').value) || 10;
+            document.getElementById('disp-bet-total').innerText = Number(val).toLocaleString('vi-VN');
+        }
+
+        function updateBalance() {
+            updateBalanceDisplay();
+        }
+
+        function toggleTurbo() {
+            isTurbo = !isTurbo;
+            document.getElementById('turbo-btn').classList.toggle('active', isTurbo);
+        }
+
+        function toggleAutoPlay() {
+            isAutoPlaying = !isAutoPlaying;
+            document.getElementById('auto-btn').classList.toggle('active', isAutoPlaying);
+            if (isAutoPlaying && !isSpinning) {
+                startSpin();
+            }
+        }
+
+        function stopAutoPlay() {
+            isAutoPlaying = false;
+            document.getElementById('auto-btn').classList.remove('active');
+            if (autoTimer) clearTimeout(autoTimer);
+        }
+
+        function initGrid() {
+            const grid = document.getElementById('slot-grid');
+            grid.innerHTML = '';
+            gridData = [];
+
+            for (let c = 0; c < cols; c++) {
+                let colData = [];
+                const windowDiv = document.createElement('div');
+                windowDiv.className = 'reel-window';
+                windowDiv.id = `reel-window-${c}`;
+
+                const trackDiv = document.createElement('div');
+                trackDiv.className = 'reel-track';
+                trackDiv.id = `reel-track-${c}`;
+
+                for (let r = 0; r < rows; r++) {
+                    let tile = tileAssets[Math.floor(Math.random() * tileAssets.length)];
+                    colData.push(tile);
+
+                    const cell = document.createElement('div');
+                    cell.className = 'reel-cell';
+                    cell.id = `cell-${c}-${r}`;
+                    cell.dataset.tile = tile;
+                    cell.innerHTML = getCellContentHTML(tile);
+                    trackDiv.appendChild(cell);
+                }
+
+                gridData.push(colData);
+                windowDiv.appendChild(trackDiv);
+                grid.appendChild(windowDiv);
+            }
+            updateBetDisplay();
+            updateBalance();
+        }
+
+        function generateSpinningTrackHTML() {
+            let html = '';
+            for (let i = 0; i < 16; i++) {
+                let randT = tileAssets[Math.floor(Math.random() * tileAssets.length)];
+                html += `<div class="reel-cell">${getCellContentHTML(randT)}</div>`;
+            }
+            return html;
+        }
+
+        async function showWinOverlay(imageSrc, amount) {
+            const overlay = document.getElementById('win-overlay');
+            const imgEl = document.getElementById('win-overlay-img');
+            const amountEl = document.getElementById('win-overlay-amount');
+
+            imgEl.onload = function() { cleanCheckerboard(this); };
+            imgEl.src = imageSrc;
+            amountEl.innerText = `đ${amount.toFixed(2)}`;
+
+            overlay.classList.add('active');
+
+            await sleep(isTurbo ? 2000 : 3200);
+            overlay.classList.remove('active');
+            await sleep(300);
+        }
+        async function startSpin() {
+            if (isSpinning) return;
+
+            const betTotal = parseInt(document.getElementById('bet-amount').value) || 10;
+
+            if (freeSpinsLeft > 0) {
+                freeSpinsLeft--;
+                document.getElementById('freespin-badge').innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
+                if (freeSpinsLeft === 0) document.getElementById('freespin-badge').style.display = 'none';
+            } else {
+                if (balance < betTotal) {
+                    alert("Casino không đủ!");
+                    stopAutoPlay();
+                    return;
+                }
+                const ok = await serverBet(betTotal);
+                if (!ok) {
+                    stopAutoPlay();
+                    return;
+                }
+            }
+
+            isSpinning = true;
+            document.getElementById('disp-win-amount').innerText = "0";
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+            spinBtn.classList.add('rotating');
+
+            currentMultiplierIdx = 0;
+            updateMultiplierDisplay();
+
+            let isFreeSpinTrigger = (Math.random() < 0.12);
+            let targetScatters = 0;
+
+            if (isFreeSpinTrigger) {
+                targetScatters = (Math.random() < 0.85) ? 3 : 4;
+            } else {
+                targetScatters = Math.floor(Math.random() * 3);
+            }
+
+            let newMatrix = [];
+            for (let c = 0; c < cols; c++) {
+                let colTiles = [];
+                for (let r = 0; r < rows; r++) {
+                    let randTile = tileAssets[Math.floor(Math.random() * tileAssets.length)];
+                    colTiles.push(randTile);
+                }
+                newMatrix.push(colTiles);
+            }
+
+            let scatteredCount = 0;
+            let usedCols = new Set();
+            while (scatteredCount < targetScatters) {
+                let randomCol = Math.floor(Math.random() * cols);
+                if (!usedCols.has(randomCol)) {
+                    usedCols.add(randomCol);
+                    let randomRow = Math.floor(Math.random() * rows);
+                    newMatrix[randomCol][randomRow] = scatterTile;
+                    scatteredCount++;
+                }
+            }
+
+            for (let c = 0; c < cols; c++) {
+                const track = document.getElementById(`reel-track-${c}`);
+                track.innerHTML = generateSpinningTrackHTML();
+                track.classList.add('spinning');
+            }
+
+            let scatterFound = 0;
+            const gridContainer = document.getElementById('slot-grid');
+
+            for (let c = 0; c < cols; c++) {
+                if (!isTurbo && scatterFound >= 2 && c >= 2) {
+                    gridContainer.classList.add('dimmed');
+                    const currentWindow = document.getElementById(`reel-window-${c}`);
+                    currentWindow.classList.add('tension-active');
+
+                    const currentTrack = document.getElementById(`reel-track-${c}`);
+                    currentTrack.classList.remove('spinning');
+                    currentTrack.classList.add('spinning-slow');
+
+                    await sleep(1500);
+
+                    currentWindow.classList.remove('tension-active');
+                    gridContainer.classList.remove('dimmed');
+                } else {
+                    await sleep(isTurbo ? 80 : 250);
+                }
+
+                const track = document.getElementById(`reel-track-${c}`);
+                track.classList.remove('spinning', 'spinning-slow');
+                track.innerHTML = '';
+
+                for (let r = 0; r < rows; r++) {
+                    let tile = newMatrix[c][r];
+                    const cell = document.createElement('div');
+                    cell.className = 'reel-cell';
+                    if (tile === scatterTile) cell.classList.add('scatter-cell');
+                    cell.id = `cell-${c}-${r}`;
+                    cell.dataset.tile = tile;
+                    cell.innerHTML = getCellContentHTML(tile);
+                    track.appendChild(cell);
+
+                    if (tile === scatterTile) scatterFound++;
+                }
+                gridData[c] = newMatrix[c];
+            }
+
+            await sleep(200);
+
+            let totalWin = await processCascadingWins(betTotal);
+
+            if (scatterFound >= 3) {
+                freeSpinsLeft += (scatterFound === 3) ? 10 : 12;
+                document.getElementById('freespin-badge').innerText = `MIỄN PHÍ: ${freeSpinsLeft}`;
+                document.getElementById('freespin-badge').style.display = 'block';
+
+                await showWinOverlay('/static/assets/scatter.png', totalWin);
+            } else if (totalWin > betTotal * 10) {
+                await showWinOverlay('/static/assets/scatter.png', totalWin);
+            }
+
+            isSpinning = false;
+            spinBtn.disabled = false;
+            spinBtn.classList.remove('rotating');
+
+            if (isAutoPlaying || freeSpinsLeft > 0) {
+                autoTimer = setTimeout(startSpin, isTurbo ? 400 : 800);
+            }
+        }
+
+        async function processCascadingWins(betTotal) {
+            let winMultiplier = multipliers[currentMultiplierIdx];
+            let roundWin = 0;
+
+            let hasWin = Math.random() < 0.45;
+            if (hasWin) {
+                let winBase = (Math.random() * 2.5 + 0.5) * betTotal;
+                roundWin = Math.round(winBase * winMultiplier);
+                if (roundWin > 0) {
+                    await serverWin(roundWin);
+                    document.getElementById('disp-win-amount').innerText = Number(roundWin).toLocaleString('vi-VN');
+                }
+
+                if (currentMultiplierIdx < multipliers.length - 1) {
+                    currentMultiplierIdx++;
+                    updateMultiplierDisplay();
+                }
+            }
+
+            return roundWin;
+        }
+
+        window.onload = function() {
+            initGrid();
+            updateBalanceDisplay();
+            updateBetDisplay();
+        };
+    </script>
+</body>
+</html>

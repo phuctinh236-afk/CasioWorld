@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Khu vực ưu đãi - TX68</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1523;color:#e2e8f0;font-family:system-ui,sans-serif;padding-bottom:80px}
+.header{background:#f97316;color:#fff;padding:14px;text-align:center;font-weight:bold;position:relative}
+.header a{position:absolute;left:12px;top:14px;color:#fff;text-decoration:none}
+.wrap{max-width:480px;margin:0 auto;padding:12px}
+.card{background:#171a29;border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid #24293f}
+.banner{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;padding:14px;font-weight:bold}
+.body{padding:14px;font-size:13px;line-height:1.55;color:#9fa5b9}
+.body b{color:#f8fafc}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px}
+th,td{border:1px solid #334155;padding:8px;text-align:center}
+th{background:#1e293b;color:#fb923c}
+.btn{display:inline-block;margin-top:10px;background:#f97316;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:bold;border:0;cursor:pointer;font-size:13px}
+.btn:disabled,.btn.off{background:#475569;cursor:not-allowed}
+.tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:bold;margin-bottom:8px}
+.tag.on{background:#14532d;color:#86efac}.tag.off{background:#3f3f46;color:#a1a1aa}
+.msg{padding:10px;border-radius:8px;margin-bottom:12px;font-size:13px}
+.msg.err{background:#450a0a;color:#fecaca}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#171a29;border-top:1px solid #24293f;display:flex;justify-content:space-around;padding:8px 0}
+.nav-item{color:#7a83a0;text-decoration:none;font-size:10px;text-align:center}
+.nav-item.active{color:#f97316}
+.nav-icon{font-size:18px;display:block}
+</style>
+</head>
+<body>
+<div class="header"><a href="/">←</a> Khu vực ưu đãi TX68</div>
+<div class="wrap">
+  {% if err %}<div class="msg err">{{ err }}</div>{% endif %}
+
+  <div class="card">
+    <div class="banner">📅 Điểm danh mỗi ngày — chuỗi 7 ngày tới ~439K</div>
+    <div class="body">
+      {% if checked_today %}<span class="tag off">ĐÃ ĐIỂM DANH HÔM NAY</span>
+      {% else %}<span class="tag on">CHƯA ĐIỂM DANH</span>{% endif %}
+      <p>Chuỗi hiện tại: <b>ngày {{ checkin_streak or 0 }}/7</b> · Ngày tới: <b>{{ next_checkin_day }}</b> (+{{ "{:,}".format(next_checkin_reward or 0) }})</p>
+      <p>Tất cả thành viên TX68 điểm danh mỗi ngày. Điểm danh liên tục 7 ngày nhận thưởng tăng dần. Nghỉ 1 ngày tính lại từ đầu.</p>
+      <table>
+        <tr><th>Ngày</th><th>Thưởng</th></tr>
+        <tr><td>1</td><td>27.000</td></tr>
+        <tr><td>2</td><td>37.000</td></tr>
+        <tr><td>3</td><td>47.000</td></tr>
+        <tr><td>4</td><td>57.000</td></tr>
+        <tr><td>5</td><td>67.000</td></tr>
+        <tr><td>6</td><td>77.000</td></tr>
+        <tr><td>7</td><td>107.000</td></tr>
+      </table>
+      <form method="post" action="/promotions/checkin">
+        <button class="btn {% if checked_today %}off{% endif %}" type="submit" {% if checked_today %}disabled{% endif %}>Điểm danh nhận thưởng</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="banner">👑 Chào mừng VIP trở lại (VIP3+)</div>
+    <div class="body">
+      <p>Cấp VIP hiện tại: <b>VIP {{ vip_level or 1 }}</b></p>
+      {% if vip_return_claimed %}<span class="tag off">ĐÃ NHẬN</span>
+      {% elif (vip_level or 1) >= 3 %}<span class="tag on">ĐỦ ĐIỀU KIỆN</span>
+      {% else %}<span class="tag off">Cần VIP ≥ 3</span>{% endif %}
+      <table>
+        <tr><th>VIP</th><th>Thưởng</th></tr>
+        <tr><td>3–5</td><td>38K–58K</td></tr>
+        <tr><td>6–7</td><td>68K–88K</td></tr>
+        <tr><td>8</td><td>188K</td></tr>
+      </table>
+      <form method="post" action="/promotions/vip-return">
+        <button class="btn {% if vip_return_claimed or (vip_level or 1) < 3 %}off{% endif %}" type="submit" {% if vip_return_claimed or (vip_level or 1) < 3 %}disabled{% endif %}>Đăng ký nhận ngay</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="banner">💯 Thưởng 100% nạp lần đầu (tối đa 500.000)</div>
+    <div class="body">
+      {% if welcome_claimed %}<span class="tag off">ĐÃ NHẬN</span>{% else %}<span class="tag on">CHƯA NHẬN</span>{% endif %}
+      <p>Nạp lần đầu ≥ 100.000 → +100% (tối đa 500.000). Tự động cộng khi nạp tại TX68.</p>
+      <a class="btn" href="/deposit">Nạp tiền ngay</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="banner">⏰ Giờ vàng nạp lại 8% / 11% (19h–23h)</div>
+    <div class="body">
+      {% if golden_hour %}<span class="tag on">ĐANG GIỜ VÀNG</span>{% else %}<span class="tag off">Ngoài giờ vàng</span>{% endif %}
+      <table>
+        <tr><th>Nạp</th><th>%</th></tr>
+        <tr><td>≥ 500.000</td><td>11%</td></tr>
+        <tr><td>≥ 100.000</td><td>8%</td></tr>
+      </table>
+      <a class="btn" href="/deposit">Nạp trong giờ vàng</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="banner">💰 Hoàn trả tới 0.80% theo doanh thu</div>
+    <div class="body">
+      <p>Doanh thu hôm nay: <b>{{ "{:,}".format(turnover_today or 0) }}</b> · Tỷ lệ <b>{{ '%.2f'|format(cashback_rate or 0) }}%</b> · Ước tính <b>{{ "{:,}".format(pending_cashback or 0) }}</b></p>
+      <table>
+        <tr><th>Doanh thu</th><th>%</th></tr>
+        <tr><td>&lt; 75tr</td><td>0.40%</td></tr>
+        <tr><td>75–150tr</td><td>0.60%</td></tr>
+        <tr><td>&gt; 150tr</td><td>0.80%</td></tr>
+      </table>
+      <form method="post" action="/promotions/claim-cashback">
+        <button class="btn" type="submit">Nhận hoàn trả (gửi thư)</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a class="nav-item" href="/"><span class="nav-icon">🏠</span>Trang chủ</a>
+  <a class="nav-item active" href="/promotions"><span class="nav-icon">🎁</span>Ưu đãi</a>
+  <a class="nav-item" href="/deposit"><span class="nav-icon">💳</span>Nạp</a>
+  <a class="nav-item" href="/mailbox"><span class="nav-icon">📬</span>Thư</a>
+</div>
+</body>
+</html>

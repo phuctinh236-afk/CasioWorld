@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặc Quyền VIP - Ab666</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #131521; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #131521; position: relative; padding-bottom: 70px; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow-y: auto; }
+        .header { padding: 12px 15px; background-color: #171a29; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #24293f; position: sticky; top: 0; z-index: 100; }
+        .header-title { font-size: 15px; font-weight: bold; color: #cca352; }
+        .container { padding: 15px; }
+        
+        /* Thẻ VIP chính */
+        .vip-main-card { background: linear-gradient(135deg, #212537, #171a29); border: 1px solid #cca352; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(204,163,82,0.15); }
+        .vip-badge { font-size: 28px; margin-bottom: 8px; }
+        .vip-level-name { font-size: 20px; color: #cca352; font-weight: bold; margin-bottom: 5px; }
+        .vip-username { font-size: 13px; color: #9fa5b9; margin-bottom: 15px; }
+        
+        /* Thanh tiến trình */
+        .progress-box { background: #131521; padding: 12px; border-radius: 8px; border: 1px solid #24293f; text-align: left; margin-top: 15px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 12px; color: #9fa5b9; margin-bottom: 6px; }
+        .progress-bar { width: 100%; height: 8px; background: #24293f; border-radius: 4px; overflow: hidden; }
+        .progress-fill { width: 25%; height: 100%; background: linear-gradient(90deg, #cca352, #ffdf85); border-radius: 4px; }
+
+        /* Danh sách đặc quyền */
+        .perks-section-title { font-size: 14px; color: #cca352; font-weight: bold; margin: 20px 0 10px 5px; }
+        .perks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .perk-card { background-color: #171a29; border: 1px solid #24293f; border-radius: 10px; padding: 15px; text-align: center; }
+        .perk-icon { font-size: 22px; margin-bottom: 8px; }
+        .perk-title { font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .perk-desc { font-size: 11px; color: #9fa5b9; }
+
+        /* Thanh điều hướng */
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background-color: #171a29; border-top: 1px solid #24293f; display: flex; justify-content: space-around; padding: 8px 0; z-index: 900; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #7a83a0; font-size: 10px; gap: 3px; }
+        .nav-item.active { color: #cca352; }
+        .nav-icon { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-title">💎 TRUNG TÂM VIP</div>
+        </div>
+        
+        <div class="container">
+            <!-- Thẻ hiển thị VIP hiện tại -->
+            <div class="vip-main-card">
+                <div class="vip-badge">👑</div>
+                <div class="vip-level-name">VIP CẤP {{ vip_level|default(1) }}</div>
+                <div class="vip-username">Thành viên: <span style="color: #fff;">{{ username|default(user.username if user else '') }}</span></div>
+                
+                <div class="progress-box">
+                    <div class="progress-info">
+                        <span>Tiến trình nâng cấp VIP {{ next_level|default(2) }} (theo tiền nạp)</span>
+                        <span>{{ "{:,}".format(have|default(0)) }} / {{ "{:,}".format(need|default(1000000)) }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ pct|default(0) }}%"></div>
+                    </div>
+                </div>
+            
+            <div style="margin-top:16px;background:#1a2035;border-radius:12px;padding:12px;font-size:12px;color:#9fa5b9;">
+                <b style="color:#cca352;">Ngưỡng VIP (chỉ tính tiền nạp):</b><br>
+                VIP1: 0 · VIP2: 1.000.000 · VIP3: 5.000.000 · VIP4: 20.000.000<br>
+                VIP5: 50.000.000 · VIP6: 100.000.000 · VIP7: 300.000.000 · VIP8: 1.000.000.000
+            </div>
+
+            <div class="perks-section-title">🎁 ĐẶC QUYỀN HỘI VIÊN VIP</div>
+            <div class="perks-grid">
+                <div class="perk-card">
+                    <div class="perk-icon">🧧</div>
+                    <div class="perk-title">Lì Xì Thăng Hạng</div>
+                    <div class="perk-desc">Nhận thưởng ngay khi lên cấp VIP mới</div>
+                </div>
+                <div class="perk-card">
+                    <div class="perk-icon">💵</div>
+                    <div class="perk-title">Hoàn Trả Cao Hơn</div>
+                    <div class="perk-desc">Hoàn trả {{ cashback|default(0.5) }}% (theo cấp VIP · tính từ tiền nạp)</div>
+                </div>
+                <div class="perk-card">
+                    <div class="perk-icon">🎂</div>
+                    <div class="perk-title">Quà Sinh Nhật</div>
+                    <div class="perk-desc">Phần quà tri ân đặc biệt vào tháng sinh nhật</div>
+                </div>
+                <div class="perk-card">
+                    <div class="perk-icon">⚡</div>
+                    <div class="perk-title">Ưu Tiên Rút Tiền</div>
+                    <div class="perk-desc">Giao dịch nạp rút nhanh chóng, hạn mức lớn</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh điều hướng chuẩn -->
+        <nav class="bottom-nav">
+            <a href="{{ url_for('index') }}" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Trang chủ</span>
+            </a>
+            <a href="{{ url_for('promotions') }}" class="nav-item">
+                <div class="nav-icon">🎁</div>
+                <span>Khuyến mãi</span>
+            </a>
+            <a href="{{ url_for('deposit') }}" class="nav-item">
+                <div class="nav-icon">💳</div>
+                <span>Nạp tiền</span>
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Tài khoản</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

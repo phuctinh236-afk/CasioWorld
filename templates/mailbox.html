@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Hộp thư đến</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1523;color:#e2e8f0;font-family:system-ui,sans-serif;padding-bottom:80px}
+.header{background:#cca352;color:#131521;padding:14px;text-align:center;font-weight:bold;position:relative}
+.header a{position:absolute;right:14px;top:14px;color:#131521;text-decoration:none;font-size:18px}
+.wrap{max-width:480px;margin:0 auto}
+.day{background:#cca352;color:#131521;padding:8px 14px;font-size:12px;font-weight:bold;display:flex;justify-content:space-between}
+.item{display:flex;gap:12px;padding:14px;border-bottom:1px solid #1e293b;background:#171a29}
+.icon{width:36px;height:36px;border-radius:50%;background:#cca352;color:#131521;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.meta{flex:1;min-width:0}
+.title{font-weight:bold;font-size:14px;color:#f8fafc;margin-bottom:4px}
+.body{font-size:12px;color:#94a3b8;line-height:1.4}
+.time{font-size:11px;color:#64748b;white-space:nowrap}
+.amt{color:#4ade80;font-weight:bold;font-size:12px;margin-top:4px}
+.empty{text-align:center;padding:40px 16px;color:#64748b}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#171a29;border-top:1px solid #24293f;display:flex;justify-content:space-around;padding:8px 0}
+.nav-item{color:#7a83a0;text-decoration:none;font-size:10px;text-align:center}
+.nav-item.active{color:#cca352}
+.nav-icon{font-size:18px;display:block}
+</style>
+</head>
+<body>
+<div class="header">Hộp thư đến <a href="/">✕</a></div>
+<div class="wrap">
+{% if messages and messages|length > 0 %}
+  {% set ns = namespace(last='') %}
+  {% for m in messages %}
+    {% set d = (m.created_at or '')[:10] %}
+    {% if d != ns.last %}
+      <div class="day"><span>📅 {{ d }}</span><span>GMT+7</span></div>
+      {% set ns.last = d %}
+    {% endif %}
+    <div class="item">
+      <div class="icon">📢</div>
+      <div class="meta">
+        <div class="title">{{ m.title }}</div>
+        <div class="body">{{ m.body }}</div>
+        {% if m.amount and m.amount > 0 %}
+        <div class="amt">+{{ "{:,}".format(m.amount) }}</div>
+        {% endif %}
+      </div>
+      <div class="time">{{ (m.created_at or '')[11:19] }}</div>
+    </div>
+  {% endfor %}
+  <div class="empty">- cuối trang -</div>
+{% else %}
+  <div class="empty">Hiện chưa có tin nhắn.<br>Chơi game / nạp tiền / nhận hoàn trả sẽ có thư tại đây.</div>
+{% endif %}
+</div>
+<div class="bottom-nav">
+  <a class="nav-item" href="/"><span class="nav-icon">🏠</span>Trang chủ</a>
+  <a class="nav-item" href="/promotions"><span class="nav-icon">🎁</span>Khuyến mãi</a>
+  <a class="nav-item" href="/deposit"><span class="nav-icon">💳</span>Nạp tiền</a>
+  <a class="nav-item active" href="/mailbox"><span class="nav-icon">📬</span>Hộp thư</a>
+</div>
+</body>
+</html>

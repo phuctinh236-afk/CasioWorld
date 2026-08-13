@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>{{ game_name }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(180deg,#1e1b4b,#0f172a);color:#fff;min-height:100vh;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center}
+.bar{width:100%;max-width:430px;display:flex;justify-content:space-between;padding:8px 12px}
+.bar a{color:#c4b5fd;text-decoration:none}
+h1{font-size:15px;color:#fbbf24;text-align:center;margin:4px}
+.banner{font-size:12px;text-align:center;color:#fde68a;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;width:100%;max-width:400px;aspect-ratio:6/5;margin:0 auto;padding:0 8px}
+.cell{background:#312e81;border:1px solid #4c1d95;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:clamp(14px,4.5vw,24px);transition:.15s}
+.cell.spin{opacity:.6}.cell.win{background:#f59e0b55;border-color:#fbbf24;transform:scale(1.06);box-shadow:0 0 12px #f59e0b}
+.bot{width:100%;max-width:430px;margin-top:auto;background:#1e1b4b;padding:12px;border-top:1px solid #4c1d95}
+.stats{display:flex;justify-content:space-around;font-size:12px;margin-bottom:10px;color:#a5b4fc}
+.stats b{display:block;color:#fbbf24;font-size:14px}
+.ctrl{display:flex;justify-content:center;align-items:center;gap:14px}
+.btn{width:40px;height:40px;border-radius:50%;border:0;background:#312e81;color:#fff;font-size:18px}
+.spin{width:68px;height:68px;border-radius:50%;border:3px solid #fbbf24;background:radial-gradient(circle at 30% 30%,#fff4,#f59e0b);font-size:24px;font-weight:900;cursor:pointer}
+.spin.go{animation:r .5s linear infinite}@keyframes r{to{transform:rotate(360deg)}}
+.msg{text-align:center;color:#4ade80;font-weight:bold;margin-top:8px;min-height:20px}
+.free{display:none;background:#7c3aed;text-align:center;padding:6px;border-radius:12px;margin:6px auto;width:fit-content;font-size:12px;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="bar"><a href="/">✕</a><span>{{ game_name }}</span><span></span></div>
+<h1>THẮNG TỚI 15,000x CƯỢC</h1>
+<div class="banner">Cascading · Nhân hệ số</div>
+<div class="free" id="free">FREE: 0</div>
+<div class="grid" id="grid"></div>
+<div class="bot">
+  <div class="stats"><div>Casino<b id="bal">0</b></div><div>Thắng<b id="win">0</b></div><div>Cược<b id="betD">10</b></div></div>
+  <div class="ctrl">
+    <button class="btn" onclick="chg(-1)">−</button>
+    <button class="spin" id="spin" onclick="go()">↻</button>
+    <button class="btn" onclick="chg(1)">+</button>
+  </div>
+  <div class="msg" id="msg"></div>
+</div>
+<script>
+const GN={{ game_name|tojson }}, SYM={{ symbols|tojson }}, R=5,C=6;
+let bal={{ balance|int }}, bet=10, busy=0, free=0, luck=50;
+(async()=>{try{const d=await(await fetch('/api/me/luck')).json();luck=d.luck_rate||50}catch(e){}})();
+const $=id=>document.getElementById(id), fmt=n=>Number(n||0).toLocaleString('vi-VN'), sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function ui(){$('bal').innerText=fmt(bal);$('betD').innerText=fmt(bet);$('free').style.display=free>0?'block':'none';$('free').innerText='FREE: '+free}
+function chg(d){const s=[1,5,10,20,50,100,500,1000,5000];let i=s.indexOf(bet);if(i<0)i=2;i=Math.max(0,Math.min(s.length-1,i+d));bet=s[i];ui()}
+function pick(){return SYM[Math.floor(Math.random()*SYM.length)]}
+function build(){const g=$('grid');g.innerHTML='';for(let i=0;i<R*C;i++){const e=document.createElement('div');e.className='cell';e.id='c'+i;e.innerText=pick();g.appendChild(e)}}
+async function sBet(a){const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(!res.ok){alert(d.message||'Lỗi');return false}bal=d.balance;ui();return true}
+async function sWin(a){if(a<=0)return;const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(res.ok){bal=d.balance;ui()}}
+async function go(){
+  if(busy)return;if(free<=0&&bal<bet){alert('Không đủ Casino');return}
+  busy=1;$('spin').classList.add('go');$('spin').disabled=1;$('win').innerText='0';$('msg').innerText='';
+  if(free>0)free--;else if(!await sBet(bet)){busy=0;$('spin').classList.remove('go');$('spin').disabled=0;return}
+  const cells=document.querySelectorAll('.cell');
+  for(let t=0;t<10;t++){cells.forEach(c=>{c.classList.add('spin');c.innerText=pick()});await sleep(50)}
+  cells.forEach(c=>c.classList.remove('spin'));
+  // cascade rounds
+  let total=0, mult=1;
+  for(let round=0;round<4;round++){
+    const vals=[...cells].map(c=>c.innerText);
+    const cnt={};vals.forEach(v=>cnt[v]=(cnt[v]||0)+1);
+    let hit=false;const winS=new Set();
+    for(const[s,n]of Object.entries(cnt)){if(n>=6){hit=true;winS.add(s);total+=Math.round(bet*(n/3)*mult*(luck>60?1.3:1))}}
+    if(!hit)break;
+    cells.forEach((c,i)=>{if(winS.has(c.innerText)){c.classList.add('win')}});
+    await sleep(400);
+    cells.forEach(c=>{if(winS.has(c.innerText)){c.classList.remove('win');c.innerText=pick()}});
+    mult*=2;await sleep(200);
+  }
+  if(total>0){await sWin(total);$('win').innerText=fmt(total);$('msg').innerText='THẮNG +'+fmt(total);if(Math.random()<0.15+luck/500){free+=8;ui()}}
+  else $('msg').innerText='Thử lại';
+  busy=0;$('spin').classList.remove('go');$('spin').disabled=0;ui();
+  if(free>0)setTimeout(go,600);
+}
+build();ui();
+</script>
+</body>
+</html>

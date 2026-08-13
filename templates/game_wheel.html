@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>{{ game_name }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a0533;color:#fff;min-height:100vh;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center}
+.bar{width:100%;max-width:430px;display:flex;justify-content:space-between;padding:10px}
+.bar a{color:#e9d5ff;text-decoration:none}
+h1{color:#fbbf24;font-size:16px;margin:8px}
+.wheel-wrap{position:relative;width:280px;height:280px;margin:12px auto}
+.wheel{width:280px;height:280px;border-radius:50%;border:8px solid #fbbf24;background:conic-gradient(
+#ef4444 0 30deg,#f97316 30deg 60deg,#eab308 60deg 90deg,#22c55e 90deg 120deg,
+#06b6d4 120deg 150deg,#3b82f6 150deg 180deg,#8b5cf6 180deg 210deg,#ec4899 210deg 240deg,
+#ef4444 240deg 270deg,#f97316 270deg 300deg,#eab308 300deg 330deg,#22c55e 330deg 360deg
+);transition:transform 4s cubic-bezier(.15,.85,.25,1);box-shadow:0 0 30px #7c3aed88}
+.pin{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid #fbbf24;z-index:2}
+.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:#1a0533;border:3px solid #fbbf24;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fbbf24}
+.bets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:340px;padding:8px}
+.bet{padding:14px 8px;border-radius:12px;text-align:center;font-weight:bold;font-size:18px;cursor:pointer;border:2px solid transparent;background:#2e1065}
+.bet small{display:block;font-size:11px;opacity:.8}
+.bet.on{border-color:#fbbf24;box-shadow:0 0 12px #fbbf2488}
+.bet:nth-child(1){background:#6b7280}.bet:nth-child(2){background:#ca8a04}.bet:nth-child(3){background:#2563eb}
+.bet:nth-child(4){background:#7c3aed}.bet:nth-child(5){background:#c2410c}.bet:nth-child(6){background:#b45309}
+.bot{width:100%;max-width:430px;padding:12px;margin-top:auto}
+.stats{display:flex;justify-content:space-between;font-size:12px;color:#c4b5fd;margin-bottom:10px}
+.stats b{display:block;color:#fbbf24}
+.spin{width:100%;padding:14px;border:0;border-radius:12px;background:linear-gradient(90deg,#7c3aed,#db2777);color:#fff;font-weight:bold;font-size:16px;cursor:pointer}
+.spin:disabled{opacity:.5}
+.msg{text-align:center;margin-top:10px;font-weight:bold;color:#4ade80;min-height:22px}
+</style>
+</head>
+<body>
+<div class="bar"><a href="/">✕</a><span>{{ game_name }}</span><span></span></div>
+<h1>SIÊU VÒNG QUAY</h1>
+<div class="wheel-wrap">
+  <div class="pin"></div>
+  <div class="wheel" id="wheel"></div>
+  <div class="center">M</div>
+</div>
+<div class="bets" id="bets"></div>
+<div class="bot">
+  <div class="stats"><div>Casino<b id="bal">0</b></div><div>Cược ô<b id="betD">10</b></div><div>Chọn<b id="pick">—</b></div></div>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button onclick="chg(-1)" style="flex:1;padding:10px;background:#2e1065;border:0;color:#fff;border-radius:8px">−</button>
+    <button onclick="chg(1)" style="flex:1;padding:10px;background:#2e1065;border:0;color:#fff;border-radius:8px">+</button>
+  </div>
+  <button class="spin" id="spin" onclick="go()">QUAY</button>
+  <div class="msg" id="msg"></div>
+</div>
+<script>
+const GN={{ game_name|tojson }};
+const SEGS=[1,2,5,10,20,40,1,2,5,8,10,15];
+let bal={{ balance|int }}, bet=10, chosen=null, busy=0, luck=50, rot=0;
+(async()=>{try{const d=await(await fetch('/api/me/luck')).json();luck=d.luck_rate||50}catch(e){}})();
+const $=id=>document.getElementById(id), fmt=n=>Number(n||0).toLocaleString('vi-VN');
+function ui(){$('bal').innerText=fmt(bal);$('betD').innerText=fmt(bet);$('pick').innerText=chosen!=null?chosen+'x':'—'}
+function chg(d){const s=[1,5,10,20,50,100,500,1000];let i=s.indexOf(bet);if(i<0)i=2;i=Math.max(0,Math.min(s.length-1,i+d));bet=s[i];ui()}
+function buildBets(){
+  const unique=[1,2,5,10,20,40];
+  const box=$('bets');box.innerHTML='';
+  unique.forEach(n=>{
+    const el=document.createElement('div');el.className='bet';el.innerHTML=n+'<small>'+n+'x</small>';
+    el.onclick=()=>{chosen=n;document.querySelectorAll('.bet').forEach(b=>b.classList.remove('on'));el.classList.add('on');ui()};
+    box.appendChild(el);
+  });
+}
+async function sBet(a){const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(!res.ok){alert(d.message||'Lỗi');return false}bal=d.balance;ui();return true}
+async function sWin(a){if(a<=0)return;const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(res.ok){bal=d.balance;ui()}}
+async function go(){
+  if(busy)return;if(chosen==null){alert('Chọn một ô cược!');return}if(bal<bet){alert('Không đủ Casino');return}
+  busy=1;$('spin').disabled=1;$('msg').innerText='Đang quay...';
+  if(!await sBet(bet)){busy=0;$('spin').disabled=0;return}
+  // weighted result
+  let idx=Math.floor(Math.random()*SEGS.length);
+  if(Math.random()*100<luck*0.4){const matches=SEGS.map((v,i)=>v===chosen?i:-1).filter(i=>i>=0);if(matches.length)idx=matches[Math.floor(Math.random()*matches.length)]}
+  const result=SEGS[idx];
+  rot+=1440+(360-idx*(360/SEGS.length));
+  $('wheel').style.transform='rotate('+rot+'deg)';
+  await new Promise(r=>setTimeout(r,4200));
+  if(result===chosen){const win=bet*chosen;await sWin(win);$('msg').innerText='🎉 TRÚNG '+result+'x → +'+fmt(win)}
+  else $('msg').innerText='Ra '+result+'x — không trúng';
+  busy=0;$('spin').disabled=0;ui();
+}
+buildBets();ui();
+</script>
+</body>
+</html>

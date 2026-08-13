@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>{{ game_name }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0c0a09;color:#fff;min-height:100vh;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center}
+.bar{width:100%;max-width:430px;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1c1917}
+.bar a{color:#a8a29e;text-decoration:none;font-size:13px}
+.bar h1{font-size:14px;color:{{ accent }}}
+.stage{width:100%;max-width:430px;flex:1;background:linear-gradient(180deg,#292524,#0c0a09);padding:8px;position:relative}
+.ways{text-align:center;font-size:11px;color:#fbbf24;margin:4px 0}
+.mults{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.mults span{padding:3px 10px;border-radius:6px;background:#292524;color:#78716c;font-size:11px;font-weight:bold;border:1px solid #44403c}
+.mults span.on{background:{{ accent }};color:#000;border-color:{{ accent }}}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;aspect-ratio:5/4;max-width:400px;margin:0 auto}
+.cell{background:#1c1917;border:1px solid #44403c;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,5vw,26px);transition:.15s}
+.cell.spin{animation:sh .1s infinite}.cell.win{background:{{ accent }}44;border-color:{{ accent }};transform:scale(1.04);box-shadow:0 0 8px {{ accent }}}
+.cell.sc{border-color:#c084fc;background:#3b076455}
+@keyframes sh{50%{transform:translateY(-2px)}}
+.hint{text-align:center;font-size:11px;color:#a8a29e;margin:8px;min-height:18px}
+.free{display:none;text-align:center;background:linear-gradient(90deg,#7c3aed,#db2777);padding:6px;border-radius:20px;font-size:12px;font-weight:bold;margin:6px auto;width:fit-content}
+.bot{width:100%;max-width:430px;background:#1c1917;border-top:1px solid #44403c;padding:10px 12px 16px}
+.stats{display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px;color:#a8a29e}
+.stats b{color:#fbbf24;display:block;font-size:14px}
+.ctrl{display:flex;align-items:center;justify-content:center;gap:12px}
+.btn{width:42px;height:42px;border-radius:50%;border:0;background:#292524;color:#fff;font-size:18px;cursor:pointer}
+.spin{width:64px;height:64px;border-radius:50%;border:3px solid {{ accent }};background:radial-gradient(circle at 30% 30%,#fff3,{{ accent }});color:#000;font-weight:900;font-size:22px;cursor:pointer}
+.spin:disabled{opacity:.5}.spin.go{animation:rot .5s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.side{font-size:11px;padding:8px 10px;border-radius:8px;border:1px solid #44403c;background:#292524;color:#e7e5e4;cursor:pointer}
+.side.on{background:{{ accent }};color:#000}
+.winmsg{text-align:center;color:#4ade80;font-weight:bold;min-height:20px;margin-top:6px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="bar"><a href="/">✕</a><h1>{{ game_name }}</h1><span style="width:24px"></span></div>
+<div class="stage">
+  <div class="ways">10800 ĐƯỜNG</div>
+  <div class="mults"><span class="on" id="m0">x1</span><span id="m1">x2</span><span id="m2">x3</span><span id="m3">x5</span></div>
+  <div class="free" id="free">MIỄN PHÍ: 0</div>
+  <div class="grid" id="grid"></div>
+  <div class="hint" id="hint">3+ Scatter → vòng quay miễn phí</div>
+</div>
+<div class="bot">
+  <div class="stats">
+    <div>Casino<b id="bal">0</b></div>
+    <div>Thắng<b id="win">0</b></div>
+    <div>Cược<b id="betD">10</b></div>
+  </div>
+  <div class="ctrl">
+    <button class="side" id="turbo" onclick="tgTurbo()">⚡</button>
+    <button class="btn" onclick="chgBet(-1)">−</button>
+    <button class="spin" id="spin" onclick="doSpin()">↻</button>
+    <button class="btn" onclick="chgBet(1)">+</button>
+    <button class="side" id="auto" onclick="tgAuto()">AUTO</button>
+  </div>
+  <div class="winmsg" id="msg"></div>
+</div>
+<script>
+const GN={{ game_name|tojson }}, SYM={{ symbols|tojson }}, SC='✦', R=4,C=5, M=[1,2,3,5];
+let bal={{ balance|int }}, bet=10, spinning=0, turbo=0, auto=0, free=0, mi=0, tmr=null, luck=50, scatL=0;
+(async()=>{try{const d=await(await fetch('/api/me/luck')).json();luck=d.luck_rate||50;scatL=d.scatter_next||0}catch(e){}})();
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n||0).toLocaleString('vi-VN');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function ui(){$('bal').innerText=fmt(bal);$('betD').innerText=fmt(bet);$('free').style.display=free>0?'block':'none';$('free').innerText='MIỄN PHÍ: '+free;for(let i=0;i<4;i++)$('m'+i).classList.toggle('on',i===mi)}
+function chgBet(d){const steps=[1,5,10,20,50,100,500,1000,5000,10000,50000,100000];let i=steps.indexOf(bet);if(i<0)i=2;i=Math.max(0,Math.min(steps.length-1,i+d));bet=steps[i];ui()}
+function tgTurbo(){turbo=!turbo;$('turbo').classList.toggle('on',turbo)}
+function tgAuto(){auto=!auto;$('auto').classList.toggle('on',auto);if(auto&&!spinning)doSpin();if(!auto&&tmr){clearTimeout(tmr);tmr=null}}
+function pick(){return Math.random()<0.08?SC:SYM[Math.floor(Math.random()*SYM.length)]}
+function build(){const g=$('grid');g.innerHTML='';for(let r=0;r<R;r++)for(let c=0;c<C;c++){const el=document.createElement('div');el.className='cell';el.id='c'+r+'_'+c;el.innerText=pick();g.appendChild(el)}}
+async function sBet(a){try{const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:Math.round(a),game:GN})});const d=await res.json();if(!res.ok){alert(d.message||'Không đủ');return false}bal=d.balance;ui();return true}catch(e){return false}}
+async function sWin(a){a=Math.round(a);if(a<=0)return;try{const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(res.ok){bal=d.balance;ui()}}catch(e){}}
+async function doSpin(){
+  if(spinning)return;const useFree=free>0;
+  if(!useFree&&bal<bet){alert('Không đủ Casino');auto=0;$('auto').classList.remove('on');return}
+  spinning=1;$('spin').disabled=1;$('spin').classList.add('go');$('win').innerText='0';$('msg').innerText='';mi=0;ui();
+  if(!useFree){if(!await sBet(bet)){spinning=0;$('spin').disabled=0;$('spin').classList.remove('go');return}}else{free--;ui()}
+  const cells=document.querySelectorAll('.cell');cells.forEach(c=>{c.classList.add('spin');c.classList.remove('win','sc')});
+  for(let t=0;t<(turbo?5:12);t++){cells.forEach(c=>{const s=pick();c.innerText=s;c.classList.toggle('sc',s===SC)});await sleep(turbo?35:60)}
+  cells.forEach(c=>c.classList.remove('spin'));
+  let board=[],sc=0;const force=scatL>0||Math.random()*100<luck*0.12;
+  for(let r=0;r<R;r++){board[r]=[];for(let c=0;c<C;c++){let s=pick();if(Math.random()*100<luck*0.3&&c>0&&board[r][c-1]!==SC)s=board[r][c-1];board[r][c]=s;if(s===SC)sc++}}
+  if(force&&sc<3){const sp=[...Array(R*C).keys()].sort(()=>Math.random()-0.5);for(let k=0;k<3;k++){const i=sp[k];board[Math.floor(i/C)][i%C]=SC}sc=0;for(let r=0;r<R;r++)for(let c=0;c<C;c++)if(board[r][c]===SC)sc++;if(scatL>0){try{await fetch('/api/me/scatter/consume',{method:'POST'});scatL--}catch(e){}}}
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++){const el=$('c'+r+'_'+c);el.innerText=board[r][c];el.classList.toggle('sc',board[r][c]===SC)}
+  let total=0;const cnt={},winS=new Set();
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++){const s=board[r][c];if(s===SC)continue;cnt[s]=(cnt[s]||0)+1}
+  for(const[s,n]of Object.entries(cnt)){if(n>=5){let p=bet*(n>=10?5:n>=8?3:n>=6?2:1)*M[mi];if(luck>70)p*=1+(luck-50)/100;total+=Math.round(p);winS.add(s);if(mi<3)mi++}}
+  if(winS.size){for(let r=0;r<R;r++)for(let c=0;c<C;c++)if(winS.has(board[r][c]))$('c'+r+'_'+c).classList.add('win');await sleep(turbo?180:400)}
+  if(total>0){await sWin(total);$('win').innerText=fmt(total);$('msg').innerText='THẮNG +'+fmt(total)}else $('msg').innerText='Thử lại';
+  if(sc>=3){const add=sc>=5?15:sc>=4?12:10;free+=add;$('hint').innerText=sc+' Scatter → +'+add+' free';ui()}else $('hint').innerText='3+ Scatter → vòng quay miễn phí';
+  spinning=0;$('spin').disabled=0;$('spin').classList.remove('go');ui();
+  if(auto||free>0)tmr=setTimeout(doSpin,turbo?300:650);
+}
+build();ui();
+</script>
+</body>
+</html>

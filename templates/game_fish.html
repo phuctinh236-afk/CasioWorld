@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>{{ game_name }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0c4a6e;color:#fff;min-height:100vh;font-family:system-ui,sans-serif;overflow:hidden;touch-action:none}
+.bar{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:8px 12px;background:#082f49aa;z-index:10}
+.bar a{color:#7dd3fc;text-decoration:none}
+#sea{position:fixed;inset:0;background:linear-gradient(180deg,#0ea5e9 0%,#0c4a6e 40%,#164e63 100%)}
+.fish{position:absolute;font-size:32px;cursor:pointer;transition:transform .1s;user-select:none}
+.fish:active{transform:scale(1.2)}
+.boom{position:absolute;font-size:28px;pointer-events:none;animation:fade .5s forwards}
+@keyframes fade{to{opacity:0;transform:scale(1.8)}}
+.hud{position:fixed;bottom:0;left:0;right:0;background:#082f49ee;padding:10px 12px 16px;z-index:10}
+.stats{display:flex;justify-content:space-between;font-size:12px;color:#bae6fd;margin-bottom:8px}
+.stats b{display:block;color:#fde047}
+.ctrl{display:flex;gap:8px;align-items:center}
+.ctrl button{padding:10px 14px;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+.gun{background:#eab308;color:#000}.pm{background:#0369a1;color:#fff}
+.msg{text-align:center;color:#86efac;font-size:12px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="bar"><a href="/">✕</a><b>{{ game_name }}</b><span id="bul">•</span></div>
+<div id="sea"></div>
+<div class="hud">
+  <div class="stats"><div>Casino<b id="bal">0</b></div><div>Thắng ván<b id="win">0</b></div><div>Đạn<b id="betD">10</b></div></div>
+  <div class="ctrl">
+    <button class="pm" onclick="chg(-1)">−</button>
+    <button class="gun" id="fire" onclick="toggle()">BẮN: BẬT</button>
+    <button class="pm" onclick="chg(1)">+</button>
+  </div>
+  <div class="msg">Chạm cá để bắn · mỗi phát trừ đạn (cược)</div>
+</div>
+<script>
+const GN={{ game_name|tojson }}, FISH={{ symbols|tojson }};
+let bal={{ balance|int }}, bet=10, on=false, sessionWin=0, luck=50, timer=null;
+(async()=>{try{const d=await(await fetch('/api/me/luck')).json();luck=d.luck_rate||50}catch(e){}})();
+const $=id=>document.getElementById(id), fmt=n=>Number(n||0).toLocaleString('vi-VN');
+function ui(){$('bal').innerText=fmt(bal);$('betD').innerText=fmt(bet);$('win').innerText=fmt(sessionWin)}
+function chg(d){const s=[1,5,10,20,50,100,500];let i=s.indexOf(bet);if(i<0)i=2;i=Math.max(0,Math.min(s.length-1,i+d));bet=s[i];ui()}
+function toggle(){on=!on;$('fire').innerText=on?'BẮN: BẬT':'BẮN: TẮT';$('fire').style.background=on?'#22c55e':'#eab308'}
+async function sBet(a){const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(!res.ok)return false;bal=d.balance;ui();return true}
+async function sWin(a){if(a<=0)return;const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:Math.round(a),game:GN})});const d=await res.json();if(res.ok){bal=d.balance;ui()}}
+function spawn(){
+  const sea=$('sea');
+  const f=document.createElement('div');f.className='fish';
+  f.innerText=FISH[Math.floor(Math.random()*FISH.length)];
+  const y=60+Math.random()*(window.innerHeight-180);
+  f.style.top=y+'px';f.style.left=(Math.random()>0.5?-40:window.innerWidth+10)+'px';
+  const dir=parseFloat(f.style.left)<0?1:-1;
+  const speed=1+Math.random()*2;
+  const value=bet*(1+Math.random()*3)*(Math.random()<0.1?5:1);
+  f.dataset.val=value;
+  sea.appendChild(f);
+  let x=parseFloat(f.style.left);
+  const move=setInterval(()=>{
+    x+=dir*speed*2;f.style.left=x+'px';
+    if(x<-50||x>window.innerWidth+50){clearInterval(move);f.remove()}
+  },30);
+  f.onclick=async()=>{
+    if(!on)return;if(bal<bet){alert('Không đủ Casino');return}
+    if(!await sBet(bet))return;
+    const hit=Math.random()*100<40+luck*0.35;
+    const boom=document.createElement('div');boom.className='boom';boom.innerText=hit?'💥':'•';
+    boom.style.left=f.style.left;boom.style.top=f.style.top;$('sea').appendChild(boom);
+    setTimeout(()=>boom.remove(),500);
+    if(hit){const w=Math.round(parseFloat(f.dataset.val)||bet*2);sessionWin+=w;await sWin(w);ui();f.remove();clearInterval(move)}
+  };
+}
+setInterval(spawn,700);
+ui();
+</script>
+</body>
+</html>

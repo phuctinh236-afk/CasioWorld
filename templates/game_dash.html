@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>{{ game_name }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#14532d;color:#fff;min-height:100vh;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center}
+.bar{width:100%;max-width:430px;display:flex;justify-content:space-between;padding:10px;background:#052e16}
+.bar a{color:#bbf7d0;text-decoration:none}
+h1{color:#fde047;font-size:18px;margin:8px;text-shadow:0 2px 4px #000}
+.road{width:100%;max-width:400px;height:340px;background:linear-gradient(90deg,#166534 0 18%,#3f3f46 18% 100%);border-radius:12px;position:relative;overflow:hidden;margin:8px;border:3px solid #422006}
+.lane{position:absolute;left:22%;right:8%;top:0;bottom:0;border-left:3px dashed #a3a3a3;border-right:3px dashed #a3a3a3}
+.actor{position:absolute;left:4%;font-size:48px;transition:bottom .4s ease,left .35s ease;z-index:3}
+.pad{position:absolute;width:56px;height:56px;border-radius:50%;background:#3b82f6;border:3px solid #93c5fd;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;cursor:pointer;box-shadow:0 4px 10px #0006;transition:.15s}
+.pad:active{transform:scale(.92)}.pad.dead{background:#7f1d1d;border-color:#ef4444;opacity:.5}
+.pad.ok{background:#16a34a;border-color:#86efac}
+.side{position:absolute;left:0;top:0;bottom:0;width:18%;background:#15803d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.wheelmini{width:70px;height:70px;border-radius:50%;background:conic-gradient(#ef4444,#eab308,#22c55e,#3b82f6,#ef4444);border:3px solid #fde047;font-size:10px;display:flex;align-items:center;justify-content:center}
+.bot{width:100%;max-width:430px;background:#052e16;padding:12px;margin-top:auto}
+.stats{display:flex;justify-content:space-between;font-size:12px;color:#bbf7d0;margin-bottom:10px}
+.stats b{display:block;color:#fde047}
+.ctrl{display:flex;gap:8px}
+.ctrl button{flex:1;padding:12px;border:0;border-radius:10px;font-weight:bold;cursor:pointer}
+.b1{background:#2563eb;color:#fff}.b2{background:#ca8a04;color:#000}.b3{background:#16a34a;color:#fff}
+.msg{text-align:center;margin-top:8px;font-weight:bold;color:#4ade80;min-height:20px}
+</style>
+</head>
+<body>
+<div class="bar"><a href="/">✕</a><span>{{ game_name }}</span><span id="step">0/20</span></div>
+<h1 id="title">{{ game_name }}</h1>
+<div class="road" id="road">
+  <div class="side"><div class="wheelmini">×</div></div>
+  <div class="lane"></div>
+  <div class="actor" id="actor">🐔</div>
+</div>
+<div class="bot">
+  <div class="stats"><div>Casino<b id="bal">0</b></div><div>Thắng<b id="win">0</b></div><div>Cược<b id="betD">10</b></div></div>
+  <div class="ctrl">
+    <button class="b1" onclick="chg(-1)">Cược −</button>
+    <button class="b2" onclick="chg(1)">Cược +</button>
+    <button class="b3" id="go" onclick="start()">Bắt đầu</button>
+  </div>
+  <div class="msg" id="msg">Chọn đường đi — đừng đụng bẫy!</div>
+</div>
+<script>
+const GN={{ game_name|tojson }}, SYM={{ symbols|tojson }};
+const actorEmoji = (SYM[0]||'🐔');
+let bal={{ balance|int }}, bet=10, busy=0, step=0, mult=1, pads=[], luck=50;
+(async()=>{try{const d=await(await fetch('/api/me/luck')).json();luck=d.luck_rate||50}catch(e){}})();
+const $=id=>document.getElementById(id), fmt=n=>Number(n||0).toLocaleString('vi-VN');
+$('actor').innerText=actorEmoji;
+function ui(){$('bal').innerText=fmt(bal);$('betD').innerText=fmt(bet);$('win').innerText=fmt(Math.floor(bet*(mult-1)));$('step').innerText=step+'/20'}
+function chg(d){const s=[1,5,10,20,50,100,500,1000];let i=s.indexOf(bet);if(i<0)i=2;i=Math.max(0,Math.min(s.length-1,i+d));bet=s[i];ui()}
+async function sBet(a){const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:GN})});const d=await res.json();if(!res.ok){alert(d.message||'Lỗi');return false}bal=d.balance;ui();return true}
+async function sWin(a){if(a<=0)return;const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:Math.round(a),game:GN})});const d=await res.json();if(res.ok){bal=d.balance;ui()}}
+function clearPads(){document.querySelectorAll('.pad').forEach(p=>p.remove());pads=[]}
+function spawnPads(){
+  clearPads();
+  const road=$('road');
+  const y=280-step*12;
+  const m1=(1+Math.random()*0.8).toFixed(2);
+  const m2=(1.2+Math.random()*1.2).toFixed(2);
+  [30,62].forEach((left,i)=>{
+    const p=document.createElement('div');p.className='pad';
+    p.style.left=left+'%';p.style.bottom=Math.max(40,y)+'px';
+    p.innerText=(i===0?m1:m2)+'x';
+    p.dataset.m=i===0?m1:m2;
+    // one is trap sometimes
+    const trap=Math.random()>(0.55+luck/400);
+    p.dataset.trap=trap?'1':'0';
+    p.onclick=()=>pick(p);
+    road.appendChild(p);pads.push(p);
+  });
+}
+async function start(){
+  if(busy)return;if(bal<bet){alert('Không đủ Casino');return}
+  if(!await sBet(bet))return;
+  busy=1;step=0;mult=1;$('go').disabled=1;$('msg').innerText='Chọn 1 ô để tiến!';
+  $('actor').style.bottom='20px';$('actor').style.left='4%';
+  ui();spawnPads();
+}
+async function pick(p){
+  if(!busy||p.classList.contains('dead'))return;
+  pads.forEach(x=>x.style.pointerEvents='none');
+  if(p.dataset.trap==='1'){
+    p.classList.add('dead');p.innerText='💥';
+    $('msg').innerText='Rớt! Mất cược';
+    busy=0;$('go').disabled=0;clearPads();ui();return;
+  }
+  p.classList.add('ok');
+  mult=parseFloat(p.dataset.m)||1;
+  step++;
+  $('actor').style.left=p.style.left;$('actor').style.bottom=p.style.bottom;
+  $('msg').innerText='x'+mult+' — tiếp hoặc dừng?';
+  ui();
+  if(step>=12){await cashout();return}
+  // offer cashout via msg click or next pads
+  clearPads();
+  const cash=document.createElement('div');cash.className='pad ok';cash.style.left='45%';cash.style.bottom='20px';cash.innerText='LẤY';cash.onclick=cashout;
+  $('road').appendChild(cash);
+  setTimeout(()=>{if(busy){cash.remove();spawnPads()}},800);
+}
+async function cashout(){
+  if(!busy)return;
+  const win=Math.round(bet*mult);
+  await sWin(win);
+  $('msg').innerText='Nhận +'+fmt(win)+' (x'+mult+')';
+  busy=0;$('go').disabled=0;clearPads();ui();
+}
+ui();
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Ví của tôi - TX68</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1523;color:#e2e8f0;font-family:system-ui,sans-serif;padding-bottom:80px}
+.top{background:#c9a227;color:#1a1200;padding:14px;text-align:center;font-weight:bold;position:relative}
+.top a{position:absolute;right:14px;top:14px;color:#1a1200;text-decoration:none}
+.tabs{display:flex;background:#1a2235}
+.tabs a{flex:1;text-align:center;padding:12px;color:#94a3b8;text-decoration:none;font-weight:600}
+.tabs a.on{background:#c9a227;color:#1a1200}
+.wrap{max-width:480px;margin:0 auto;padding:12px}
+.sec{margin-bottom:14px}
+.sec h3{font-size:13px;color:#c9a227;margin-bottom:8px;border-left:3px solid #c9a227;padding-left:8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.m{background:#171a29;border:2px solid #24293f;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;font-size:12px}
+.m.on{border-color:#c9a227;background:#2a2410}
+.m .ic{font-size:22px;display:block;margin-bottom:4px}
+.amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.amounts button{background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 4px;border-radius:8px;font-size:13px;cursor:pointer}
+.amounts button.on{background:#c9a227;color:#1a1200;border-color:#c9a227}
+input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:16px;margin:6px 0}
+.btn{width:100%;padding:14px;background:linear-gradient(180deg,#e3b53c,#c9a227);color:#1a1200;border:0;border-radius:10px;font-weight:bold;font-size:16px;cursor:pointer;margin-top:10px}
+.msg{padding:10px;border-radius:8px;margin-bottom:10px;font-size:13px}
+.err{background:#450a0a;color:#fecaca}.ok{background:#14532d;color:#bbf7d0}
+.order{background:#fff;color:#111;border-radius:14px;padding:16px;margin-bottom:14px}
+.order .title{text-align:center;font-size:13px;color:#666;margin-bottom:6px}
+.order .amt{text-align:center;font-size:22px;font-weight:800;color:#0f172a;margin-bottom:12px}
+.qrbox{display:flex;justify-content:center;margin:8px 0 14px}
+.qrbox img{width:220px;height:220px;border-radius:12px;border:4px solid #1d4ed8;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;font-size:14px;gap:8px}
+.row span{color:#64748b;flex-shrink:0}
+.row b{color:#0f172a;text-align:right;word-break:break-all}
+.copy{background:#e2e8f0;color:#0f172a;border:0;padding:6px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0}
+.warn{font-size:12px;color:#b91c1c;margin-top:12px;line-height:1.45}
+.pending{background:#171a29;border-radius:8px;padding:10px;margin:6px 0;font-size:12px;color:#e2e8f0}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px}
+.badge.p{background:#3b2f0b;color:#fbbf24}.badge.s{background:#14532d;color:#86efac}.badge.f{background:#450a0a;color:#fca5a5}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#171a29;border-top:1px solid #24293f;display:flex;justify-content:space-around;padding:8px 0}
+.nav a{color:#7a83a0;text-decoration:none;font-size:10px;text-align:center}
+.nav a.on{color:#c9a227}
+.nav span{display:block;font-size:18px}
+.timer{text-align:center;color:#b45309;font-size:13px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="top">Ví của tôi <a href="/">✕</a></div>
+<div class="tabs">
+  <a href="/deposit" class="on">Nạp tiền</a>
+  <a href="/deposit#rut">Rút tiền</a>
+</div>
+<div class="wrap">
+  {% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+  {% if success %}<div class="msg ok">{{ success }}</div>{% endif %}
+
+  {% if order %}
+  <div class="order">
+    <div class="title">Thanh toán sẽ hết hạn sau</div>
+    <div class="timer" id="timer">{{ order.expires }}</div>
+    <div class="amt">{{ "{:,}".format(order.amount) }} VND</div>
+
+    {% if order.qr_url %}
+    <div class="qrbox">
+      <img src="{{ order.qr_url }}" alt="QR thanh toán">
+    </div>
+    <div style="text-align:center;margin-bottom:10px">
+      <a class="copy" href="{{ order.qr_url }}" download="qr-tx68.png">Tải QR</a>
+    </div>
+    {% else %}
+    <div class="qrbox" style="min-height:80px;align-items:center;color:#666;font-size:13px">Cổng này dùng STK bên dưới</div>
+    {% endif %}
+
+    <div class="row"><span>Ngân hàng</span><b>{{ order.pm.name }}</b></div>
+    <div class="row">
+      <span>Chủ tài khoản</span>
+      <b>{{ order.pm.account_name }}</b>
+      <button class="copy" type="button" onclick="cp('{{ order.pm.account_name }}')">Copy</button>
+    </div>
+    <div class="row">
+      <span>Số tài khoản</span>
+      <b>{{ order.pm.account_no }}</b>
+      <button class="copy" type="button" onclick="cp('{{ order.pm.account_no }}')">Copy</button>
+    </div>
+    <div class="row">
+      <span>Số tiền</span>
+      <b>{{ "{:,}".format(order.amount) }}</b>
+      <button class="copy" type="button" onclick="cp('{{ order.amount }}')">Copy</button>
+    </div>
+    <div class="row">
+      <span>Nội dung</span>
+      <b style="color:#b45309">{{ order.code }}</b>
+      <button class="copy" type="button" onclick="cp('{{ order.code }}')">Copy</button>
+    </div>
+    {% if order.bonus %}
+    <div class="row"><span>Thưởng KM</span><b style="color:#16a34a">+{{ "{:,}".format(order.bonus) }}đ</b></div>
+    {% endif %}
+
+    <p class="warn">
+      • Quét QR hoặc chuyển đúng <b>STK + số tiền + nội dung {{ order.code }}</b>.<br>
+      • Sai nội dung sẽ không được cộng tiền tự động.<br>
+      • Đơn đã gửi Telegram <b>pphuc8386</b> để xác nhận.
+    </p>
+  </div>
+  {% endif %}
+
+  {% if not order %}
+  <form method="post" id="napForm">
+    <input type="hidden" name="action" value="create_order">
+    <input type="hidden" name="method" id="method" value="bank_vcb">
+    <div class="sec">
+      <h3>Phương thức thanh toán</h3>
+      <div class="grid" id="methods">
+        <div class="m on" data-m="bank_vcb"><span class="ic">🏦</span>Vietcombank</div>
+        <div class="m" data-m="bank_tcb"><span class="ic">🏦</span>Techcombank</div>
+        <div class="m" data-m="bank_liobank"><span class="ic">🏦</span>Liobank</div>
+        <div class="m" data-m="momo"><span class="ic">💜</span>MoMo</div>
+        <div class="m" data-m="zalopay"><span class="ic">💙</span>ZaloPay</div>
+        <div class="m" data-m="usdt"><span class="ic">₮</span>USDT TRC20</div>
+      </div>
+    </div>
+    <div class="sec">
+      <h3>Khuyến mãi nạp</h3>
+      <select name="promo" id="promo">
+        {% for k,v in promos.items() %}
+        <option value="{{ k }}">{{ v.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="sec">
+      <h3>Số tiền nạp</h3>
+      <div class="amounts">
+        {% for a in [50000,100000,200000,500000,1000000,2000000,5000000,10000000] %}
+        <button type="button" data-a="{{ a }}">{{ "{:,}".format(a) }}</button>
+        {% endfor %}
+      </div>
+      <input type="number" name="amount" id="amount" placeholder="Nhập số tiền (VND)" min="50000" required>
+    </div>
+    <button class="btn" type="submit">Tạo mã QR nạp tiền</button>
+  </form>
+  {% endif %}
+
+  {% if pending and pending|length %}
+  <div class="sec" style="margin-top:18px">
+    <h3>Lịch sử nạp gần đây</h3>
+    {% for p in pending %}
+    <div class="pending">
+      #{{ p.id }} · {{ "{:,}".format(p.amount) }}đ
+      {% if p.bonus_amount %}+{{ "{:,}".format(p.bonus_amount) }}{% endif %}
+      · <span class="badge {{ 's' if p.status=='success' else ('f' if p.status=='failed' else 'p') }}">{{ p.status }}</span><br>
+      Mã: <b>{{ p.content_code or '-' }}</b> · {{ p.created_at }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="sec" id="rut" style="margin-top:20px">
+    <h3>Rút tiền</h3>
+    <form method="post">
+      <input type="hidden" name="action" value="withdraw">
+      <input type="number" name="amount" placeholder="Số tiền rút" min="10000" required>
+      <button class="btn" type="submit" style="background:#334155;color:#fff">Gửi yêu cầu rút</button>
+    </form>
+  </div>
+</div>
+<div class="nav">
+  <a href="/"><span>🏠</span>Trang chủ</a>
+  <a href="/promotions"><span>🎁</span>KM</a>
+  <a href="/deposit" class="on"><span>💳</span>Nạp</a>
+  <a href="/profile"><span>👤</span>Tôi</a>
+</div>
+<script>
+function cp(t){navigator.clipboard.writeText(String(t)).then(()=>alert('Đã copy'));}
+document.querySelectorAll('#methods .m').forEach(el=>{
+  el.onclick=()=>{
+    document.querySelectorAll('#methods .m').forEach(x=>x.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('method').value=el.dataset.m;
+  };
+});
+document.querySelectorAll('.amounts button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.amounts button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('amount').value=b.dataset.a;
+  };
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ví của tôi - TX68</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#0b1220;color:#e8eef8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{min-height:100vh;padding-bottom:72px}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#121a2b 0%,#0b1220 40%)}
+
+/* Header */
+.header{background:linear-gradient(180deg,#e4b93c,#c9a227);color:#1a1400;padding:14px 16px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:50;font-weight:800;font-size:16px}
+.header .x{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#1a1400;text-decoration:none;font-size:20px;font-weight:400}
+
+/* Tabs */
+.tabs{display:flex;background:#171f33;border-bottom:1px solid #243049}
+.tabs a{flex:1;text-align:center;padding:12px;color:#8b97b0;text-decoration:none;font-weight:700;font-size:14px;position:relative}
+.tabs a.on{color:#f0c14b}
+.tabs a.on:after{content:"";position:absolute;left:20%;right:20%;bottom:0;height:3px;background:#f0c14b;border-radius:3px 3px 0 0}
+
+.wrap{padding:14px}
+
+/* Messages */
+.msg{padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:13px;line-height:1.4}
+.err{background:#3b1212;color:#fecaca;border:1px solid #7f1d1d}
+.ok{background:#10291a;color:#bbf7d0;border:1px solid #166534}
+
+/* ===== PAYMENT ORDER (giống ảnh thanh toán) ===== */
+.pay-card{background:#f7f8fc;color:#0f172a;border-radius:16px;padding:16px 14px 18px;margin-bottom:14px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.pay-timer{text-align:center;font-size:13px;color:#64748b;margin-bottom:4px}
+.pay-timer b{color:#c2410c;font-variant-numeric:tabular-nums}
+.pay-amount{text-align:center;font-size:26px;font-weight:800;color:#0f172a;margin:6px 0 12px;letter-spacing:.5px}
+.qr-wrap{display:flex;justify-content:center;margin:4px 0 10px}
+.qr-wrap img{width:230px;height:230px;object-fit:contain;background:#fff;border-radius:12px;border:5px solid #2563eb;padding:6px}
+.qr-actions{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.qr-actions button,.qr-actions a{
+  background:#fff;border:1px solid #cbd5e1;color:#0f172a;padding:8px 14px;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;text-decoration:none
+}
+.pay-note{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.45;margin-bottom:12px}
+.field{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid #e2e8f0}
+.field:last-child{border-bottom:0}
+.field .lab{font-size:12px;color:#64748b;min-width:90px}
+.field .val{flex:1;text-align:right;font-weight:700;font-size:14px;color:#0f172a;word-break:break-all}
+.field .val.hl{color:#c2410c;font-size:15px;letter-spacing:.5px}
+.field .copy{
+  flex-shrink:0;background:#e2e8f0;border:0;color:#0f172a;padding:6px 10px;border-radius:7px;
+  font-size:11px;font-weight:700;cursor:pointer
+}
+.field .copy:active{background:#cbd5e1}
+
+/* ===== METHOD GRID ===== */
+.sec{margin-bottom:16px}
+.sec-title{font-size:13px;font-weight:700;color:#f0c14b;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-title:before{content:"";width:3px;height:14px;background:#f0c14b;border-radius:2px}
+
+.methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.method{
+  background:#171f33;border:2px solid #243049;border-radius:12px;padding:12px 6px;
+  text-align:center;cursor:pointer;transition:.15s
+}
+.method.on{border-color:#f0c14b;background:linear-gradient(180deg,#2a2410,#1a1f30)}
+.method .ic{font-size:22px;line-height:1.2;margin-bottom:4px}
+.method .nm{font-size:11px;font-weight:600;color:#cbd5e1}
+.method.on .nm{color:#f0c14b}
+
+.sub-methods{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sub-methods button{
+  background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:8px;
+  font-size:12px;cursor:pointer
+}
+.sub-methods button.on{background:#f0c14b;color:#1a1400;border-color:#f0c14b;font-weight:700}
+
+/* amounts */
+.amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.amounts button{
+  background:#171f33;border:1px solid #2a3550;color:#e2e8f0;padding:11px 4px;border-radius:10px;
+  font-size:12px;font-weight:600;cursor:pointer
+}
+.amounts button.on{background:#f0c14b;color:#1a1400;border-color:#f0c14b}
+
+input,select{
+  width:100%;padding:13px 14px;border-radius:10px;border:1px solid #2a3550;
+  background:#121a2b;color:#fff;font-size:16px;margin-top:6px
+}
+select option{background:#121a2b}
+
+.btn-main{
+  width:100%;padding:14px;margin-top:14px;border:0;border-radius:12px;
+  background:linear-gradient(180deg,#f0c14b,#c9a227);color:#1a1400;
+  font-weight:800;font-size:16px;cursor:pointer
+}
+.btn-main:active{opacity:.9}
+.btn-sub{
+  width:100%;padding:14px;margin-top:10px;border:0;border-radius:12px;
+  background:#243049;color:#e2e8f0;font-weight:700;font-size:15px;cursor:pointer
+}
+
+/* history */
+.hist{background:#171f33;border:1px solid #243049;border-radius:10px;padding:10px 12px;margin:6px 0;font-size:12px}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700}
+.badge.p{background:#3b2f0b;color:#fbbf24}
+.badge.s{background:#14532d;color:#86efac}
+.badge.f{background:#450a0a;color:#fca5a5}
+
+/* bottom nav */
+.nav{position:fixed;bottom:0;left:0;right:0;background:#121a2b;border-top:1px solid #243049;
+  display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:40}
+.nav a{color:#7a83a0;text-decoration:none;font-size:10px;text-align:center;min-width:56px}
+.nav a.on{color:#f0c14b}
+.nav span{display:block;font-size:18px;margin-bottom:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    Ví của tôi
+    <a class="x" href="/">✕</a>
+  </div>
+  <div class="tabs">
+    <a href="/deposit" class="on">Nạp tiền</a>
+    <a href="#rut">Rút tiền</a>
+  </div>
+
+  <div class="wrap">
+    {% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+    {% if success %}<div class="msg ok">{{ success }}</div>{% endif %}
+
+    {% if order %}
+    <!-- ========== MÀN MÃ / QR (giống ảnh) ========== -->
+    <div class="pay-card">
+      <div class="pay-timer">Thanh toán sẽ hết hạn sau : <b id="countdown">--:--</b></div>
+      <div class="pay-amount">{{ "{:,}".format(order.amount) }} VND</div>
+
+      {% if order.qr_url %}
+      <div class="qr-wrap">
+        <img src="{{ order.qr_url }}" alt="QR">
+      </div>
+      <div class="qr-actions">
+        <button type="button" onclick="cp('{{ order.pm.account_no }}')">Sao chép STK</button>
+        <a href="{{ order.qr_url }}" download="qr-tx68.png">Tải xuống</a>
+      </div>
+      {% endif %}
+
+      <div class="pay-note">
+        ⚠ Số tiền bạn chuyển phải <b>đúng</b> và nội dung phải là <b>{{ order.code }}</b>. Sai nội dung sẽ không cộng tiền.
+      </div>
+
+      <div class="field">
+        <span class="lab">Ngân hàng</span>
+        <span class="val">{{ order.pm.name }}</span>
+      </div>
+      <div class="field">
+        <span class="lab">Chủ tài khoản</span>
+        <span class="val">{{ order.pm.account_name }}</span>
+        <button class="copy" type="button" onclick="cp('{{ order.pm.account_name }}')">Copy</button>
+      </div>
+      <div class="field">
+        <span class="lab">Số tài khoản</span>
+        <span class="val">{{ order.pm.account_no }}</span>
+        <button class="copy" type="button" onclick="cp('{{ order.pm.account_no }}')">Copy</button>
+      </div>
+      <div class="field">
+        <span class="lab">Số tiền</span>
+        <span class="val">{{ "{:,}".format(order.amount) }}</span>
+        <button class="copy" type="button" onclick="cp('{{ order.amount }}')">Copy</button>
+      </div>
+      <div class="field">
+        <span class="lab">Nội dung</span>
+        <span class="val hl">{{ order.code }}</span>
+        <button class="copy" type="button" onclick="cp('{{ order.code }}')">Copy</button>
+      </div>
+      {% if order.bonus %}
+      <div class="field">
+        <span class="lab">Thưởng KM</span>
+        <span class="val" style="color:#16a34a">+{{ "{:,}".format(order.bonus) }}đ</span>
+      </div>
+      {% endif %}
+    </div>
+    <a class="btn-sub" href="/deposit" style="display:block;text-align:center;text-decoration:none">Tạo lệnh khác</a>
+    <script>
+      (function(){
+        var exp = "{{ order.expires }}";
+        var el = document.getElementById('countdown');
+        function tick(){
+          var end = new Date(exp.replace(' ','T')).getTime();
+          var left = Math.max(0, Math.floor((end - Date.now())/1000));
+          var m = String(Math.floor(left/60)).padStart(2,'0');
+          var s = String(left%60).padStart(2,'0');
+          el.textContent = m + ' : ' + s + ' phút';
+          if(left<=0) el.textContent = 'Hết hạn';
+        }
+        tick(); setInterval(tick, 1000);
+      })();
+    </script>
+    {% else %}
+
+    <!-- ========== SẢNH CHỌN CỔNG ========== -->
+    <form method="post" id="napForm">
+      <input type="hidden" name="action" value="create_order">
+      <input type="hidden" name="method" id="method" value="bank_vcb">
+
+      <div class="sec">
+        <div class="sec-title">Phương thức thanh toán</div>
+        <div class="methods" id="methods">
+          <div class="method on" data-m="bank_vcb"><div class="ic">🏦</div><div class="nm">Ngân hàng</div></div>
+          <div class="method" data-m="momo"><div class="ic">💜</div><div class="nm">MOMOPAY</div></div>
+          <div class="method" data-m="zalopay"><div class="ic">💙</div><div class="nm">ZaloPay</div></div>
+          <div class="method" data-m="bank_tcb"><div class="ic">🏦</div><div class="nm">Techcombank</div></div>
+          <div class="method" data-m="bank_liobank"><div class="ic">🏦</div><div class="nm">Liobank</div></div>
+          <div class="method" data-m="usdt"><div class="ic">₮</div><div class="nm">USDT TRC20</div></div>
+        </div>
+        <div class="sub-methods" id="bankSubs">
+          <button type="button" class="on" data-m="bank_vcb">Vietcombank</button>
+          <button type="button" data-m="bank_tcb">Techcombank</button>
+          <button type="button" data-m="bank_liobank">Liobank</button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Khuyến mãi nạp</div>
+        <select name="promo">
+          {% for k,v in promos.items() %}
+          <option value="{{ k }}">{{ v.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Số tiền nạp <span style="color:#8b97b0;font-weight:500">(đ50.000 - đ50.000.000)</span></div>
+        <div class="amounts">
+          {% for a in [50000,100000,200000,500000,1000000,2000000,5000000,10000000] %}
+          <button type="button" data-a="{{ a }}">{{ "{:,}".format(a) }}</button>
+          {% endfor %}
+        </div>
+        <input type="number" name="amount" id="amount" placeholder="Nhập số tiền" min="50000" required>
+        <div style="font-size:11px;color:#8b97b0;margin-top:6px">1 = 1 VND</div>
+      </div>
+
+      <button class="btn-main" type="submit">Gửi · Tạo mã QR</button>
+    </form>
+    {% endif %}
+
+    {% if pending and pending|length %}
+    <div class="sec" style="margin-top:18px">
+      <div class="sec-title">Lịch sử nạp gần đây</div>
+      {% for p in pending %}
+      <div class="hist">
+        #{{ p.id }} · <b>{{ "{:,}".format(p.amount) }}đ</b>
+        {% if p.bonus_amount %}(+{{ "{:,}".format(p.bonus_amount) }}){% endif %}
+        · <span class="badge {{ 's' if p.status=='success' else ('f' if p.status=='failed' else 'p') }}">{{ p.status }}</span><br>
+        Nội dung: <b>{{ p.content_code or '-' }}</b> · {{ p.created_at }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="sec" id="rut" style="margin-top:22px">
+      <div class="sec-title">Rút tiền</div>
+      <form method="post">
+        <input type="hidden" name="action" value="withdraw">
+        <input type="number" name="amount" placeholder="Số tiền muốn rút" min="10000" required>
+        <button class="btn-sub" type="submit">Gửi yêu cầu rút</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <a href="/"><span>🏠</span>Trang chủ</a>
+  <a href="/promotions"><span>🎁</span>Khuyến mãi</a>
+  <a href="/deposit" class="on"><span>💳</span>Nạp tiền</a>
+  <a href="/profile"><span>👤</span>Cá nhân</a>
+</nav>
+
+<script>
+function cp(t){
+  navigator.clipboard.writeText(String(t)).then(function(){ alert('Đã sao chép'); });
+}
+var methodInput = document.getElementById('method');
+document.querySelectorAll('#methods .method').forEach(function(el){
+  el.onclick = function(){
+    document.querySelectorAll('#methods .method').forEach(function(x){ x.classList.remove('on'); });
+    el.classList.add('on');
+    methodInput.value = el.dataset.m;
+    var bank = el.dataset.m.indexOf('bank') === 0 || el.dataset.m === 'bank_vcb';
+    document.getElementById('bankSubs').style.display = (el.dataset.m === 'bank_vcb' || el.classList.contains('on') && el.querySelector('.nm').textContent.indexOf('Ngân')>=0) ? 'flex' : 'flex';
+    if(el.dataset.m === 'bank_vcb') document.getElementById('bankSubs').style.display = 'flex';
+    else if(el.dataset.m.indexOf('bank') === 0) document.getElementById('bankSubs').style.display = 'flex';
+    else document.getElementById('bankSubs').style.display = 'none';
+  };
+});
+document.querySelectorAll('#bankSubs button').forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll('#bankSubs button').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    methodInput.value = b.dataset.m;
+    document.querySelectorAll('#methods .method').forEach(function(x){ x.classList.remove('on'); });
+    var main = document.querySelector('#methods .method[data-m="bank_vcb"]');
+    if(main) main.classList.add('on');
+  };
+});
+document.querySelectorAll('.amounts button').forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll('.amounts button').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    document.getElementById('amount').value = b.dataset.a;
+  };
+});
+</script>
+</body>
+</html>

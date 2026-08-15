@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Wild Bounty Showdown</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#1a120a;color:#fff;font-family:system-ui,sans-serif;overflow-x:hidden}
+.wrap{
+  min-height:100vh;max-width:430px;margin:0 auto;
+  background:#1a120a url("{{ url_for('static', filename='assets/wild_bounty/bg.jpg') }}") center top / cover no-repeat;
+  display:flex;flex-direction:column;position:relative;
+}
+.wrap:before{content:"";position:absolute;inset:0;background:rgba(10,6,2,.35);pointer-events:none}
+.top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
+.top a{color:#f5e6c8;text-decoration:none;font-size:13px;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:8px}
+.top h1{font-size:14px;color:#f3c56b;text-shadow:0 1px 3px #000}
+.stage{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;padding:4px 12px 8px}
+.frame{
+  width:100%;max-width:380px;aspect-ratio:1/1.05;
+  background:rgba(40,22,10,.55);
+  border:3px solid #8b5a2b;border-radius:18px;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.4);
+  padding:10px;display:flex;align-items:center;justify-content:center;
+}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:100%;height:100%}
+.cell{
+  background:linear-gradient(180deg,#3a2414,#1f120a);
+  border:1px solid #6b4423;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  position:relative;
+}
+.cell img{width:88%;height:88%;object-fit:contain;pointer-events:none}
+.cell.spin img{animation:sh .08s infinite}
+.cell.win{box-shadow:0 0 0 2px #f3c56b,0 0 14px #f59e0b;transform:scale(1.03)}
+.cell.sc{box-shadow:0 0 0 2px #c084fc}
+@keyframes sh{50%{transform:translateY(-3px)}}
+.stats{
+  position:relative;z-index:2;width:100%;max-width:400px;margin:8px auto 0;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:0 8px;
+}
+.stat{
+  background:linear-gradient(180deg,#5c3a1e,#2a180c);
+  border:1px solid #a67c3a;border-radius:12px;padding:8px 6px;text-align:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+.stat label{display:block;font-size:10px;color:#d4b483;letter-spacing:1px}
+.stat b{display:block;font-size:14px;color:#fff;margin-top:2px}
+.mults{display:flex;gap:6px;justify-content:center;margin:8px 0 4px;position:relative;z-index:2}
+.mults span{padding:3px 10px;border-radius:8px;background:rgba(0,0,0,.4);border:1px solid #6b4423;color:#a8a29e;font-size:11px;font-weight:700}
+.mults span.on{background:#f3c56b;color:#1a120a;border-color:#f3c56b}
+.free{display:none;text-align:center;background:linear-gradient(90deg,#7c3aed,#db2777);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:bold;margin:4px auto;width:fit-content;position:relative;z-index:2}
+.bot{position:relative;z-index:2;width:100%;max-width:430px;padding:8px 10px 16px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.btn{
+  min-width:48px;height:44px;padding:0 12px;border-radius:12px;border:1px solid #8b5a2b;
+  background:linear-gradient(180deg,#5c3a1e,#2a180c);color:#f5e6c8;font-weight:700;font-size:13px;cursor:pointer
+}
+.btn.on{background:#f3c56b;color:#1a120a}
+.spin{
+  width:68px;height:68px;border-radius:50%;border:3px solid #f3c56b;
+  background:radial-gradient(circle at 35% 30%,#fde68a,#b45309 55%,#7c2d12);
+  color:#1a120a;font-size:26px;font-weight:900;cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.45);
+}
+.spin.go{animation:spin .4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin:disabled{opacity:.6}
+.msg{width:100%;text-align:center;font-size:12px;color:#fde68a;min-height:18px;position:relative;z-index:2;padding:0 10px}
+.pay{font-size:10px;color:#c4a574;text-align:center;padding:0 12px 6px;position:relative;z-index:2;line-height:1.35}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="/">← Sảnh</a>
+    <h1>WILD BOUNTY SHOWDOWN</h1>
+    <span style="width:48px"></span>
+  </div>
+  <div class="stage">
+    <div class="mults">
+      <span id="m0" class="on">x1</span><span id="m1">x2</span><span id="m2">x3</span><span id="m3">x5</span>
+    </div>
+    <div class="free" id="free">MIỄN PHÍ: 0</div>
+    <div class="frame">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><label>WALLET</label><b id="bal">0</b></div>
+      <div class="stat"><label>WIN</label><b id="win">0</b></div>
+      <div class="stat"><label>BET</label><b id="betD">0</b></div>
+    </div>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="pay">
+    Bandit x80 · Súng x40 · Nón x25 · Rượu x15 · K x10 · Q x8 · A x5 · J x3 · 3⭐ Scatter = Free
+  </div>
+  <div class="bot">
+    <button class="btn" id="turbo" onclick="tgTurbo()">TURBO</button>
+    <button class="btn" onclick="chgBet(-1)">−</button>
+    <button class="spin" id="spin" onclick="doSpin()">↻</button>
+    <button class="btn" onclick="chgBet(1)">+</button>
+    <button class="btn" id="auto" onclick="tgAuto()">AUTO</button>
+  </div>
+</div>
+<script>
+const BASE = "{{ url_for('static', filename='assets/wild_bounty/') }}";
+// Symbols: id, file, weight, pay (3+ of kind approx mult of bet)
+const SYMS = [
+  {id:'j', file:'j.png', w:18, pay:3},
+  {id:'a', file:'a.png', w:16, pay:5},
+  {id:'q', file:'q.png', w:14, pay:8},
+  {id:'k', file:'k.png', w:12, pay:10},
+  {id:'whiskey', file:'whiskey.png', w:10, pay:15},
+  {id:'hat', file:'hat.png', w:8, pay:25},
+  {id:'gun', file:'gun.png', w:6, pay:40},
+  {id:'bandit', file:'bandit.png', w:4, pay:80},
+];
+const SCAT = {id:'scat', file:'k_star.png'}; // scatter
+const WILD = {id:'wild', file:'bandit_star.png'}; // wild
+const R=4, C=5, M=[1,2,3,5];
+let bal={{ balance|int }}, bet=1000, spinning=0, turbo=0, auto=0, free=0, mi=0, tmr=null, luck=50, scatL=0;
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n||0).toLocaleString('vi-VN');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+(async()=>{try{const d=await(await fetch('/api/me/luck')).json();luck=d.luck_rate||50;scatL=d.scatter_next||0}catch(e){}})();
+
+function ui(){
+  $('bal').innerText=fmt(bal);
+  $('betD').innerText=fmt(bet);
+  $('free').style.display=free>0?'block':'none';
+  $('free').innerText='MIỄN PHÍ: '+free;
+  for(let i=0;i<4;i++) $('m'+i).classList.toggle('on', i===mi);
+}
+function chgBet(d){
+  const steps=[100,200,500,1000,2000,5000,10000,20000,50000,100000,500000,1000000];
+  let i=steps.indexOf(bet); if(i<0)i=3;
+  i=Math.max(0,Math.min(steps.length-1,i+d));
+  bet=steps[i]; ui();
+}
+function tgTurbo(){turbo=!turbo;$('turbo').classList.toggle('on',turbo)}
+function tgAuto(){auto=!auto;$('auto').classList.toggle('on',auto);if(auto&&!spinning)doSpin();if(!auto&&tmr){clearTimeout(tmr);tmr=null}}
+
+function pickSym(){
+  // scatter ~7%
+  if(Math.random()<0.07) return SCAT;
+  // wild ~4%
+  if(Math.random()<0.04) return WILD;
+  let total=SYMS.reduce((s,x)=>s+x.w,0);
+  // luck bias toward higher pay
+  if(luck>60 && Math.random()<(luck-50)/100){
+    const hi=SYMS.filter(s=>s.pay>=25);
+    return hi[Math.floor(Math.random()*hi.length)];
+  }
+  let r=Math.random()*total;
+  for(const s of SYMS){ r-=s.w; if(r<=0) return s; }
+  return SYMS[0];
+}
+
+function setCell(el, sym){
+  el.dataset.id = sym.id;
+  el.innerHTML = '<img src="'+BASE+sym.file+'" alt="'+sym.id+'">';
+  el.classList.toggle('sc', sym.id==='scat');
+}
+
+function build(){
+  const g=$('grid'); g.innerHTML='';
+  for(let r=0;r<R;r++) for(let c=0;c<C;c++){
+    const el=document.createElement('div');
+    el.className='cell'; el.id='c'+r+'_'+c;
+    setCell(el, pickSym());
+    g.appendChild(el);
+  }
+}
+
+async function sBet(a){
+  try{
+    const res=await fetch('/api/game/play',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:Math.round(a),game:'Wild Bounty'})});
+    const d=await res.json();
+    if(!res.ok){alert(d.message||'Không đủ');return false}
+    bal=d.balance; ui(); return true;
+  }catch(e){return false}
+}
+async function sWin(a){
+  a=Math.round(a); if(a<=0)return;
+  try{
+    const res=await fetch('/api/game/win',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,game:'Wild Bounty'})});
+    const d=await res.json(); if(res.ok){bal=d.balance;ui()}
+  }catch(e){}
+}
+
+function evalWin(grid){
+  // left-to-right ways: count matching on each row with wild
+  let total=0, winCells=new Set(), scat=0;
+  for(let r=0;r<R;r++) for(let c=0;c<C;c++) if(grid[r][c].id==='scat') scat++;
+  for(let r=0;r<R;r++){
+    let base=null, len=0;
+    for(let c=0;c<C;c++){
+      const id=grid[r][c].id;
+      if(id==='scat') break;
+      if(id==='wild'){ len++; continue; }
+      if(!base){ base=id; len++; continue; }
+      if(id===base || id==='wild'){ len++; continue; }
+      break;
+    }
+    if(base && len>=3){
+      const sym=SYMS.find(s=>s.id===base);
+      const pay=sym?sym.pay:3;
+      const mult = len===3?1:len===4?2:3;
+      total += bet * pay * mult / 10;
+      for(let c=0;c<len;c++) winCells.add(r+'_'+c);
+    }
+  }
+  // scatter free
+  let freeAdd=0;
+  if(scat>=3) freeAdd = scat===3?8:scat===4?12:20;
+  return {total:Math.floor(total), winCells, scat, freeAdd};
+}
+
+async function doSpin(){
+  if(spinning) return;
+  const useFree=free>0;
+  if(!useFree && bal<bet){alert('Không đủ số dư');auto=0;$('auto').classList.remove('on');return}
+  spinning=1; $('spin').disabled=1; $('spin').classList.add('go');
+  $('win').innerText='0'; $('msg').innerText=''; mi=0; ui();
+  if(!useFree){ if(!(await sBet(bet))){spinning=0;$('spin').disabled=0;$('spin').classList.remove('go');return} }
+  else free--;
+
+  // force scatter if admin set
+  let forceScat = scatL>0;
+  if(forceScat){ try{ await fetch('/api/me/luck',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scatter_next:0})});}catch(e){} scatL=0; }
+
+  const cells=[];
+  for(let r=0;r<R;r++){ cells[r]=[]; for(let c=0;c<C;c++){
+    const el=$('c'+r+'_'+c); el.classList.add('spin'); el.classList.remove('win','sc');
+    cells[r][c]=el;
+  }}
+
+  const rounds = turbo?6:14;
+  for(let t=0;t<rounds;t++){
+    for(let r=0;r<R;r++) for(let c=0;c<C;c++) setCell(cells[r][c], pickSym());
+    await sleep(turbo?30:55);
+  }
+
+  // final grid
+  const grid=[];
+  for(let r=0;r<R;r++){
+    grid[r]=[];
+    for(let c=0;c<C;c++){
+      let sym=pickSym();
+      if(forceScat && r===0 && c<3) sym=SCAT;
+      grid[r][c]=sym;
+      setCell(cells[r][c], sym);
+      cells[r][c].classList.remove('spin');
+    }
+  }
+
+  const res=evalWin(grid);
+  res.winCells.forEach(k=>{
+    const [r,c]=k.split('_'); cells[+r][+c].classList.add('win');
+  });
+
+  // cascade mult display
+  for(let i=0;i<M.length;i++){
+    mi=i; ui();
+    if(res.total>0) await sleep(turbo?80:150);
+  }
+  const winAmt = Math.floor(res.total * M[Math.min(mi,M.length-1)]);
+  $('win').innerText=fmt(winAmt);
+  if(winAmt>0){
+    await sWin(winAmt);
+    $('msg').innerText='THẮNG +'+fmt(winAmt);
+  } else $('msg').innerText='Chúc may mắn';
+  if(res.freeAdd){ free+=res.freeAdd; $('msg').innerText=(winAmt?$('msg').innerText+' · ':'')+'FREE +'+res.freeAdd; }
+
+  spinning=0; $('spin').disabled=0; $('spin').classList.remove('go'); ui();
+  if(auto) tmr=setTimeout(doSpin, turbo?400:900);
+}
+build(); ui();
+</script>
+</body>
+</html>

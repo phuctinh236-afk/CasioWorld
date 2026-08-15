@@ -1,24 +1,19 @@
-# ============================================
-# Tạo file combine.py để gộp cả hai app
-# ============================================
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from server import app as game_app   # Import app từ server.py
-from ai import app as ai_app         # Import app từ ai.py
 from flask import Flask
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from server import app as game_app
+from ai import app as ai_app
 
-# Tạo app chính
+# Tạo app Flask gốc
 combined = Flask(__name__)
 
-# Gắn hai app con vào các đường dẫn riêng
+# Gắn app game vào root (/) và app AI vào (/ai)
 combined.wsgi_app = DispatcherMiddleware(
-    combined.wsgi_app,
+    game_app,  # Mặc định truy cập / sẽ vào app game
     {
-        '/game': game_app,  # Truy cập game tại /game
-        '/ai': ai_app,      # Truy cập AI VIP tại /ai
+        '/ai': ai_app  # Truy cập /ai sẽ vào app AI
     }
 )
 
-# ============================================
-# Cấu hình Render:
-# Start Command: gunicorn combine:combined
-# ============================================
+if __name__ == '__main__':
+    combined.run(host='0.0.0.0', port=5000)
+    

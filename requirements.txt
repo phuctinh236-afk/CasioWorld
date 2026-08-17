@@ -5,3 +5,5 @@ pillow
 authlib
 requests
 gunicorn
+pypdf
+python-docx

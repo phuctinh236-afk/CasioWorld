@@ -9,3 +9,4 @@ authlib
 pypdf
 python-docx
 werkzeug
+cloudscraper

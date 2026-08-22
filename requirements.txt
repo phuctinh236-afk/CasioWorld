@@ -7,3 +7,4 @@ requests
 gunicorn
 pypdf
 python-docx
+werkzeug

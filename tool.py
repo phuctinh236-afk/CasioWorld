@@ -90,7 +90,7 @@ HTML = """
         <div class="banner">
             <h1>⚡ LINK4M BYPASS SIÊU TỐC v2.0 ⚡</h1>
             <div class="info">[+] Tool   : Bypass link4m.net</div>
-            <div class="info">[+] Tác giả: Toai nhà/Trần</div>
+            <div class="info">[+] Tác giả: Phuc Tool VIP</div>
             <div class="info">[+] Trạng thái: <span class="online">ONLINE</span></div>
         </div>
 

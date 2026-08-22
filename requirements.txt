@@ -1,10 +1,11 @@
 flask
+requests
+gunicorn
+colorama
 scikit-learn
 numpy
 pillow
 authlib
-requests
-gunicorn
 pypdf
 python-docx
 werkzeug

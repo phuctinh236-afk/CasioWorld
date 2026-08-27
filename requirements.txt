@@ -1,0 +1,10 @@
+flask
+requests
+gunicorn
+colorama
+pillow
+authlib
+pypdf
+python-docx
+werkzeug
+cloudscraper
